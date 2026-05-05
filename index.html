@@ -292,7 +292,7 @@
       const cv=generateRandomString(64);
       const cc=b64url(await sha256(cv));
       sessionStorage.setItem('spotify_code_verifier',cv);
-      const p=new URLSearchParams({client_id:clientId,response_type:'code',redirect_uri:redirectUri,scope:'playlist-modify-public playlist-modify-private user-read-private user-read-email',code_challenge_method:'S256',code_challenge:cc});
+      const p=new URLSearchParams({client_id:clientId,response_type:'code',redirect_uri:redirectUri,scope:'ugc-image-upload playlist-modify-public playlist-modify-private user-read-private user-read-email',code_challenge_method:'S256',code_challenge:cc});
       window.location='https://accounts.spotify.com/authorize?'+p.toString();
     }
 

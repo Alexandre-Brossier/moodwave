@@ -1,16 +1,8 @@
 {
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/callback",
-      "destination": "/public/callback.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/public/$1"
-    }
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/callback", "destination": "/public/callback.html" },
+    { "source": "/callback.html", "destination": "/public/callback.html" },
+    { "source": "/(.*)", "destination": "/public/index.html" }
   ]
 }

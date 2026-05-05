@@ -10,8 +10,8 @@ export default async function handler(req, res) {
     if (!token) return res.status(400).json({ error: 'Token manquant' });
     if (!userId) return res.status(400).json({ error: 'userId manquant' });
 
-    const createRes = await fetch(
-      'https://api.spotify.com/v1/users/' + userId + '/playlists',
+const createRes = await fetch(
+  'https://api.spotify.com/v1/me/playlists',
       {
         method: 'POST',
         headers: {

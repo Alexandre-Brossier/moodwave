@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodwave — Ta playlist selon ton mood</title>
+  <meta name="description" content="Génère une playlist musicale personnalisée basée sur ton mood, ton énergie et ton moment. Propulsé par l'IA.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+    :root {
+      --bg: #07080f;
+      --surface: rgba(255,255,255,0.06);
+      --surface2: rgba(255,255,255,0.10);
+      --border: rgba(255,255,255,0.15);
+      --text: #f0f0ff;
+      --muted: rgba(240,240,255,0.65);
+      --accent: #7c6aff;
+      --accent2: #c4b5fd;
+      --cyan: #a5f3fc;
+    }
+ 
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+ 
+    /* ── Orbes de fond ── */
+    .orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.28; z-index: 0; }
+    .orb1 { width: 500px; height: 500px; background: radial-gradient(circle, #4f46e5, transparent); top: -150px; left: -150px; }
+    .orb2 { width: 400px; height: 400px; background: radial-gradient(circle, #7c3aed, transparent); top: 40%; right: -100px; }
+    .orb3 { width: 350px; height: 350px; background: radial-gradient(circle, #0891b2, transparent); bottom: -80px; left: 35%; }
+ 
+    /* ── Écrans ── */
+    .screen { display: none; position: relative; z-index: 1; min-height: 100vh; padding: 2rem 1.25rem; }
+    .screen.active { display: flex; flex-direction: column; }
+ 
+    /* ── HERO ── */
+    #hero { align-items: center; justify-content: center; text-align: center; gap: 1.5rem; }
+    .logo { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.22em; color: var(--accent2); text-transform: uppercase; }
+    .hero-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 8vw, 3.2rem); font-weight: 800; line-height: 1.1; color: #ffffff; max-width: 500px; }
+    .hero-title span { color: var(--accent2); }
+    .hero-sub { color: var(--muted); font-size: 1rem; max-width: 340px; line-height: 1.65; }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+    .hero-badge { font-size: 0.75rem; padding: 0.3rem 0.8rem; border-radius: 100px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: var(--muted); }
+ 
+    /* ── Bouton principal ── */
+    .btn-primary {
+      background: linear-gradient(135deg, #7c6aff, #a78bfa);
+      border: none;
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.9rem 2.5rem;
+      border-radius: 100px;
+      cursor: pointer;
+      box-shadow: 0 0 32px rgba(124,106,255,0.42);
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 52px rgba(124,106,255,0.62); }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn-primary.full { width: 100%; }
+ 
+    /* ── FORMULAIRE ── */
+    #form-screen { max-width: 520px; margin: 0 auto; gap: 0; }
+    .form-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; padding-top: 0.5rem; }
+    .back-btn {
+      background: var(--surface2); border: 0.5px solid var(--border); color: #ffffff;
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.18); }
+    .form-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; }
+    .error-msg { background: rgba(255,80,80,0.1); border: 1px solid rgba(255,100,100,0.32); color: #fca5a5; border-radius: 12px; padding: 0.875rem 1rem; font-size: 0.85rem; margin-bottom: 1rem; display: none; line-height: 1.5; }
+ 
+    .section-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent2); margin-bottom: 0.6rem; }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1.5rem; }
+    .pill {
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
+      color: #e0e0ff; font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      padding: 0.48rem 1rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; user-select: none;
+    }
+    .pill:hover { border-color: var(--accent2); color: #ffffff; background: rgba(255,255,255,0.13); }
+    .pill.selected { background: rgba(124,106,255,0.32); border-color: #a78bfa; color: #ffffff; font-weight: 500; }
+ 
+    .surprise-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 1.75rem;
+    }
+    .surprise-info h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.2rem; }
+    .surprise-info p { font-size: 0.8rem; color: var(--muted); }
+    .toggle { width: 44px; height: 24px; background: rgba(255,255,255,0.15); border-radius: 100px; position: relative; cursor: pointer; transition: background 0.3s; border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0; }
+    .toggle.on { background: linear-gradient(135deg, #7c6aff, #a78bfa); border-color: #a78bfa; }
+    .toggle::after { content: ''; position: absolute; width: 18px; height: 18px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: transform 0.3s; }
+    .toggle.on::after { transform: translateX(20px); }
+ 
+    /* ── LOADING ── */
+    #loading-screen { align-items: center; justify-content: center; gap: 2rem; text-align: center; }
+    .wave-container { display: flex; align-items: center; gap: 5px; height: 60px; }
+    .wave-bar { width: 5px; border-radius: 100px; background: linear-gradient(to top, #7c6aff, #a5f3fc); animation: wave 1.2s ease-in-out infinite; }
+    .wave-bar:nth-child(1){height:20px;animation-delay:0s} .wave-bar:nth-child(2){height:35px;animation-delay:.1s}
+    .wave-bar:nth-child(3){height:50px;animation-delay:.2s} .wave-bar:nth-child(4){height:35px;animation-delay:.3s}
+    .wave-bar:nth-child(5){height:20px;animation-delay:.4s} .wave-bar:nth-child(6){height:40px;animation-delay:.15s}
+    .wave-bar:nth-child(7){height:55px;animation-delay:.25s} .wave-bar:nth-child(8){height:40px;animation-delay:.35s}
+    .wave-bar:nth-child(9){height:20px;animation-delay:.45s}
+    @keyframes wave { 0%,100%{transform:scaleY(0.5);opacity:0.5} 50%{transform:scaleY(1.2);opacity:1} }
+    .loading-text { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--muted); }
+ 
+    /* ── RÉSULTATS ── */
+    #results-screen { max-width: 520px; margin: 0 auto; gap: 0; }
+    .results-meta { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; margin-left: 48px; margin-bottom: 1rem; }
+    .song-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 0.7rem; transition: border-color 0.2s, background 0.2s; }
+    .song-card:hover { border-color: rgba(167,139,250,0.45); background: rgba(255,255,255,0.08); }
+    .song-num { font-size: 0.7rem; color: var(--muted); font-weight: 600; margin-bottom: 0.2rem; }
+    .song-artist { font-size: 0.82rem; color: var(--accent2); font-weight: 500; margin-bottom: 0.15rem; }
+    .song-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: #ffffff; margin-bottom: 0.4rem; }
+    .song-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+    .genre-tag { font-size: 0.7rem; padding: 0.22rem 0.7rem; border-radius: 100px; background: rgba(165,243,252,0.1); color: var(--cyan); border: 1px solid rgba(165,243,252,0.22); font-weight: 500; }
+    .reason { font-size: 0.78rem; color: rgba(220,220,255,0.6); line-height: 1.5; margin-top: 0.4rem; font-style: italic; }
+    .spotify-btn { font-size: 0.75rem; background: rgba(30,215,96,0.12); border: 1px solid rgba(30,215,96,0.32); color: #4ade80; padding: 0.3rem 0.875rem; border-radius: 100px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap; font-weight: 500; text-decoration: none; display: inline-block; }
+    .spotify-btn:hover { background: rgba(30,215,96,0.22); color: #86efac; }
+ 
+    .results-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
+    .btn-secondary { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.17); color: #e0e0ff; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; padding: 0.75rem 1rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; min-width: 130px; }
+    .btn-secondary:hover { border-color: var(--accent2); color: #ffffff; background: rgba(255,255,255,0.12); }
+ 
+    footer { text-align: center; padding: 2rem 1rem 1.5rem; color: rgba(200,200,255,0.35); font-size: 0.75rem; line-height: 1.9; margin-top: auto; }
+    footer a { color: rgba(196,181,253,0.5); text-decoration: none; }
+    footer a:hover { color: var(--accent2); }
+  </style>
+</head>
+<body>
+ 
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+ 
+  <!-- ══════════ HERO ══════════ -->
+  <div id="hero" class="screen active">
+    <div class="logo">🎵 Moodwave</div>
+    <h1 class="hero-title">Qu'est-ce que tu veux<br><span>écouter aujourd'hui ?</span></h1>
+    <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
+    <div class="hero-badges">
+      <span class="hero-badge">😌 Calme → Ambient</span>
+      <span class="hero-badge">🔥 Motivé → Workout</span>
+      <span class="hero-badge">🌙 Nostalgique → Indie</span>
+      <span class="hero-badge">🎲 Mode Surprise</span>
+    </div>
+    <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
+    <footer>
+      Propulsé par l'IA · Fait pour les amoureux de musique<br>
+      <a href="mailto:contact@moodwave.app">contact@moodwave.app</a>
+    </footer>
+  </div>
+ 
+  <!-- ══════════ FORMULAIRE ══════════ -->
+  <div id="form-screen" class="screen">
+    <div class="form-header">
+      <button class="back-btn" onclick="showScreen('hero')">←</button>
+      <span class="form-title">Dis-moi comment tu te sens</span>
+    </div>
+ 
+    <div class="error-msg" id="error-msg"></div>
+ 
+    <p class="section-label">Ton mood</p>
+    <div class="pills">
+      <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)">😌 Calme</div>
+      <div class="pill" data-group="mood" data-val="Stressé" onclick="selectPill(this)">😤 Stressé</div>
+      <div class="pill" data-group="mood" data-val="Heureux" onclick="selectPill(this)">😊 Heureux</div>
+      <div class="pill" data-group="mood" data-val="Triste" onclick="selectPill(this)">😢 Triste</div>
+      <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)">🔥 Motivé</div>
+      <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)">🌙 Nostalgique</div>
+    </div>
+ 
+    <p class="section-label">Niveau d'énergie</p>
+    <div class="pills">
+      <div class="pill" data-group="energy" data-val="Faible" onclick="selectPill(this)">🔋 Faible</div>
+      <div class="pill" data-group="energy" data-val="Moyen" onclick="selectPill(this)">⚡ Moyen</div>
+      <div class="pill" data-group="energy" data-val="Élevé" onclick="selectPill(this)">🚀 Élevé</div>
+    </div>
+ 
+    <p class="section-label">Contexte</p>
+    <div class="pills">
+      <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)">💻 Travail</div>
+      <div class="pill" data-group="context" data-val="Études" onclick="selectPill(this)">📚 Études</div>
+      <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)">🏃 Sport</div>
+      <div class="pill" data-group="context" data-val="Détente" onclick="selectPill(this)">🛋️ Détente</div>
+      <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)">🚇 Trajet</div>
+      <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)">🎉 Fête</div>
+    </div>
+ 
+    <div class="surprise-row">
+      <div class="surprise-info">
+        <h4>🎲 Mode Surprise</h4>
+        <p>Découvre des sons totalement inattendus</p>
+      </div>
+      <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+ 
+    <button class="btn-primary full" id="gen-btn" onclick="generate(false)">Générer ma playlist ✨</button>
+ 
+    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+  </div>
+ 
+  <!-- ══════════ LOADING ══════════ -->
+  <div id="loading-screen" class="screen">
+    <div class="wave-container">
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    </div>
+    <p class="loading-text" id="loading-text">Analyse de ton vibe...</p>
+  </div>
+ 
+  <!-- ══════════ RÉSULTATS ══════════ -->
+  <div id="results-screen" class="screen">
+    <div class="form-header" style="margin-bottom: 0.25rem;">
+      <button class="back-btn" onclick="showScreen('form-screen')">←</button>
+      <span class="form-title">Ta playlist ✨</span>
+    </div>
+    <p class="results-meta" id="results-meta"></p>
+    <div id="songs-list"></div>
+    <div class="results-actions">
+      <button class="btn-secondary" onclick="showScreen('form-screen')">🔄 Nouveau mood</button>
+      <button class="btn-secondary" onclick="generate(true)">🎲 Surprise me</button>
+    </div>
+    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+  </div>
+ 
+  <script>
+    const sel = { mood: null, energy: null, context: null };
+    let msgInterval = null;
+    const msgs = [
+      "Analyse de ton vibe...",
+      "Calibrage des fréquences...",
+      "Exploration des sons...",
+      "Presque prêt..."
+    ];
+ 
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+ 
+    function selectPill(el) {
+      const g = el.dataset.group;
+      document.querySelectorAll(`.pill[data-group="${g}"]`).forEach(p => p.classList.remove('selected'));
+      el.classList.add('selected');
+      sel[g] = el.dataset.val;
+    }
+ 
+    function showError(msg) {
+      const el = document.getElementById('error-msg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+    function hideError() { document.getElementById('error-msg').style.display = 'none'; }
+ 
+    function startLoading() {
+      let i = 0;
+      document.getElementById('loading-text').textContent = msgs[0];
+      msgInterval = setInterval(() => {
+        i = (i + 1) % msgs.length;
+        document.getElementById('loading-text').textContent = msgs[i];
+      }, 2200);
+    }
+    function stopLoading() { clearInterval(msgInterval); }
+ 
+    function esc(s) {
+      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+ 
+    async function generate(isSurprise) {
+      hideError();
+      if (!isSurprise && (!sel.mood || !sel.energy || !sel.context)) {
+        showError("Sélectionne un mood, un niveau d'énergie et un contexte avant de générer.");
+        return;
+      }
+      const withSurprise = isSurprise || document.getElementById('surprise-toggle').classList.contains('on');
+ 
+      showScreen('loading-screen');
+      startLoading();
+ 
+      const body = isSurprise
+        ? { type: 'surprise' }
+        : { type: 'mood', mood: sel.mood, energy: sel.energy, context: sel.context, surprise: withSurprise };
+ 
+      try {
+        const res = await fetch('/api/playlist', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+ 
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || `Erreur serveur (${res.status})`);
+        }
+ 
+        const songs = await res.json();
+        if (!Array.isArray(songs) || !songs.length) throw new Error("Playlist vide reçue");
+ 
+        stopLoading();
+        renderResults(songs, isSurprise, withSurprise);
+      } catch (e) {
+        stopLoading();
+        showScreen('form-screen');
+        showError("Erreur : " + e.message);
+      }
+    }
+ 
+    function renderResults(songs, isSurprise, withSurprise) {
+      document.getElementById('results-meta').textContent =
+        isSurprise ? 'Mode Surprise 🎲' :
+        `${sel.mood} · ${sel.energy} · ${sel.context}${withSurprise ? ' · Surprise 🎲' : ''}`;
+ 
+      document.getElementById('songs-list').innerHTML = songs.map((s, i) => `
+        <div class="song-card">
+          <div class="song-num">${String(i + 1).padStart(2, '0')}</div>
+          <div class="song-artist">${esc(s.artist)}</div>
+          <div class="song-title">${esc(s.title)}</div>
+          <div class="song-bottom">
+            <span class="genre-tag">${esc(s.genre)}</span>
+            <a class="spotify-btn" href="https://open.spotify.com/search/${encodeURIComponent((s.artist || '') + ' ' + (s.title || ''))}" target="_blank" rel="noopener">▶ Spotify</a>
+          </div>
+          <div class="reason">${esc(s.reason)}</div>
+        </div>
+      `).join('');
+ 
+      showScreen('results-screen');
+    }
+  </script>
+</body>
+</html>

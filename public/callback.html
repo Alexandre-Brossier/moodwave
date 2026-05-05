@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Moodwave — Connexion Spotify</title>
+  <style>
+    body { background: #07080f; color: #f0f0ff; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; text-align: center; }
+    .msg { font-size: 1.1rem; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <p class="msg">🎵 Connexion à Spotify en cours…</p>
+  <script>
+    // Cette page reçoit le ?code= de Spotify et redirige vers l'accueil
+    // L'accueil (index.html) détecte le paramètre code= et finalise l'auth
+    window.location.href = '/' + window.location.search;
+  </script>
+</body>
+</html>

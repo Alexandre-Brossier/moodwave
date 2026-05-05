@@ -20,6 +20,7 @@
       --accent: #7c6aff;
       --accent2: #c4b5fd;
       --cyan: #a5f3fc;
+      --green: #4ade80;
     }
  
     html, body {
@@ -30,79 +31,66 @@
       overflow-x: hidden;
     }
  
-    /* ── Orbes de fond ── */
     .orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.28; z-index: 0; }
     .orb1 { width: 500px; height: 500px; background: radial-gradient(circle, #4f46e5, transparent); top: -150px; left: -150px; }
     .orb2 { width: 400px; height: 400px; background: radial-gradient(circle, #7c3aed, transparent); top: 40%; right: -100px; }
     .orb3 { width: 350px; height: 350px; background: radial-gradient(circle, #0891b2, transparent); bottom: -80px; left: 35%; }
  
-    /* ── Écrans ── */
-    .screen { display: none; position: relative; z-index: 1; min-height: 100vh; padding: 2rem 1.25rem; }
+    .screen { display: none; position: relative; z-index: 1; min-height: 100vh; padding: 2rem 1.25rem; max-width: 560px; margin: 0 auto; }
     .screen.active { display: flex; flex-direction: column; }
  
     /* ── HERO ── */
     #hero { align-items: center; justify-content: center; text-align: center; gap: 1.5rem; }
     .logo { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; letter-spacing: 0.22em; color: var(--accent2); text-transform: uppercase; }
-    .hero-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 8vw, 3.2rem); font-weight: 800; line-height: 1.1; color: #ffffff; max-width: 500px; }
+    .hero-title { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 6vw, 2.8rem); font-weight: 800; line-height: 1.15; color: #ffffff; max-width: 420px; text-align: center; }
     .hero-title span { color: var(--accent2); }
-    .hero-sub { color: var(--muted); font-size: 1rem; max-width: 340px; line-height: 1.65; }
-    .hero-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+    .hero-sub { color: var(--muted); font-size: 1rem; max-width: 320px; line-height: 1.65; text-align: center; }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; max-width: 380px; }
     .hero-badge { font-size: 0.75rem; padding: 0.3rem 0.8rem; border-radius: 100px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); color: var(--muted); }
+    .hero-actions { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; width: 100%; max-width: 320px; }
  
-    /* ── Bouton principal ── */
+    /* ── BOUTONS ── */
     .btn-primary {
       background: linear-gradient(135deg, #7c6aff, #a78bfa);
-      border: none;
-      color: #ffffff !important;
-      -webkit-text-fill-color: #ffffff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      padding: 0.9rem 2.5rem;
-      border-radius: 100px;
-      cursor: pointer;
+      border: none; color: #ffffff !important; -webkit-text-fill-color: #ffffff;
+      font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+      padding: 0.9rem 2.5rem; border-radius: 100px; cursor: pointer;
       box-shadow: 0 0 32px rgba(124,106,255,0.42);
-      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-      white-space: nowrap;
+      transition: transform 0.2s, box-shadow 0.2s; white-space: nowrap; width: 100%;
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 52px rgba(124,106,255,0.62); }
     .btn-primary:active { transform: scale(0.97); }
-    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
-    .btn-primary.full { width: 100%; }
+    .btn-history {
+      background: transparent; border: 1px solid rgba(255,255,255,0.18);
+      color: var(--muted) !important; -webkit-text-fill-color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500;
+      padding: 0.75rem 2rem; border-radius: 100px; cursor: pointer;
+      transition: all 0.2s; width: 100%;
+    }
+    .btn-history:hover { border-color: var(--accent2); color: #ffffff !important; -webkit-text-fill-color: #ffffff; }
+    .btn-history .count-badge { display: inline-block; background: rgba(124,106,255,0.35); color: var(--accent2); font-size: 0.7rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: 100px; margin-left: 0.4rem; }
  
     /* ── FORMULAIRE ── */
-    #form-screen { max-width: 520px; margin: 0 auto; gap: 0; }
+    #form-screen { gap: 0; }
     .form-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; padding-top: 0.5rem; }
-    .back-btn {
-      background: var(--surface2); border: 0.5px solid var(--border); color: #ffffff;
-      width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1rem;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s;
-    }
+    .back-btn { background: var(--surface2); border: 0.5px solid var(--border); color: #ffffff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; }
     .back-btn:hover { background: rgba(255,255,255,0.18); }
     .form-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: #ffffff; }
     .error-msg { background: rgba(255,80,80,0.1); border: 1px solid rgba(255,100,100,0.32); color: #fca5a5; border-radius: 12px; padding: 0.875rem 1rem; font-size: 0.85rem; margin-bottom: 1rem; display: none; line-height: 1.5; }
- 
     .section-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent2); margin-bottom: 0.6rem; }
     .pills { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 1.5rem; }
-    .pill {
-      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16);
-      color: #e0e0ff; font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
-      padding: 0.48rem 1rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; user-select: none;
-    }
+    .pill { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); color: #e0e0ff; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; padding: 0.48rem 1rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; user-select: none; }
     .pill:hover { border-color: var(--accent2); color: #ffffff; background: rgba(255,255,255,0.13); }
     .pill.selected { background: rgba(124,106,255,0.32); border-color: #a78bfa; color: #ffffff; font-weight: 500; }
- 
-    .surprise-row {
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.13);
-      border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 1.75rem;
-    }
+    .surprise-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.13); border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 1.75rem; }
     .surprise-info h4 { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: #ffffff; margin-bottom: 0.2rem; }
     .surprise-info p { font-size: 0.8rem; color: var(--muted); }
     .toggle { width: 44px; height: 24px; background: rgba(255,255,255,0.15); border-radius: 100px; position: relative; cursor: pointer; transition: background 0.3s; border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0; }
     .toggle.on { background: linear-gradient(135deg, #7c6aff, #a78bfa); border-color: #a78bfa; }
     .toggle::after { content: ''; position: absolute; width: 18px; height: 18px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: transform 0.3s; }
     .toggle.on::after { transform: translateX(20px); }
+    .btn-full { width: 100%; background: linear-gradient(135deg, #7c6aff, #a78bfa); border: none; color: #ffffff !important; -webkit-text-fill-color: #ffffff; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600; padding: 0.9rem; border-radius: 100px; cursor: pointer; box-shadow: 0 0 32px rgba(124,106,255,0.42); transition: transform 0.2s, box-shadow 0.2s; }
+    .btn-full:hover { transform: translateY(-2px); }
  
     /* ── LOADING ── */
     #loading-screen { align-items: center; justify-content: center; gap: 2rem; text-align: center; }
@@ -117,7 +105,7 @@
     .loading-text { font-family: 'Syne', sans-serif; font-size: 1.1rem; color: var(--muted); }
  
     /* ── RÉSULTATS ── */
-    #results-screen { max-width: 520px; margin: 0 auto; gap: 0; }
+    #results-screen { gap: 0; }
     .results-meta { font-size: 0.8rem; color: var(--muted); margin-top: 0.25rem; margin-left: 48px; margin-bottom: 1rem; }
     .song-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 0.7rem; transition: border-color 0.2s, background 0.2s; }
     .song-card:hover { border-color: rgba(167,139,250,0.45); background: rgba(255,255,255,0.08); }
@@ -128,11 +116,31 @@
     .genre-tag { font-size: 0.7rem; padding: 0.22rem 0.7rem; border-radius: 100px; background: rgba(165,243,252,0.1); color: var(--cyan); border: 1px solid rgba(165,243,252,0.22); font-weight: 500; }
     .reason { font-size: 0.78rem; color: rgba(220,220,255,0.6); line-height: 1.5; margin-top: 0.4rem; font-style: italic; }
     .spotify-btn { font-size: 0.75rem; background: rgba(30,215,96,0.12); border: 1px solid rgba(30,215,96,0.32); color: #4ade80; padding: 0.3rem 0.875rem; border-radius: 100px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; white-space: nowrap; font-weight: 500; text-decoration: none; display: inline-block; }
-    .spotify-btn:hover { background: rgba(30,215,96,0.22); color: #86efac; }
- 
+    .spotify-btn:hover { background: rgba(30,215,96,0.22); }
     .results-actions { display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap; }
     .btn-secondary { flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.17); color: #e0e0ff; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; padding: 0.75rem 1rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; min-width: 130px; }
-    .btn-secondary:hover { border-color: var(--accent2); color: #ffffff; background: rgba(255,255,255,0.12); }
+    .btn-secondary:hover { border-color: var(--accent2); color: #ffffff; }
+ 
+    /* ── HISTORIQUE ── */
+    #history-screen { gap: 0; }
+    .history-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .history-empty .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .history-empty p { font-size: 0.9rem; line-height: 1.6; }
+    .history-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 0.7rem; cursor: pointer; transition: all 0.2s; }
+    .history-item:hover { border-color: rgba(167,139,250,0.45); background: rgba(255,255,255,0.08); }
+    .history-item-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+    .history-item-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .history-tag { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 100px; background: rgba(124,106,255,0.2); color: var(--accent2); border: 1px solid rgba(124,106,255,0.3); }
+    .history-tag.surprise { background: rgba(165,243,252,0.1); color: var(--cyan); border-color: rgba(165,243,252,0.25); }
+    .history-date { font-size: 0.72rem; color: var(--muted); }
+    .history-songs-preview { font-size: 0.8rem; color: rgba(220,220,255,0.55); line-height: 1.6; }
+    .history-count { font-size: 0.72rem; color: var(--accent2); font-weight: 500; }
+    .history-actions { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .btn-danger { flex: 1; background: rgba(255,80,80,0.08); border: 1px solid rgba(255,100,100,0.25); color: #fca5a5; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; padding: 0.65rem 1rem; border-radius: 100px; cursor: pointer; transition: all 0.2s; }
+    .btn-danger:hover { background: rgba(255,80,80,0.15); }
+ 
+    /* ── PLAYLIST SAUVEGARDÉE ── */
+    #saved-screen { gap: 0; }
  
     footer { text-align: center; padding: 2rem 1rem 1.5rem; color: rgba(200,200,255,0.35); font-size: 0.75rem; line-height: 1.9; margin-top: auto; }
     footer a { color: rgba(196,181,253,0.5); text-decoration: none; }
@@ -145,10 +153,10 @@
   <div class="orb orb2"></div>
   <div class="orb orb3"></div>
  
-  <!-- ══════════ HERO ══════════ -->
+  <!-- ══════ HERO ══════ -->
   <div id="hero" class="screen active">
     <div class="logo">🎵 Moodwave</div>
-    <h1 class="hero-title">Qu'est-ce que tu veux<br><span>écouter aujourd'hui ?</span></h1>
+    <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
     <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
     <div class="hero-badges">
       <span class="hero-badge">😌 Calme → Ambient</span>
@@ -156,22 +164,25 @@
       <span class="hero-badge">🌙 Nostalgique → Indie</span>
       <span class="hero-badge">🎲 Mode Surprise</span>
     </div>
-    <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
+      <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')">
+        📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span>
+      </button>
+    </div>
     <footer>
       Propulsé par l'IA · Fait pour les amoureux de musique<br>
       <a href="mailto:contact@moodwave.app">contact@moodwave.app</a>
     </footer>
   </div>
  
-  <!-- ══════════ FORMULAIRE ══════════ -->
+  <!-- ══════ FORMULAIRE ══════ -->
   <div id="form-screen" class="screen">
     <div class="form-header">
       <button class="back-btn" onclick="showScreen('hero')">←</button>
       <span class="form-title">Dis-moi comment tu te sens</span>
     </div>
- 
     <div class="error-msg" id="error-msg"></div>
- 
     <p class="section-label">Ton mood</p>
     <div class="pills">
       <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)">😌 Calme</div>
@@ -181,14 +192,12 @@
       <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)">🔥 Motivé</div>
       <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)">🌙 Nostalgique</div>
     </div>
- 
     <p class="section-label">Niveau d'énergie</p>
     <div class="pills">
       <div class="pill" data-group="energy" data-val="Faible" onclick="selectPill(this)">🔋 Faible</div>
       <div class="pill" data-group="energy" data-val="Moyen" onclick="selectPill(this)">⚡ Moyen</div>
       <div class="pill" data-group="energy" data-val="Élevé" onclick="selectPill(this)">🚀 Élevé</div>
     </div>
- 
     <p class="section-label">Contexte</p>
     <div class="pills">
       <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)">💻 Travail</div>
@@ -198,7 +207,6 @@
       <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)">🚇 Trajet</div>
       <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)">🎉 Fête</div>
     </div>
- 
     <div class="surprise-row">
       <div class="surprise-info">
         <h4>🎲 Mode Surprise</h4>
@@ -206,13 +214,11 @@
       </div>
       <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
     </div>
- 
-    <button class="btn-primary full" id="gen-btn" onclick="generate(false)">Générer ma playlist ✨</button>
- 
+    <button class="btn-full" onclick="generate(false)">Générer ma playlist ✨</button>
     <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
   </div>
  
-  <!-- ══════════ LOADING ══════════ -->
+  <!-- ══════ LOADING ══════ -->
   <div id="loading-screen" class="screen">
     <div class="wave-container">
       <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
@@ -222,9 +228,9 @@
     <p class="loading-text" id="loading-text">Analyse de ton vibe...</p>
   </div>
  
-  <!-- ══════════ RÉSULTATS ══════════ -->
+  <!-- ══════ RÉSULTATS ══════ -->
   <div id="results-screen" class="screen">
-    <div class="form-header" style="margin-bottom: 0.25rem;">
+    <div class="form-header" style="margin-bottom:0.25rem">
       <button class="back-btn" onclick="showScreen('form-screen')">←</button>
       <span class="form-title">Ta playlist ✨</span>
     </div>
@@ -237,22 +243,52 @@
     <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
   </div>
  
+  <!-- ══════ HISTORIQUE ══════ -->
+  <div id="history-screen" class="screen">
+    <div class="form-header">
+      <button class="back-btn" onclick="showScreen('hero')">←</button>
+      <span class="form-title">Mes playlists 📋</span>
+    </div>
+    <div id="history-list"></div>
+    <div class="history-actions" id="history-actions" style="display:none">
+      <button class="btn-secondary" onclick="showScreen('form-screen')">+ Nouvelle playlist</button>
+      <button class="btn-danger" onclick="clearHistory()">🗑️ Tout effacer</button>
+    </div>
+    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+  </div>
+ 
+  <!-- ══════ PLAYLIST SAUVEGARDÉE ══════ -->
+  <div id="saved-screen" class="screen">
+    <div class="form-header" style="margin-bottom:0.25rem">
+      <button class="back-btn" onclick="showScreen('history-screen')">←</button>
+      <span class="form-title" id="saved-title">Playlist sauvegardée</span>
+    </div>
+    <p class="results-meta" id="saved-meta"></p>
+    <div id="saved-songs-list"></div>
+    <div class="results-actions">
+      <button class="btn-secondary" onclick="showScreen('history-screen')">← Historique</button>
+      <button class="btn-secondary" onclick="showScreen('form-screen')">+ Nouveau mood</button>
+    </div>
+    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+  </div>
+ 
   <script>
     const sel = { mood: null, energy: null, context: null };
     let msgInterval = null;
-    const msgs = [
-      "Analyse de ton vibe...",
-      "Calibrage des fréquences...",
-      "Exploration des sons...",
-      "Presque prêt..."
-    ];
+    let currentSongs = [];
+    let currentMeta = '';
+    const msgs = ["Analyse de ton vibe...","Calibrage des fréquences...","Exploration des sons...","Presque prêt..."];
  
+    /* ── Navigation ── */
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       window.scrollTo(0, 0);
+      if (id === 'history-screen') renderHistory();
+      if (id === 'hero') updateHistoryBadge();
     }
  
+    /* ── Sélection pills ── */
     function selectPill(el) {
       const g = el.dataset.group;
       document.querySelectorAll(`.pill[data-group="${g}"]`).forEach(p => p.classList.remove('selected'));
@@ -260,27 +296,22 @@
       sel[g] = el.dataset.val;
     }
  
-    function showError(msg) {
-      const el = document.getElementById('error-msg');
-      el.textContent = msg;
-      el.style.display = 'block';
-    }
+    /* ── Erreurs ── */
+    function showError(msg) { const el = document.getElementById('error-msg'); el.textContent = msg; el.style.display = 'block'; }
     function hideError() { document.getElementById('error-msg').style.display = 'none'; }
  
+    /* ── Loading ── */
     function startLoading() {
       let i = 0;
       document.getElementById('loading-text').textContent = msgs[0];
-      msgInterval = setInterval(() => {
-        i = (i + 1) % msgs.length;
-        document.getElementById('loading-text').textContent = msgs[i];
-      }, 2200);
+      msgInterval = setInterval(() => { i = (i+1)%msgs.length; document.getElementById('loading-text').textContent = msgs[i]; }, 2200);
     }
     function stopLoading() { clearInterval(msgInterval); }
  
-    function esc(s) {
-      return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    }
+    /* ── Échappement HTML ── */
+    function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
  
+    /* ── Génération ── */
     async function generate(isSurprise) {
       hideError();
       if (!isSurprise && (!sel.mood || !sel.energy || !sel.context)) {
@@ -288,7 +319,6 @@
         return;
       }
       const withSurprise = isSurprise || document.getElementById('surprise-toggle').classList.contains('on');
- 
       showScreen('loading-screen');
       startLoading();
  
@@ -302,44 +332,130 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body)
         });
- 
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || `Erreur serveur (${res.status})`);
-        }
- 
+        if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.error || `Erreur serveur (${res.status})`); }
         const songs = await res.json();
         if (!Array.isArray(songs) || !songs.length) throw new Error("Playlist vide reçue");
  
         stopLoading();
-        renderResults(songs, isSurprise, withSurprise);
-      } catch (e) {
+        const meta = isSurprise ? 'Mode Surprise 🎲' : `${sel.mood} · ${sel.energy} · ${sel.context}${withSurprise?' · Surprise 🎲':''}`;
+        currentSongs = songs;
+        currentMeta = meta;
+        saveToHistory(songs, meta);
+        renderResults(songs, meta);
+      } catch(e) {
         stopLoading();
         showScreen('form-screen');
         showError("Erreur : " + e.message);
       }
     }
  
-    function renderResults(songs, isSurprise, withSurprise) {
-      document.getElementById('results-meta').textContent =
-        isSurprise ? 'Mode Surprise 🎲' :
-        `${sel.mood} · ${sel.energy} · ${sel.context}${withSurprise ? ' · Surprise 🎲' : ''}`;
- 
-      document.getElementById('songs-list').innerHTML = songs.map((s, i) => `
+    /* ── Affichage résultats ── */
+    function renderResults(songs, meta) {
+      document.getElementById('results-meta').textContent = meta;
+      document.getElementById('songs-list').innerHTML = songs.map((s,i) => `
         <div class="song-card">
-          <div class="song-num">${String(i + 1).padStart(2, '0')}</div>
+          <div class="song-num">${String(i+1).padStart(2,'0')}</div>
           <div class="song-artist">${esc(s.artist)}</div>
           <div class="song-title">${esc(s.title)}</div>
           <div class="song-bottom">
             <span class="genre-tag">${esc(s.genre)}</span>
-            <a class="spotify-btn" href="https://open.spotify.com/search/${encodeURIComponent((s.artist || '') + ' ' + (s.title || ''))}" target="_blank" rel="noopener">▶ Spotify</a>
+            <a class="spotify-btn" href="https://open.spotify.com/search/${encodeURIComponent((s.artist||'')+' '+(s.title||''))}" target="_blank" rel="noopener">▶ Spotify</a>
           </div>
           <div class="reason">${esc(s.reason)}</div>
-        </div>
-      `).join('');
- 
+        </div>`).join('');
       showScreen('results-screen');
     }
+ 
+    /* ══════════════════════════════
+       HISTORIQUE LOCAL (localStorage)
+    ══════════════════════════════ */
+    function getHistory() {
+      try { return JSON.parse(localStorage.getItem('moodwave_history') || '[]'); }
+      catch(e) { return []; }
+    }
+ 
+    function saveToHistory(songs, meta) {
+      const history = getHistory();
+      const entry = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' }),
+        meta,
+        songs
+      };
+      history.unshift(entry); // plus récent en premier
+      if (history.length > 20) history.pop(); // max 20 playlists
+      localStorage.setItem('moodwave_history', JSON.stringify(history));
+      updateHistoryBadge();
+    }
+ 
+    function updateHistoryBadge() {
+      const count = getHistory().length;
+      document.getElementById('history-count-badge').textContent = count;
+      document.getElementById('btn-history-hero').style.display = count > 0 ? 'block' : 'none';
+    }
+ 
+    function renderHistory() {
+      const history = getHistory();
+      const list = document.getElementById('history-list');
+      const actions = document.getElementById('history-actions');
+ 
+      if (history.length === 0) {
+        list.innerHTML = `
+          <div class="history-empty">
+            <div class="icon">🎵</div>
+            <p>Aucune playlist sauvegardée pour l'instant.<br>Génère ta première playlist !</p>
+          </div>`;
+        actions.style.display = 'none';
+        return;
+      }
+ 
+      actions.style.display = 'flex';
+      list.innerHTML = history.map(entry => {
+        const preview = entry.songs.slice(0, 3).map(s => `${s.artist} – ${s.title}`).join(' · ');
+        const isSurprise = entry.meta.includes('Surprise');
+        const tags = isSurprise
+          ? `<span class="history-tag surprise">🎲 Surprise</span>`
+          : entry.meta.split(' · ').map(t => `<span class="history-tag">${esc(t)}</span>`).join('');
+        return `
+          <div class="history-item" onclick="openSaved(${entry.id})">
+            <div class="history-item-header">
+              <div class="history-item-tags">${tags}</div>
+              <span class="history-date">${esc(entry.date)}</span>
+            </div>
+            <div class="history-songs-preview">${esc(preview)}…</div>
+            <div style="margin-top:0.4rem"><span class="history-count">${entry.songs.length} titres</span></div>
+          </div>`;
+      }).join('');
+    }
+ 
+    function openSaved(id) {
+      const entry = getHistory().find(e => e.id === id);
+      if (!entry) return;
+      document.getElementById('saved-title').textContent = 'Playlist sauvegardée';
+      document.getElementById('saved-meta').textContent = entry.meta + ' · ' + entry.date;
+      document.getElementById('saved-songs-list').innerHTML = entry.songs.map((s,i) => `
+        <div class="song-card">
+          <div class="song-num">${String(i+1).padStart(2,'0')}</div>
+          <div class="song-artist">${esc(s.artist)}</div>
+          <div class="song-title">${esc(s.title)}</div>
+          <div class="song-bottom">
+            <span class="genre-tag">${esc(s.genre)}</span>
+            <a class="spotify-btn" href="https://open.spotify.com/search/${encodeURIComponent((s.artist||'')+' '+(s.title||''))}" target="_blank" rel="noopener">▶ Spotify</a>
+          </div>
+          <div class="reason">${esc(s.reason)}</div>
+        </div>`).join('');
+      showScreen('saved-screen');
+    }
+ 
+    function clearHistory() {
+      if (!confirm('Effacer toutes tes playlists sauvegardées ?')) return;
+      localStorage.removeItem('moodwave_history');
+      updateHistoryBadge();
+      renderHistory();
+    }
+ 
+    /* ── Init ── */
+    updateHistoryBadge();
   </script>
 </body>
 </html>

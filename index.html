@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    :root{--bg:#07080f;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.10);--border:rgba(255,255,255,0.15);--text:#f0f0ff;--muted:rgba(240,240,255,0.65);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc;--spotify:#1ed760}
+    :root{--bg:#07080f;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.10);--border:rgba(255,255,255,0.15);--text:#f0f0ff;--muted:rgba(240,240,255,0.65);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc;--spotify:#1ed760;--deezer:#ef5466;--youtube:#ff0000}
     html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
     .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;opacity:.28;z-index:0}
     .orb1{width:500px;height:500px;background:radial-gradient(circle,#4f46e5,transparent);top:-150px;left:-150px}
@@ -50,6 +50,7 @@
     .back-btn:hover{background:rgba(255,255,255,.18)}
     .form-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff}
     .error-msg{background:rgba(255,80,80,.1);border:1px solid rgba(255,100,100,.32);color:#fca5a5;border-radius:12px;padding:.875rem 1rem;font-size:.85rem;margin-bottom:1rem;display:none;line-height:1.5}
+    .success-msg{background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.25);color:#4ade80;border-radius:12px;padding:.75rem 1rem;font-size:.85rem;margin-bottom:.75rem;display:none;line-height:1.5}
     .section-label{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:.6rem}
     .pills{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1.5rem}
     .pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.875rem;padding:.48rem 1rem;border-radius:100px;cursor:pointer;transition:all .2s;user-select:none}
@@ -78,15 +79,40 @@
     .song-bottom{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
     .genre-tag{font-size:.7rem;padding:.22rem .7rem;border-radius:100px;background:rgba(165,243,252,.1);color:var(--cyan);border:1px solid rgba(165,243,252,.22);font-weight:500}
     .reason{font-size:.78rem;color:rgba(220,220,255,.6);line-height:1.5;margin-top:.4rem;font-style:italic}
-    .spotify-link{font-size:.75rem;background:rgba(30,215,96,.12);border:1px solid rgba(30,215,96,.32);color:#4ade80;padding:.3rem .875rem;border-radius:100px;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;font-weight:500;text-decoration:none;display:inline-block}
-    .spotify-link:hover{background:rgba(30,215,96,.22)}
-    .create-playlist-btn{width:100%;background:var(--spotify);border:none;color:#000!important;-webkit-text-fill-color:#000;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;padding:.9rem;border-radius:100px;cursor:pointer;transition:transform .2s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.75rem}
-    .create-playlist-btn:hover{transform:translateY(-2px);opacity:.92}
-    .create-playlist-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-    .playlist-created-banner{background:rgba(30,215,96,.1);border:1px solid rgba(30,215,96,.3);border-radius:14px;padding:1rem 1.25rem;margin-bottom:.75rem;display:none}
-    .playlist-created-banner p{font-size:.85rem;color:var(--spotify);font-weight:500;margin-bottom:.5rem}
-    .playlist-created-banner a{font-size:.85rem;color:var(--spotify);text-decoration:underline}
+    .song-links{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+    .song-link{font-size:.72rem;padding:.25rem .65rem;border-radius:100px;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap;font-weight:500;text-decoration:none;display:inline-block;cursor:pointer;border:1px solid}
+    .song-link.sp{background:rgba(30,215,96,.1);border-color:rgba(30,215,96,.3);color:#4ade80}
+    .song-link.sp:hover{background:rgba(30,215,96,.22)}
+    .song-link.dz{background:rgba(239,84,102,.1);border-color:rgba(239,84,102,.3);color:#f87171}
+    .song-link.dz:hover{background:rgba(239,84,102,.22)}
+    .song-link.yt{background:rgba(255,0,0,.1);border-color:rgba(255,0,0,.3);color:#f87171}
+    .song-link.yt:hover{background:rgba(255,0,0,.22)}
     .results-actions{display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap}
+
+    /* ZONE EXPORT */
+    .export-zone{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:1.25rem;margin-bottom:1rem}
+    .export-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:#fff;margin-bottom:.875rem}
+    .export-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+    .export-btn{display:flex;align-items:center;gap:.5rem;padding:.6rem .875rem;border-radius:12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.8rem;font-weight:500;border:1px solid;transition:all .2s;background:transparent;color:#e0e0ff;border-color:rgba(255,255,255,.15)}
+    .export-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3)}
+    .export-btn .icon{font-size:1rem;flex-shrink:0}
+    .export-btn.copy{border-color:rgba(124,106,255,.4);color:var(--accent2)}
+    .export-btn.copy:hover{background:rgba(124,106,255,.15)}
+    .export-btn.spotify-open{border-color:rgba(30,215,96,.4);color:#4ade80}
+    .export-btn.spotify-open:hover{background:rgba(30,215,96,.12)}
+    .export-btn.deezer-open{border-color:rgba(239,84,102,.4);color:#f87171}
+    .export-btn.deezer-open:hover{background:rgba(239,84,102,.12)}
+    .export-btn.youtube-open{border-color:rgba(255,0,0,.4);color:#f87171}
+    .export-btn.youtube-open:hover{background:rgba(255,0,0,.12)}
+    .export-btn.txt{border-color:rgba(165,243,252,.3);color:var(--cyan)}
+    .export-btn.txt:hover{background:rgba(165,243,252,.08)}
+    .export-btn.csv{border-color:rgba(167,139,250,.3);color:var(--accent2)}
+    .export-btn.csv:hover{background:rgba(167,139,250,.08)}
+    .export-btn.pdf-btn{border-color:rgba(251,146,60,.3);color:#fb923c}
+    .export-btn.pdf-btn:hover{background:rgba(251,146,60,.08)}
+    .export-btn.word-btn{border-color:rgba(59,130,246,.3);color:#60a5fa}
+    .export-btn.word-btn:hover{background:rgba(59,130,246,.08)}
+
     #history-screen{gap:0}
     .history-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
     .history-empty .icon{font-size:2.5rem;margin-bottom:1rem}
@@ -112,7 +138,7 @@
   <div id="hero" class="screen active">
     <div class="logo">🎵 Moodwave</div>
     <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
-    <p class="hero-sub">Une playlist générée par l'IA, créée directement dans ton Spotify.</p>
+    <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
     <div class="hero-badges">
       <span class="hero-badge">😌 Calme → Ambient</span>
       <span class="hero-badge">🔥 Motivé → Workout</span>
@@ -203,14 +229,8 @@
       <span class="form-title">Ta playlist ✨</span>
     </div>
     <p class="results-meta" id="results-meta"></p>
-    <button class="create-playlist-btn" id="create-playlist-btn" onclick="createSpotifyPlaylist(currentSongs, currentMeta, 'create-playlist-btn', 'playlist-created-banner', 'playlist-spotify-link')" style="display:none">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-      Créer dans Spotify
-    </button>
-    <div class="playlist-created-banner" id="playlist-created-banner">
-      <p>✅ Playlist créée dans ton Spotify !</p>
-      <a id="playlist-spotify-link" href="#" target="_blank">Ouvrir dans Spotify →</a>
-    </div>
+    <div class="success-msg" id="results-success"></div>
+    <div id="results-export-zone"></div>
     <div id="songs-list"></div>
     <div class="results-actions">
       <button class="btn-secondary" onclick="showScreen('form-screen')">🔄 Nouveau mood</button>
@@ -240,14 +260,8 @@
       <span class="form-title">Playlist sauvegardée</span>
     </div>
     <p class="results-meta" id="saved-meta"></p>
-    <button class="create-playlist-btn" id="saved-create-btn" onclick="createSpotifyPlaylist(savedSongs, savedMeta, 'saved-create-btn', 'saved-created-banner', 'saved-spotify-link')" style="display:none">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-      Créer dans Spotify
-    </button>
-    <div class="playlist-created-banner" id="saved-created-banner">
-      <p>✅ Playlist créée dans ton Spotify !</p>
-      <a id="saved-spotify-link" href="#" target="_blank">Ouvrir dans Spotify →</a>
-    </div>
+    <div class="success-msg" id="saved-success"></div>
+    <div id="saved-export-zone"></div>
     <div id="saved-songs-list"></div>
     <div class="results-actions">
       <button class="btn-secondary" onclick="showScreen('history-screen')">← Historique</button>
@@ -262,6 +276,7 @@
     let spotifyToken=null,spotifyUserId=null;
     const msgs=["Analyse de ton vibe...","Calibrage des fréquences...","Exploration des sons...","Presque prêt..."];
 
+    /* ══ NAV ══ */
     function showScreen(id){
       document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
@@ -276,30 +291,25 @@
     }
     function showError(msg){const el=document.getElementById('error-msg');el.textContent=msg;el.style.display='block';}
     function hideError(){document.getElementById('error-msg').style.display='none';}
+    function showSuccess(elId,msg){const el=document.getElementById(elId);if(el){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000);}}
     function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
     function startLoading(){let i=0;document.getElementById('loading-text').textContent=msgs[0];msgInterval=setInterval(()=>{i=(i+1)%msgs.length;document.getElementById('loading-text').textContent=msgs[i];},2200);}
     function stopLoading(){clearInterval(msgInterval);}
 
-    /* SPOTIFY AUTH */
+    /* ══ SPOTIFY AUTH ══ */
     function generateRandomString(n){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b=>c[b%c.length]).join('');}
     async function sha256(p){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));}
     function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
-
     async function connectSpotify(){
-      const r=await fetch('/api/spotify-config');
-      const {clientId}=await r.json();
+      const r=await fetch('/api/spotify-config');const {clientId}=await r.json();
       const redirectUri=window.location.origin+'/callback';
-      const cv=generateRandomString(64);
-      const cc=b64url(await sha256(cv));
+      const cv=generateRandomString(64);const cc=b64url(await sha256(cv));
       sessionStorage.setItem('spotify_code_verifier',cv);
-      const p=new URLSearchParams({client_id:clientId,response_type:'code',redirect_uri:redirectUri,scope:'ugc-image-upload playlist-modify-public playlist-modify-private user-read-private user-read-email',code_challenge_method:'S256',code_challenge:cc});
+      const p=new URLSearchParams({client_id:clientId,response_type:'code',redirect_uri:redirectUri,scope:'playlist-modify-public playlist-modify-private user-read-private user-read-email',code_challenge_method:'S256',code_challenge:cc});
       window.location='https://accounts.spotify.com/authorize?'+p.toString();
     }
-
     async function handleCallback(){
-      const params=new URLSearchParams(window.location.search);
-      const code=params.get('code');
-      if(!code)return;
+      const params=new URLSearchParams(window.location.search);const code=params.get('code');if(!code)return;
       const cv=sessionStorage.getItem('spotify_code_verifier');
       const res=await fetch('/api/spotify-token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,codeVerifier:cv,redirectUri:window.location.origin+'/callback'})});
       const data=await res.json();
@@ -309,74 +319,120 @@
         localStorage.setItem('spotify_token_expires',Date.now()+data.expires_in*1000);
         if(data.refresh_token)localStorage.setItem('spotify_refresh_token',data.refresh_token);
         await fetchSpotifyUser();
-        window.history.replaceState({},'','/');
-        updateSpotifyUI();
+        window.history.replaceState({},'','/');updateSpotifyUI();
       }
     }
-
     async function fetchSpotifyUser(){
       if(!spotifyToken)return;
-      try{
-        const res=await fetch('https://api.spotify.com/v1/me',{headers:{Authorization:'Bearer '+spotifyToken}});
-        const u=await res.json();
-        spotifyUserId=u.id;
-        localStorage.setItem('spotify_user_id',u.id);
-        localStorage.setItem('spotify_user_name',u.display_name||u.id);
-      }catch(e){}
+      try{const res=await fetch('https://api.spotify.com/v1/me',{headers:{Authorization:'Bearer '+spotifyToken}});const u=await res.json();spotifyUserId=u.id;localStorage.setItem('spotify_user_id',u.id);localStorage.setItem('spotify_user_name',u.display_name||u.id);}catch(e){}
     }
-
     function loadSpotifySession(){
-      const token=localStorage.getItem('spotify_token');
-      const expires=parseInt(localStorage.getItem('spotify_token_expires')||'0');
+      const token=localStorage.getItem('spotify_token');const expires=parseInt(localStorage.getItem('spotify_token_expires')||'0');
       if(token&&expires>Date.now()){spotifyToken=token;spotifyUserId=localStorage.getItem('spotify_user_id');}
       else{spotifyToken=null;spotifyUserId=null;}
     }
-
     function disconnectSpotify(){
       ['spotify_token','spotify_token_expires','spotify_refresh_token','spotify_user_id','spotify_user_name'].forEach(k=>localStorage.removeItem(k));
       spotifyToken=null;spotifyUserId=null;updateSpotifyUI();
     }
-
     function updateSpotifyUI(){
       const ok=!!spotifyToken;
       document.getElementById('btn-connect-spotify').style.display=ok?'none':'flex';
       document.getElementById('spotify-banner').style.display=ok?'flex':'none';
       if(ok)document.getElementById('spotify-username').textContent=localStorage.getItem('spotify_user_name')||'Connecté';
-      ['create-playlist-btn','saved-create-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=ok?'flex':'none';});
     }
 
-    /* CRÉER PLAYLIST SPOTIFY — fonction réutilisable */
-    async function createSpotifyPlaylist(songs,meta,btnId,bannerId,linkId){
-      if(!spotifyToken||!spotifyUserId||!songs||!songs.length)return;
-      const btn=document.getElementById(btnId);
-      btn.disabled=true;
-      btn.innerHTML='⏳ Création en cours...';
-      try{
-        const res=await fetch('/api/spotify-create',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({token:spotifyToken,userId:spotifyUserId,meta,songs})
-        });
-        const data=await res.json();
-        if(data.url){
-          btn.style.display='none';
-          const banner=document.getElementById(bannerId);
-          banner.style.display='block';
-          document.getElementById(linkId).href=data.url;
-          if(data.notFound&&data.notFound.length>0){
-            banner.innerHTML+='<p style="font-size:.75rem;color:rgba(30,215,96,.6);margin-top:.4rem">'+data.found+'/'+data.total+' titres trouvés sur Spotify</p>';
-          }
-        }else{
-          throw new Error(data.error||'Erreur inconnue');
-        }
-      }catch(e){
-        btn.disabled=false;
-        btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg> Créer dans Spotify';
-        showError('Erreur Spotify : '+e.message);
-      }
+    /* ══ EXPORT — fonctions communes ══ */
+    function playlistToText(songs,meta){
+      let txt='🎵 MOODWAVE — '+meta+'\n'+'='.repeat(40)+'\n\n';
+      songs.forEach((s,i)=>{txt+=String(i+1).padStart(2,'0')+'. '+s.artist+' — '+s.title+' ['+s.genre+']\n    '+s.reason+'\n\n';});
+      txt+='='.repeat(40)+'\nGénérée par Moodwave · moodwave.app\n';
+      return txt;
     }
 
-    /* GÉNÉRATION */
+    function copyPlaylist(songs,meta,successId){
+      const text=songs.map((s,i)=>`${i+1}. ${s.artist} — ${s.title}`).join('\n');
+      const full='🎵 Moodwave · '+meta+'\n\n'+text;
+      navigator.clipboard.writeText(full).then(()=>showSuccess(successId,'✅ Playlist copiée dans le presse-papier !')).catch(()=>{
+        const ta=document.createElement('textarea');ta.value=full;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);
+        showSuccess(successId,'✅ Playlist copiée !');
+      });
+    }
+
+    function downloadTXT(songs,meta){
+      const text=playlistToText(songs,meta);
+      const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+      a.download='moodwave-'+meta.replace(/[^a-zA-Z0-9]/g,'-').slice(0,40)+'.txt';
+      a.click();URL.revokeObjectURL(a.href);
+    }
+
+    function downloadCSV(songs,meta){
+      let csv='Numéro,Artiste,Titre,Genre,Raison\n';
+      songs.forEach((s,i)=>{
+        csv+=`${i+1},"${(s.artist||'').replace(/"/g,'""')}","${(s.title||'').replace(/"/g,'""')}","${(s.genre||'').replace(/"/g,'""')}","${(s.reason||'').replace(/"/g,'""')}"\n`;
+      });
+      const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+      a.download='moodwave-'+meta.replace(/[^a-zA-Z0-9]/g,'-').slice(0,40)+'.csv';
+      a.click();URL.revokeObjectURL(a.href);
+    }
+
+    function downloadPDF(songs,meta){
+      const w=window.open('','_blank');
+      const rows=songs.map((s,i)=>`<tr><td style="padding:6px 8px;color:#888;font-size:12px">${String(i+1).padStart(2,'0')}</td><td style="padding:6px 8px;font-weight:600">${esc(s.artist)}</td><td style="padding:6px 8px">${esc(s.title)}</td><td style="padding:6px 8px;color:#7c6aff;font-size:12px">${esc(s.genre)}</td><td style="padding:6px 8px;color:#888;font-size:11px;font-style:italic">${esc(s.reason)}</td></tr>`).join('');
+      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave · ${esc(meta)}</title><style>body{font-family:Arial,sans-serif;padding:40px;color:#111;max-width:800px;margin:0 auto}h1{color:#7c6aff;font-size:24px;margin-bottom:4px}p{color:#888;font-size:13px;margin-bottom:24px}table{width:100%;border-collapse:collapse}tr:nth-child(even){background:#f8f8ff}th{background:#7c6aff;color:#fff;padding:8px;text-align:left;font-size:12px}footer{margin-top:32px;color:#aaa;font-size:11px;text-align:center;border-top:1px solid #eee;padding-top:16px}@media print{button{display:none}}</style></head><body><h1>🎵 Moodwave</h1><p>${esc(meta)}</p><table><thead><tr><th>#</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>${rows}</tbody></table><footer>Générée par Moodwave · Propulsé par l\'IA</footer><br><button onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px">🖨️ Imprimer / Enregistrer en PDF</button></body></html>`);
+      w.document.close();
+    }
+
+    function downloadWord(songs,meta){
+      const rows=songs.map((s,i)=>`<tr><td style="padding:6px;color:#666;width:30px">${String(i+1).padStart(2,'0')}</td><td style="padding:6px;font-weight:bold">${s.artist}</td><td style="padding:6px">${s.title}</td><td style="padding:6px;color:#7c6aff">${s.genre}</td><td style="padding:6px;color:#666;font-style:italic">${s.reason}</td></tr>`).join('');
+      const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>Moodwave</title></head><body><h1 style="color:#7c6aff">🎵 Moodwave</h1><p style="color:#888">${meta}</p><table border="1" style="border-collapse:collapse;width:100%"><thead><tr style="background:#7c6aff;color:#fff"><th>N°</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>${rows}</tbody></table><p style="color:#aaa;font-size:11px;margin-top:24px">Générée par Moodwave · Propulsé par l'IA</p></body></html>`;
+      const blob=new Blob([html],{type:'application/msword'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+      a.download='moodwave-'+meta.replace(/[^a-zA-Z0-9]/g,'-').slice(0,40)+'.doc';
+      a.click();URL.revokeObjectURL(a.href);
+    }
+
+    function openAllSpotify(songs){songs.forEach((s,i)=>{setTimeout(()=>{window.open('https://open.spotify.com/search/'+encodeURIComponent(s.artist+' '+s.title),'_blank');},i*300);});}
+    function openAllDeezer(songs){songs.forEach((s,i)=>{setTimeout(()=>{window.open('https://www.deezer.com/search/'+encodeURIComponent(s.artist+' '+s.title),'_blank');},i*300);});}
+    function openAllYoutube(songs){songs.forEach((s,i)=>{setTimeout(()=>{window.open('https://www.youtube.com/results?search_query='+encodeURIComponent(s.artist+' '+s.title),'_blank');},i*300);});}
+
+    /* ══ ZONE EXPORT HTML ══ */
+    function exportZoneHTML(songs,meta,successId,prefix){
+      return `<div class="export-zone">
+        <div class="export-title">📤 Partager & Exporter</div>
+        <div class="export-grid">
+          <button class="export-btn copy" onclick="copyPlaylist(${prefix}Songs,'${meta.replace(/'/g,"\\'")}','${successId}')"><span class="icon">📋</span> Copier la liste</button>
+          <button class="export-btn txt" onclick="downloadTXT(${prefix}Songs,'${meta.replace(/'/g,"\\'")}')"><span class="icon">📄</span> Exporter .txt</button>
+          <button class="export-btn csv" onclick="downloadCSV(${prefix}Songs,'${meta.replace(/'/g,"\\'")}')"><span class="icon">📊</span> Exporter .csv</button>
+          <button class="export-btn pdf-btn" onclick="downloadPDF(${prefix}Songs,'${meta.replace(/'/g,"\\'")}')"><span class="icon">📕</span> Exporter PDF</button>
+          <button class="export-btn word-btn" onclick="downloadWord(${prefix}Songs,'${meta.replace(/'/g,"\\'")}')"><span class="icon">📘</span> Exporter Word</button>
+          <button class="export-btn spotify-open" onclick="openAllSpotify(${prefix}Songs)"><span class="icon">🎵</span> Ouvrir Spotify</button>
+          <button class="export-btn deezer-open" onclick="openAllDeezer(${prefix}Songs)"><span class="icon">🎶</span> Ouvrir Deezer</button>
+          <button class="export-btn youtube-open" onclick="openAllYoutube(${prefix}Songs)"><span class="icon">▶️</span> Ouvrir YouTube</button>
+        </div>
+      </div>`;
+    }
+
+    /* ══ CARDS CHANSONS ══ */
+    function songCardsHTML(songs){
+      return songs.map((s,i)=>`
+        <div class="song-card">
+          <div class="song-num">${String(i+1).padStart(2,'0')}</div>
+          <div class="song-artist">${esc(s.artist)}</div>
+          <div class="song-title">${esc(s.title)}</div>
+          <div class="song-bottom"><span class="genre-tag">${esc(s.genre)}</span></div>
+          <div class="reason">${esc(s.reason)}</div>
+          <div class="song-links">
+            <a class="song-link sp" href="https://open.spotify.com/search/${encodeURIComponent((s.artist||'')+' '+(s.title||''))}" target="_blank" rel="noopener">🎵 Spotify</a>
+            <a class="song-link dz" href="https://www.deezer.com/search/${encodeURIComponent((s.artist||'')+' '+(s.title||''))}" target="_blank" rel="noopener">🎶 Deezer</a>
+            <a class="song-link yt" href="https://www.youtube.com/results?search_query=${encodeURIComponent((s.artist||'')+' '+(s.title||''))}" target="_blank" rel="noopener">▶️ YouTube</a>
+          </div>
+        </div>`).join('');
+    }
+
+    /* ══ GÉNÉRATION ══ */
     async function generate(isSurprise){
       hideError();
       if(!isSurprise&&(!sel.mood||!sel.energy||!sel.context)){showError("Sélectionne un mood, un niveau d'énergie et un contexte.");return;}
@@ -396,39 +452,21 @@
       }catch(e){stopLoading();showScreen('form-screen');showError('Erreur : '+e.message);}
     }
 
-    function songCardsHTML(songs){
-      return songs.map((s,i)=>`
-        <div class="song-card">
-          <div class="song-num">${String(i+1).padStart(2,'0')}</div>
-          <div class="song-artist">${esc(s.artist)}</div>
-          <div class="song-title">${esc(s.title)}</div>
-          <div class="song-bottom">
-            <span class="genre-tag">${esc(s.genre)}</span>
-            <a class="spotify-link" href="https://open.spotify.com/search/${encodeURIComponent((s.artist||'')+' '+(s.title||''))}" target="_blank" rel="noopener">▶ Spotify</a>
-          </div>
-          <div class="reason">${esc(s.reason)}</div>
-        </div>`).join('');
-    }
-
     function renderResults(songs,meta){
       document.getElementById('results-meta').textContent=meta;
-      const btn=document.getElementById('create-playlist-btn');
-      btn.disabled=false;
-      btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg> Créer dans Spotify';
-      btn.style.display=spotifyToken?'flex':'none';
-      document.getElementById('playlist-created-banner').style.display='none';
+      document.getElementById('results-success').style.display='none';
+      document.getElementById('results-export-zone').innerHTML=exportZoneHTML(songs,meta,'results','current');
       document.getElementById('songs-list').innerHTML=songCardsHTML(songs);
       showScreen('results-screen');
     }
 
-    /* HISTORIQUE */
+    /* ══ HISTORIQUE ══ */
     function getHistory(){try{return JSON.parse(localStorage.getItem('moodwave_history')||'[]');}catch(e){return[];}}
     function saveToHistory(songs,meta){
       const h=getHistory();
       h.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs});
       if(h.length>20)h.pop();
-      localStorage.setItem('moodwave_history',JSON.stringify(h));
-      updateHistoryBadge();
+      localStorage.setItem('moodwave_history',JSON.stringify(h));updateHistoryBadge();
     }
     function updateHistoryBadge(){
       const n=getHistory().length;
@@ -436,13 +474,8 @@
       document.getElementById('btn-history-hero').style.display=n>0?'block':'none';
     }
     function renderHistory(){
-      const h=getHistory();
-      const list=document.getElementById('history-list');
-      const actions=document.getElementById('history-actions');
-      if(!h.length){
-        list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist sauvegardée.<br>Génère ta première playlist !</p></div>';
-        actions.style.display='none';return;
-      }
+      const h=getHistory();const list=document.getElementById('history-list');const actions=document.getElementById('history-actions');
+      if(!h.length){list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist sauvegardée.<br>Génère ta première playlist !</p></div>';actions.style.display='none';return;}
       actions.style.display='flex';
       list.innerHTML=h.map(e=>{
         const preview=e.songs.slice(0,3).map(s=>s.artist+' – '+s.title).join(' · ');
@@ -451,16 +484,11 @@
       }).join('');
     }
     function openSaved(id){
-      const entry=getHistory().find(e=>e.id===id);
-      if(!entry)return;
-      savedSongs=entry.songs;
-      savedMeta=entry.meta;
+      const entry=getHistory().find(e=>e.id===id);if(!entry)return;
+      savedSongs=entry.songs;savedMeta=entry.meta;
       document.getElementById('saved-meta').textContent=entry.meta+' · '+entry.date;
-      const btn=document.getElementById('saved-create-btn');
-      btn.disabled=false;
-      btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg> Créer dans Spotify';
-      btn.style.display=spotifyToken?'flex':'none';
-      document.getElementById('saved-created-banner').style.display='none';
+      document.getElementById('saved-success').style.display='none';
+      document.getElementById('saved-export-zone').innerHTML=exportZoneHTML(entry.songs,entry.meta,'saved','saved');
       document.getElementById('saved-songs-list').innerHTML=songCardsHTML(entry.songs);
       showScreen('saved-screen');
     }
@@ -469,10 +497,8 @@
       localStorage.removeItem('moodwave_history');updateHistoryBadge();renderHistory();
     }
 
-    /* INIT */
-    loadSpotifySession();
-    updateHistoryBadge();
-    updateSpotifyUI();
+    /* ══ INIT ══ */
+    loadSpotifySession();updateHistoryBadge();updateSpotifyUI();
     if(window.location.search.includes('code='))handleCallback();
   </script>
 </body>

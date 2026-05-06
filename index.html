@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    :root{--bg:#07080f;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.10);--border:rgba(255,255,255,0.15);--text:#f0f0ff;--muted:rgba(240,240,255,0.65);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc;--spotify:#1ed760;--green:#4ade80}
+    :root{--bg:#07080f;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.10);--border:rgba(255,255,255,0.15);--text:#f0f0ff;--muted:rgba(240,240,255,0.65);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc;--green:#4ade80}
     html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
     .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;opacity:.28;z-index:0}
     .orb1{width:500px;height:500px;background:radial-gradient(circle,#4f46e5,transparent);top:-150px;left:-150px}
@@ -29,16 +29,8 @@
     .hero-badges{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;max-width:380px}
     .hero-badge{font-size:.75rem;padding:.3rem .8rem;border-radius:100px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--muted)}
     .hero-actions{display:flex;flex-direction:column;align-items:center;gap:.75rem;width:100%;max-width:320px}
-    .spotify-banner{display:flex;align-items:center;gap:.75rem;background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.25);border-radius:14px;padding:.75rem 1rem;width:100%}
-    .spotify-avatar{width:32px;height:32px;border-radius:50%;background:rgba(30,215,96,.2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-    .spotify-banner-text{flex:1}
-    .spotify-banner-name{font-size:.85rem;font-weight:500;color:var(--spotify)}
-    .spotify-banner-sub{font-size:.72rem;color:rgba(30,215,96,.6)}
-    .spotify-disconnect{font-size:.7rem;color:rgba(255,255,255,.35);cursor:pointer;text-decoration:underline;background:none;border:none}
     .btn-primary{background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff!important;-webkit-text-fill-color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;padding:.9rem 2.5rem;border-radius:100px;cursor:pointer;box-shadow:0 0 32px rgba(124,106,255,.42);transition:transform .2s,box-shadow .2s;width:100%}
     .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 52px rgba(124,106,255,.62)}
-    .btn-spotify-connect{background:var(--spotify);border:none;color:#000!important;-webkit-text-fill-color:#000;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:700;padding:.85rem 2rem;border-radius:100px;cursor:pointer;transition:transform .2s,opacity .2s;width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem}
-    .btn-spotify-connect:hover{transform:translateY(-2px);opacity:.92}
     .btn-history{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--muted)!important;-webkit-text-fill-color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;padding:.75rem 2rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%}
     .btn-history:hover{border-color:var(--accent2);color:#fff!important;-webkit-text-fill-color:#fff}
     .count-badge{display:inline-block;background:rgba(124,106,255,.35);color:var(--accent2);font-size:.7rem;font-weight:600;padding:.1rem .5rem;border-radius:100px;margin-left:.4rem}
@@ -206,16 +198,6 @@
       <span class="hero-badge">🎲 Mode Surprise</span>
     </div>
     <div class="hero-actions">
-      <button class="btn-spotify-connect" id="btn-connect-spotify" onclick="connectSpotify()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-        Connecter Spotify
-      </button>
-      <div class="spotify-banner" id="spotify-banner" style="display:none">
-        <div class="spotify-avatar">🎵</div>
-        <div class="spotify-banner-text">
-          <div class="spotify-banner-name" id="spotify-username">Connecté</div>
-          <div class="spotify-banner-sub">Spotify lié à Moodwave</div>
-        </div>
         <button class="spotify-disconnect" onclick="disconnectSpotify()">Déconnecter</button>
       </div>
       <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
@@ -521,14 +503,6 @@
     function generateRandomString(n){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b=>c[b%c.length]).join('');}
     async function sha256(p){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));}
     function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
-    async function connectSpotify(){
-      const r=await fetch('/api/spotify-config');const {clientId}=await r.json();
-      const redirectUri=window.location.origin+'/callback';
-      const cv=generateRandomString(64);const cc=b64url(await sha256(cv));
-      sessionStorage.setItem('spotify_code_verifier',cv);
-      const p=new URLSearchParams({client_id:clientId,response_type:'code',redirect_uri:redirectUri,scope:'playlist-modify-public playlist-modify-private user-read-private user-read-email',code_challenge_method:'S256',code_challenge:cc});
-      window.location='https://accounts.spotify.com/authorize?'+p.toString();
-    }
     async function handleCallback(){
       const params=new URLSearchParams(window.location.search);const code=params.get('code');if(!code)return;
       const cv=sessionStorage.getItem('spotify_code_verifier');
@@ -543,20 +517,12 @@
         window.history.replaceState({},'','/');updateSpotifyUI();
       }
     }
-    async function fetchSpotifyUser(){
-      if(!spotifyToken)return;
-      try{const res=await fetch('https://api.spotify.com/v1/me',{headers:{Authorization:'Bearer '+spotifyToken}});const u=await res.json();spotifyUserId=u.id;localStorage.setItem('spotify_user_id',u.id);localStorage.setItem('spotify_user_name',u.display_name||u.id);}catch(e){}
-    }
     function loadSpotifySession(){
       const token=localStorage.getItem('spotify_token');const expires=parseInt(localStorage.getItem('spotify_token_expires')||'0');
       if(token&&expires>Date.now()){spotifyToken=token;spotifyUserId=localStorage.getItem('spotify_user_id');}
       else{spotifyToken=null;spotifyUserId=null;}
     }
-    function disconnectSpotify(){
-      ['spotify_token','spotify_token_expires','spotify_refresh_token','spotify_user_id','spotify_user_name'].forEach(k=>localStorage.removeItem(k));
-      spotifyToken=null;spotifyUserId=null;updateSpotifyUI();
-    }
-    function updateSpotifyUI(){
+    function updateSpotifyUI(){return;//
       const ok=!!spotifyToken;
       document.getElementById('btn-connect-spotify').style.display=ok?'none':'flex';
       document.getElementById('spotify-banner').style.display=ok?'flex':'none';
@@ -811,7 +777,7 @@
 
     /* ══ INIT ══ */
     votes=loadVotes();
-    loadSpotifySession();updateHistoryBadge();updateSpotifyUI();
+    updateHistoryBadge();
     if(window.location.search.includes('code='))handleCallback();
   </script>
 </body>

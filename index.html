@@ -216,7 +216,6 @@
       <span class="hero-badge">🎲 Mode Surprise</span>
     </div>
     <div class="hero-actions">
-        <button class="spotify-disconnect" onclick="disconnectSpotify()">Déconnecter</button>
       </div>
       <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
       <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')" style="display:none">
@@ -226,76 +225,133 @@
     <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
   </div>
 
-  <!-- FORMULAIRE -->
+  <!-- FORMULAIRE STEPPER -->
   <div id="form-screen" class="screen">
-    <div class="form-header">
-      <button class="back-btn" onclick="showScreen('hero')">←</button>
-      <span class="form-title">Dis-moi comment tu te sens</span>
+    <div class="stepper-header">
+      <button class="back-btn" id="step-back-btn" onclick="stepBack()">←</button>
+      <div class="stepper-progress-wrap">
+        <div class="stepper-label">
+          <span id="step-label-text">Genres musicaux</span>
+          <span id="step-counter">1 / 5</span>
+        </div>
+        <div class="stepper-bar"><div class="stepper-fill" id="stepper-fill" style="width:20%"></div></div>
+      </div>
     </div>
     <div class="error-msg" id="error-msg"></div>
-    <p class="section-label">Tes genres préférés <span style="color:var(--muted);font-size:.65rem;letter-spacing:0;text-transform:none;font-weight:400">(choix multiple)</span></p>
-    <div class="pills" id="genre-pills">
-      <div class="pill multi" data-group="genre" data-val="Électronique" onclick="toggleMultiPill(this)">🎛️ Électronique</div>
-      <div class="pill multi" data-group="genre" data-val="Rock" onclick="toggleMultiPill(this)">🎸 Rock</div>
-      <div class="pill multi" data-group="genre" data-val="Rap / Hip-Hop" onclick="toggleMultiPill(this)">🎤 Rap / Hip-Hop</div>
-      <div class="pill multi" data-group="genre" data-val="Reggae" onclick="toggleMultiPill(this)">🌴 Reggae</div>
-      <div class="pill multi" data-group="genre" data-val="Classique" onclick="toggleMultiPill(this)">🎻 Classique</div>
-      <div class="pill multi" data-group="genre" data-val="R&amp;B / Soul" onclick="toggleMultiPill(this)">🎷 R&amp;B / Soul</div>
-      <div class="pill multi" data-group="genre" data-val="Métal" onclick="toggleMultiPill(this)">🤘 Métal</div>
-      <div class="pill multi" data-group="genre" data-val="Variété / Pop" onclick="toggleMultiPill(this)">🎶 Variété / Pop</div>
-      <div class="pill multi" data-group="genre" data-val="Jazz" onclick="toggleMultiPill(this)">🎺 Jazz</div>
-      <div class="pill multi" data-group="genre" data-val="Indie / Alternative" onclick="toggleMultiPill(this)">🌿 Indie</div>
-      <div class="pill multi" data-group="genre" data-val="World Music" onclick="toggleMultiPill(this)">🌍 World Music</div>
-      <div class="pill multi all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)">✨ De tout</div>
+
+    <!-- ÉTAPE 1 — Genres -->
+    <div class="step-panel active" id="step-1">
+      <div class="step-question">Quel genre tu écoutes ?</div>
+      <div class="step-hint">Choix multiple — sélectionne tout ce qui te correspond.</div>
+      <div class="pills" id="genre-pills">
+        <div class="pill multi" data-group="genre" data-val="Électronique" onclick="toggleMultiPill(this)">🎛️ Électronique</div>
+        <div class="pill multi" data-group="genre" data-val="Rock" onclick="toggleMultiPill(this)">🎸 Rock</div>
+        <div class="pill multi" data-group="genre" data-val="Rap / Hip-Hop" onclick="toggleMultiPill(this)">🎤 Rap</div>
+        <div class="pill multi" data-group="genre" data-val="Reggae" onclick="toggleMultiPill(this)">🌴 Reggae</div>
+        <div class="pill multi" data-group="genre" data-val="Classique" onclick="toggleMultiPill(this)">🎻 Classique</div>
+        <div class="pill multi" data-group="genre" data-val="R&B / Soul" onclick="toggleMultiPill(this)">🎷 R&B / Soul</div>
+        <div class="pill multi" data-group="genre" data-val="Métal" onclick="toggleMultiPill(this)">🤘 Métal</div>
+        <div class="pill multi" data-group="genre" data-val="Variété / Pop" onclick="toggleMultiPill(this)">🎶 Pop</div>
+        <div class="pill multi" data-group="genre" data-val="Jazz" onclick="toggleMultiPill(this)">🎺 Jazz</div>
+        <div class="pill multi" data-group="genre" data-val="Indie / Alternative" onclick="toggleMultiPill(this)">🌿 Indie</div>
+        <div class="pill multi" data-group="genre" data-val="World Music" onclick="toggleMultiPill(this)">🌍 World</div>
+        <div class="pill multi all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)">✨ De tout</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-next" onclick="goStep(2)">Suivant →</button>
+      </div>
     </div>
 
-    <p class="section-label">Ton mood</p>
-    <div class="pills">
-      <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)">😌 Calme</div>
-      <div class="pill" data-group="mood" data-val="Stressé" onclick="selectPill(this)">😤 Stressé</div>
-      <div class="pill" data-group="mood" data-val="Heureux" onclick="selectPill(this)">😊 Heureux</div>
-      <div class="pill" data-group="mood" data-val="Triste" onclick="selectPill(this)">😢 Triste</div>
-      <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)">🔥 Motivé</div>
-      <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)">🌙 Nostalgique</div>
-      <div class="pill" data-group="mood" data-val="Focus TDAH" onclick="selectPill(this)">🧠 Focus TDAH</div>
-      <div class="pill" data-group="mood" data-val="Anxieux" onclick="selectPill(this)">😰 Anxieux</div>
-    </div>
-    <p class="section-label">Niveau d'énergie</p>
-    <div class="pills">
-      <div class="pill" data-group="energy" data-val="Faible" onclick="selectPill(this)">🔋 Faible</div>
-      <div class="pill" data-group="energy" data-val="Moyen" onclick="selectPill(this)">⚡ Moyen</div>
-      <div class="pill" data-group="energy" data-val="Élevé" onclick="selectPill(this)">🚀 Élevé</div>
-    </div>
-    <p class="section-label">Contexte</p>
-    <div class="pills">
-      <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)">💻 Travail</div>
-      <div class="pill" data-group="context" data-val="Études" onclick="selectPill(this)">📚 Études</div>
-      <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)">🏃 Sport</div>
-      <div class="pill" data-group="context" data-val="Détente" onclick="selectPill(this)">🛋️ Détente</div>
-      <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)">🚇 Trajet</div>
-      <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)">🎉 Fête</div>
-      <div class="pill" data-group="context" data-val="Road trip" onclick="selectPill(this)">🚗 Road trip</div>
-      <div class="pill" data-group="context" data-val="Méditation" onclick="selectPill(this)">🧘 Méditation</div>
-    </div>
-    <div class="surprise-row">
-      <div class="surprise-info">
-        <h4>🎲 Mode Surprise</h4>
-        <p>Découvre des sons totalement inattendus</p>
+    <!-- ÉTAPE 2 — Mood -->
+    <div class="step-panel" id="step-2">
+      <div class="step-question">Comment tu te sens ?</div>
+      <div class="step-hint">Choisis le mood qui correspond le mieux à maintenant.</div>
+      <div class="pills">
+        <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)">😌 Calme</div>
+        <div class="pill" data-group="mood" data-val="Stressé" onclick="selectPill(this)">😤 Stressé</div>
+        <div class="pill" data-group="mood" data-val="Heureux" onclick="selectPill(this)">😊 Heureux</div>
+        <div class="pill" data-group="mood" data-val="Triste" onclick="selectPill(this)">😢 Triste</div>
+        <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)">🔥 Motivé</div>
+        <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)">🌙 Nostalgique</div>
+        <div class="pill" data-group="mood" data-val="Focus TDAH" onclick="selectPill(this)">🧠 Focus TDAH</div>
+        <div class="pill" data-group="mood" data-val="Anxieux" onclick="selectPill(this)">😰 Anxieux</div>
       </div>
-      <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
+      <div class="step-nav">
+        <button class="btn-next" id="mood-next" onclick="goStep(3)" disabled>Suivant →</button>
+      </div>
     </div>
-    <button class="btn-full" onclick="generate(false)">Générer ma playlist ✨</button>
+
+    <!-- ÉTAPE 3 — Énergie -->
+    <div class="step-panel" id="step-3">
+      <div class="step-question">Ton niveau d'énergie ?</div>
+      <div class="step-hint">Ça influence le tempo et l'intensité des morceaux.</div>
+      <div class="energy-cards">
+        <div class="energy-card" data-group="energy" data-val="Faible" onclick="selectEnergy(this)">
+          <div class="e-icon">🔋</div>
+          <div class="e-label">Faible</div>
+          <div class="e-desc">Calme, posé</div>
+        </div>
+        <div class="energy-card" data-group="energy" data-val="Moyen" onclick="selectEnergy(this)">
+          <div class="e-icon">⚡</div>
+          <div class="e-label">Moyen</div>
+          <div class="e-desc">Équilibré</div>
+        </div>
+        <div class="energy-card" data-group="energy" data-val="Élevé" onclick="selectEnergy(this)">
+          <div class="e-icon">🚀</div>
+          <div class="e-label">Élevé</div>
+          <div class="e-desc">Intense</div>
+        </div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-next" id="energy-next" onclick="goStep(4)" disabled>Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 4 — Contexte -->
+    <div class="step-panel" id="step-4">
+      <div class="step-question">Tu vas écouter où ?</div>
+      <div class="step-hint">Le contexte influence les ambiances et les tempos proposés.</div>
+      <div class="pills">
+        <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)">💻 Travail</div>
+        <div class="pill" data-group="context" data-val="Études" onclick="selectPill(this)">📚 Études</div>
+        <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)">🏃 Sport</div>
+        <div class="pill" data-group="context" data-val="Détente" onclick="selectPill(this)">🛋️ Détente</div>
+        <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)">🚇 Trajet</div>
+        <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)">🎉 Fête</div>
+        <div class="pill" data-group="context" data-val="Road trip" onclick="selectPill(this)">🚗 Road trip</div>
+        <div class="pill" data-group="context" data-val="Méditation" onclick="selectPill(this)">🧘 Méditation</div>
+      </div>
+      <div class="step-nav">
+        <button class="btn-next" id="context-next" onclick="goStep(5)" disabled>Suivant →</button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 5 — Récap + Surprise -->
+    <div class="step-panel" id="step-5">
+      <div class="step-question">C'est parti ? 🎵</div>
+      <div class="step-hint">Voici ta sélection — modifie ou lance la génération.</div>
+      <div class="recap-box" id="recap-box"></div>
+      <div class="surprise-row">
+        <div class="surprise-info">
+          <h4>🎲 Mode Surprise</h4>
+          <p>Découvre des sons totalement inattendus</p>
+        </div>
+        <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <button class="btn-next" onclick="generate(false)">Générer ma playlist ✨</button>
+    </div>
+
     <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
   </div>
 
-  <!-- LOADING -->
+    <!-- LOADING -->
   <div id="loading-screen" class="screen">
     <div class="wave-container">
       <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
       <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
       <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
     </div>
-    <p class="loading-text" id="loading-text">Analyse de ton vibe...</p>
+    <p class="loading-text" id="loading-text">Analyse de ta vibe...</p>
   </div>
 
   <!-- RÉSULTATS -->
@@ -379,7 +435,7 @@
     let spotifyToken=null,spotifyUserId=null;
     let activeDropdown=null;
     let votes={};
-    const msgs=["Analyse de ton vibe...","Calibrage des fréquences...","Exploration des sons...","Presque prêt..."];
+    const msgs=["Analyse de ta vibe...","Calibrage des fréquences...","Sélection des 10 titres...","Presque prêt..."];
 
     /* ══ NAV ══ */
     function showScreen(id){
@@ -389,7 +445,68 @@
       closeAllDropdowns();
       if(id==='history-screen')renderHistory();
       if(id==='hero'){updateHistoryBadge();updateSpotifyUI();}
+      if(id==='form-screen')resetStepper();
     }
+
+    /* ══ STEPPER ══ */
+    let currentStep=1;
+    const TOTAL_STEPS=5;
+    const stepLabels=['Genres musicaux','Ton mood','Niveau d'énergie','Contexte','Récapitulatif'];
+
+    function goStep(n){
+      // Validation avant d'avancer
+      if(n===2&&selectedGenres.length===0){
+        // Genres optionnels — on peut passer sans sélection
+      }
+      if(n===3&&!sel.mood)return;
+      if(n===4&&!sel.energy)return;
+      if(n===5&&!sel.context)return;
+
+      document.getElementById('step-'+currentStep).classList.remove('active');
+      currentStep=n;
+      document.getElementById('step-'+currentStep).classList.add('active');
+      updateStepperUI();
+      if(n===5)renderRecap();
+    }
+
+    function stepBack(){
+      if(currentStep===1){showScreen('hero');return;}
+      goStep(currentStep-1);
+    }
+
+    function updateStepperUI(){
+      document.getElementById('stepper-fill').style.width=(currentStep/TOTAL_STEPS*100)+'%';
+      document.getElementById('step-label-text').textContent=stepLabels[currentStep-1];
+      document.getElementById('step-counter').textContent=currentStep+' / '+TOTAL_STEPS;
+    }
+
+    function selectEnergy(el){
+      document.querySelectorAll('.energy-card').forEach(c=>c.classList.remove('selected'));
+      el.classList.add('selected');
+      sel.energy=el.dataset.val;
+      document.getElementById('energy-next').disabled=false;
+    }
+
+    function renderRecap(){
+      const genres=selectedGenres.length>0?selectedGenres.join(', '):'Tous genres';
+      document.getElementById('recap-box').innerHTML=`
+        <div class="recap-row"><span class="recap-key">🎵 Genres</span><span class="recap-val">${genres}</span></div>
+        <div class="recap-row"><span class="recap-key">😊 Mood</span><span class="recap-val">${sel.mood||'—'}</span></div>
+        <div class="recap-row"><span class="recap-key">⚡ Énergie</span><span class="recap-val">${sel.energy||'—'}</span></div>
+        <div class="recap-row"><span class="recap-key">📍 Contexte</span><span class="recap-val">${sel.context||'—'}</span></div>`;
+    }
+
+    function resetStepper(){
+      currentStep=1;
+      document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+      document.getElementById('step-1').classList.add('active');
+      updateStepperUI();
+      // Reset boutons next
+      ['mood-next','energy-next','context-next'].forEach(id=>{
+        const el=document.getElementById(id);if(el)el.disabled=true;
+      });
+    }
+
 
     function toggleMultiPill(el){
       // Si "De tout" était sélectionné, le désélectionner
@@ -422,6 +539,9 @@
       const g=el.dataset.group;
       document.querySelectorAll('.pill[data-group="'+g+'"]').forEach(p=>p.classList.remove('selected'));
       el.classList.add('selected');sel[g]=el.dataset.val;
+      // Activer bouton suivant
+      if(g==='mood'){const b=document.getElementById('mood-next');if(b)b.disabled=false;}
+      if(g==='context'){const b=document.getElementById('context-next');if(b)b.disabled=false;}
     }
     function showError(msg){const el=document.getElementById('error-msg');el.textContent=msg;el.style.display='block';}
     function hideError(){document.getElementById('error-msg').style.display='none';}
@@ -521,14 +641,19 @@
         ctx.fillStyle='#ffffff';
         ctx.font='700 17px Syne, sans-serif';
         ctx.fillText(truncate(s.title,34),94,y+52);
-        // Genre tag
-        const gW=ctx.measureText(s.genre).width+16;
+        // Genre tag — aligné à droite de la card
+        const genreText=s.genre.slice(0,16);
+        ctx.font='500 12px DM Sans, sans-serif';
+        const gW=Math.min(ctx.measureText(genreText).width+20,140);
+        const gX=W-44-gW; // bord droit de la card moins padding
         ctx.fillStyle='rgba(165,243,252,0.12)';
         ctx.strokeStyle='rgba(165,243,252,0.25)';ctx.lineWidth=1;
-        roundRect(ctx,W-88-gW,y+38,gW,22,11);
+        roundRect(ctx,gX,y+40,gW,22,11);
         ctx.fill();ctx.stroke();
-        ctx.fillStyle='#a5f3fc';ctx.font='500 12px DM Sans, sans-serif';
-        ctx.fillText(s.genre.slice(0,18),W-88-gW+8,y+53);
+        ctx.fillStyle='#a5f3fc';
+        ctx.textAlign='center';
+        ctx.fillText(genreText,gX+gW/2,y+55);
+        ctx.textAlign='left';
       });
 
       // Footer
@@ -912,7 +1037,8 @@
         const songs=await res.json();
         if(!Array.isArray(songs)||!songs.length)throw new Error('Playlist vide');
         stopLoading();
-        const meta=isSurprise?'Mode Surprise 🎲':`${sel.mood} · ${sel.energy} · ${sel.context}${withSurprise?' · Surprise 🎲':''}`;
+        const genreLabel=selectedGenres.length>0&&!selectedGenres.includes('De tout')?selectedGenres.join('-')+' / ':'';
+        const meta=isSurprise?'Mode Surprise 🎲':`${genreLabel}${sel.mood} / ${sel.energy} / ${sel.context}${withSurprise?' · Surprise 🎲':''}`;
         currentSongs=songs;currentMeta=meta;votes={};
         saveToHistory(songs,meta);
         renderResults(songs,meta);

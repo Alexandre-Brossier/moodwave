@@ -216,7 +216,6 @@
       <span class="hero-badge">🎲 Mode Surprise</span>
     </div>
     <div class="hero-actions">
-      </div>
       <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
       <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')" style="display:none">
         📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span>
@@ -427,6 +426,7 @@
     <button class="mini-player-close" onclick="stopPlayer()" title="Fermer">✕</button>
   </div>
   <audio id="audio-player" preload="none"></audio>
+
 
   <script>
     const sel={mood:null,energy:null,context:null};

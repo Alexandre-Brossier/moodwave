@@ -3,105 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moodwave — Ta playlist selon ton mood</title>
-  <meta name="description" content="Génère une playlist musicale personnalisée basée sur ton mood, ton énergie et ton moment.">
-  <meta property="og:title" content="Moodwave — Ma playlist du moment 🎵">
-  <meta property="og:description" content="Découvre Moodwave : une IA qui génère ta playlist selon ton mood !">
-  <meta property="og:image" content="https://project-0mjoz.vercel.app/og-image.png">
-  <meta property="og:url" content="https://project-0mjoz.vercel.app">
-  <meta name="theme-color" content="#07080f">
-  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Moodwave">
+  <meta name="theme-color" content="#07080f">
+  <meta name="description" content="Génère une playlist musicale personnalisée basée sur ton mood, ton énergie et ton moment.">
+  <title>Moodwave — Ta playlist selon ton mood</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="/icon-192.png">
-  <script defer src="/_vercel/insights/script.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script defer src="/_vercel/insights/script.js"></script>
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    :root{--bg:#07080f;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.10);--border:rgba(255,255,255,0.15);--text:#f0f0ff;--muted:rgba(240,240,255,0.65);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc;--green:#4ade80}
+    :root{--bg:#07080f;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.10);--border:rgba(255,255,255,0.15);--text:#f0f0ff;--muted:rgba(240,240,255,0.65);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc}
     html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
     .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;opacity:.28;z-index:0}
     .orb1{width:500px;height:500px;background:radial-gradient(circle,#4f46e5,transparent);top:-150px;left:-150px}
     .orb2{width:400px;height:400px;background:radial-gradient(circle,#7c3aed,transparent);top:40%;right:-100px}
     .orb3{width:350px;height:350px;background:radial-gradient(circle,#0891b2,transparent);bottom:-80px;left:35%}
-    .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:2rem 1.25rem;max-width:560px;margin:0 auto}
+    .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:2rem 1.25rem 6rem;max-width:560px;margin:0 auto}
     .screen.active{display:flex;flex-direction:column}
-    #hero{align-items:center;justify-content:center;text-align:center;gap:1.5rem}
+
+    /* HERO */
+    #hero{align-items:center;justify-content:center;text-align:center;gap:1.5rem;padding-bottom:2rem}
     .logo{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.22em;color:var(--accent2);text-transform:uppercase}
-    .hero-title{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,6vw,2.8rem);font-weight:800;line-height:1.15;color:#fff;max-width:420px;text-align:center}
+    .hero-title{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,6vw,2.8rem);font-weight:800;line-height:1.15;color:#fff;max-width:420px}
     .hero-title span{color:var(--accent2)}
-    .hero-sub{color:var(--muted);font-size:1rem;max-width:320px;line-height:1.65;text-align:center}
+    .hero-sub{color:var(--muted);font-size:1rem;max-width:320px;line-height:1.65}
     .hero-badges{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;max-width:380px}
     .hero-badge{font-size:.75rem;padding:.3rem .8rem;border-radius:100px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--muted)}
     .hero-actions{display:flex;flex-direction:column;align-items:center;gap:.75rem;width:100%;max-width:320px}
-    .btn-primary{background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff!important;-webkit-text-fill-color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;padding:.9rem 2.5rem;border-radius:100px;cursor:pointer;box-shadow:0 0 32px rgba(124,106,255,.42);transition:transform .2s,box-shadow .2s;width:100%}
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 52px rgba(124,106,255,.62)}
     .btn-history{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--muted)!important;-webkit-text-fill-color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;padding:.75rem 2rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%}
     .btn-history:hover{border-color:var(--accent2);color:#fff!important;-webkit-text-fill-color:#fff}
     .count-badge{display:inline-block;background:rgba(124,106,255,.35);color:var(--accent2);font-size:.7rem;font-weight:600;padding:.1rem .5rem;border-radius:100px;margin-left:.4rem}
-    .btn-full{width:100%;background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff!important;-webkit-text-fill-color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;padding:.9rem;border-radius:100px;cursor:pointer;box-shadow:0 0 32px rgba(124,106,255,.42);transition:transform .2s}
-    .btn-full:hover{transform:translateY(-2px)}
+
+    /* BOUTONS */
+    .btn-primary{background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff!important;-webkit-text-fill-color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;padding:.9rem 2.5rem;border-radius:100px;cursor:pointer;box-shadow:0 0 32px rgba(124,106,255,.42);transition:transform .2s,box-shadow .2s;width:100%}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 52px rgba(124,106,255,.62)}
+    .btn-primary:active{transform:scale(.97)}
     .btn-secondary{flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.17);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;padding:.75rem 1rem;border-radius:100px;cursor:pointer;transition:all .2s;min-width:130px}
     .btn-secondary:hover{border-color:var(--accent2);color:#fff}
     .btn-danger{flex:1;background:rgba(255,80,80,.08);border:1px solid rgba(255,100,100,.25);color:#fca5a5;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;padding:.65rem 1rem;border-radius:100px;cursor:pointer;transition:all .2s}
     .btn-danger:hover{background:rgba(255,80,80,.15)}
+
+    /* STEPPER */
     #form-screen{gap:0}
-    .form-header{display:flex;align-items:center;gap:.75rem;margin-bottom:2rem;padding-top:.5rem}
+    .stepper-header{display:flex;align-items:center;gap:.75rem;padding-top:.5rem;margin-bottom:1.75rem}
     .back-btn{background:var(--surface2);border:.5px solid var(--border);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
     .back-btn:hover{background:rgba(255,255,255,.18)}
-    .form-title{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff}
-    .error-msg{background:rgba(255,80,80,.1);border:1px solid rgba(255,100,100,.32);color:#fca5a5;border-radius:12px;padding:.875rem 1rem;font-size:.85rem;margin-bottom:1rem;display:none;line-height:1.5}
-    .success-msg{background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.25);color:#4ade80;border-radius:12px;padding:.75rem 1rem;font-size:.85rem;margin-bottom:.75rem;display:none;line-height:1.5}
-    .section-label{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:.6rem}
-    .pills{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1.5rem}
-    .pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.875rem;padding:.48rem 1rem;border-radius:100px;cursor:pointer;transition:all .2s;user-select:none}
-    .pill:hover{border-color:var(--accent2);color:#fff;background:rgba(255,255,255,.13)}
-    .pill.selected{background:rgba(124,106,255,.32);border-color:#a78bfa;color:#fff;font-weight:500}
-    .pill.multi.all-genres.selected{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.5);color:#fde68a}
-    .surprise-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:16px;padding:1rem 1.25rem;margin-bottom:1.75rem}
-    .surprise-info h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.2rem}
-    .surprise-info p{font-size:.8rem;color:var(--muted)}
+    .stepper-progress-wrap{flex:1}
+    .stepper-label{font-size:.72rem;color:var(--muted);margin-bottom:.35rem;display:flex;justify-content:space-between}
+    .stepper-bar{height:3px;background:rgba(255,255,255,.1);border-radius:100px;overflow:hidden}
+    .stepper-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .4s ease}
+    .step-panel{display:none}.step-panel.active{display:block}
+    .step-question{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;color:#fff;margin-bottom:.4rem;line-height:1.2}
+    .step-hint{font-size:.82rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.5}
+
+    /* PILLS */
+    .pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
+    .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.875rem;padding:.55rem 1rem;border-radius:14px;cursor:pointer;transition:all .2s;user-select:none}
+    .pill:hover{border-color:var(--accent2);color:#fff;background:rgba(255,255,255,.12)}
+    .pill.selected{background:rgba(124,106,255,.28);border-color:#a78bfa;color:#fff;font-weight:500}
+    .pill.all-genres.selected{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4);color:#fde68a}
+
+    /* ENERGY CARDS */
+    .energy-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;margin-bottom:1.25rem}
+    .energy-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1rem .75rem;text-align:center;cursor:pointer;transition:all .2s;user-select:none}
+    .energy-card:hover{border-color:var(--accent2);background:rgba(255,255,255,.1)}
+    .energy-card.selected{background:rgba(124,106,255,.22);border-color:#a78bfa}
+    .energy-card .e-icon{font-size:1.75rem;margin-bottom:.4rem}
+    .energy-card .e-label{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:#fff}
+    .energy-card .e-desc{font-size:.72rem;color:var(--muted);margin-top:.2rem}
+
+    /* RECAP */
+    .recap-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:1.25rem;margin-bottom:1.25rem}
+    .recap-row{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .recap-row:last-child{border-bottom:none}
+    .recap-key{font-size:.78rem;color:var(--muted)}
+    .recap-val{font-size:.85rem;color:#fff;font-weight:500;text-align:right;max-width:65%}
+
+    /* SURPRISE */
+    .surprise-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:.875rem 1.1rem;margin-bottom:1.25rem}
+    .surprise-info h4{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:#fff;margin-bottom:.15rem}
+    .surprise-info p{font-size:.78rem;color:var(--muted)}
     .toggle{width:44px;height:24px;background:rgba(255,255,255,.15);border-radius:100px;position:relative;cursor:pointer;transition:background .3s;border:1px solid rgba(255,255,255,.2);flex-shrink:0}
     .toggle.on{background:linear-gradient(135deg,#7c6aff,#a78bfa);border-color:#a78bfa}
     .toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .3s}
     .toggle.on::after{transform:translateX(20px)}
+
+    /* STEP NAV */
+    .step-nav{display:flex;gap:.625rem;margin-top:.5rem}
+    .btn-next{flex:1;background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff!important;-webkit-text-fill-color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;padding:.85rem;border-radius:100px;cursor:pointer;transition:transform .2s,opacity .2s}
+    .btn-next:hover{transform:translateY(-2px)}
+    .btn-next:disabled{opacity:.35;cursor:not-allowed;transform:none}
+
+    /* MESSAGES */
+    .error-msg{background:rgba(255,80,80,.1);border:1px solid rgba(255,100,100,.32);color:#fca5a5;border-radius:12px;padding:.875rem 1rem;font-size:.85rem;margin-bottom:1rem;display:none;line-height:1.5}
+    .success-msg{background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.25);color:#4ade80;border-radius:12px;padding:.75rem 1rem;font-size:.85rem;margin-bottom:.75rem;display:none;line-height:1.5}
+    .feedback-banner{background:rgba(124,106,255,.08);border:1px solid rgba(124,106,255,.2);border-radius:14px;padding:.875rem 1rem;margin-bottom:1rem;font-size:.82rem;color:var(--accent2);display:none}
+
+    /* LOADING */
     #loading-screen{align-items:center;justify-content:center;gap:2rem;text-align:center}
     .wave-container{display:flex;align-items:center;gap:5px;height:60px}
     .wave-bar{width:5px;border-radius:100px;background:linear-gradient(to top,#7c6aff,#a5f3fc);animation:wave 1.2s ease-in-out infinite}
     .wave-bar:nth-child(1){height:20px;animation-delay:0s}.wave-bar:nth-child(2){height:35px;animation-delay:.1s}.wave-bar:nth-child(3){height:50px;animation-delay:.2s}.wave-bar:nth-child(4){height:35px;animation-delay:.3s}.wave-bar:nth-child(5){height:20px;animation-delay:.4s}.wave-bar:nth-child(6){height:40px;animation-delay:.15s}.wave-bar:nth-child(7){height:55px;animation-delay:.25s}.wave-bar:nth-child(8){height:40px;animation-delay:.35s}.wave-bar:nth-child(9){height:20px;animation-delay:.45s}
     @keyframes wave{0%,100%{transform:scaleY(.5);opacity:.5}50%{transform:scaleY(1.2);opacity:1}}
     .loading-text{font-family:'Syne',sans-serif;font-size:1.1rem;color:var(--muted)}
+
+    /* RESULTS */
     #results-screen,#saved-screen{gap:0}
     .results-meta{font-size:.8rem;color:var(--muted);margin-top:.25rem;margin-left:48px;margin-bottom:1rem}
-
-    /* SONG CARD */
     .song-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1rem 1.25rem;margin-bottom:.7rem;transition:border-color .2s,background .2s}
     .song-card:hover{border-color:rgba(167,139,250,.45);background:rgba(255,255,255,.08)}
-    .song-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem}
-    .song-info{flex:1}
-    .song-num{font-size:.7rem;color:var(--muted);font-weight:600;margin-bottom:.2rem}
+    .song-card-top{display:flex;align-items:flex-start;gap:.625rem}
+    .song-info{flex:1;min-width:0}
+    .song-num{font-size:.7rem;color:var(--muted);font-weight:600;margin-bottom:.15rem}
     .song-artist{font-size:.82rem;color:var(--accent2);font-weight:500;margin-bottom:.15rem}
-    .song-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.4rem}
+    .song-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.35rem}
     .genre-tag{font-size:.7rem;padding:.22rem .7rem;border-radius:100px;background:rgba(165,243,252,.1);color:var(--cyan);border:1px solid rgba(165,243,252,.22);font-weight:500;display:inline-block}
     .reason{font-size:.78rem;color:rgba(220,220,255,.6);line-height:1.5;margin-top:.4rem;font-style:italic}
-
-    /* LIKE/DISLIKE */
     .like-btns{display:flex;flex-direction:column;gap:.35rem;flex-shrink:0}
-    .like-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s}
-    .like-btn:hover{transform:scale(1.1)}
+    .like-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
     .like-btn.liked{background:rgba(74,222,128,.2);border-color:rgba(74,222,128,.5)}
     .like-btn.disliked{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.5)}
-
-    /* FEEDBACK BANNER */
-    .feedback-banner{background:rgba(124,106,255,.08);border:1px solid rgba(124,106,255,.2);border-radius:14px;padding:.875rem 1rem;margin-bottom:1rem;font-size:.82rem;color:var(--accent2);display:none}
-
-    /* BARRE D'ACTIONS */
-    .action-bar{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+    .preview-btn{width:32px;height:32px;border-radius:50%;background:rgba(124,106,255,.15);border:1px solid rgba(124,106,255,.3);color:var(--accent2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .preview-btn:hover{background:rgba(124,106,255,.3)}
+    .preview-btn.playing{background:rgba(124,106,255,.35);border-color:var(--accent);color:#fff}
+    .preview-btn.loading{opacity:.6;cursor:wait}
+    .results-actions{display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap}
 
     /* DROPDOWN */
+    .action-bar{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
     .dropdown-wrap{position:relative;flex:1}
     .dropdown-btn{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.17);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;padding:.7rem 1rem;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.5rem;transition:all .2s}
     .dropdown-btn:hover{border-color:var(--accent2);color:#fff}
@@ -112,23 +146,18 @@
     .dropdown-item{display:flex;align-items:center;gap:.625rem;padding:.75rem 1rem;font-size:.85rem;color:#e0e0ff;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif}
     .dropdown-item:hover{background:rgba(255,255,255,.08);color:#fff}
     .dropdown-item .di{font-size:1rem;width:20px;text-align:center}
-    .dropdown-item.sep{border-top:1px solid rgba(255,255,255,.08);margin-top:4px;padding-top:calc(.75rem + 4px)}
+    .dropdown-item.sep{border-top:1px solid rgba(255,255,255,.08)}
 
-    .results-actions{display:flex;gap:.75rem;margin-top:1rem;flex-wrap:wrap}
-    #history-screen{gap:0}
-    .history-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
-    .history-empty .icon{font-size:2.5rem;margin-bottom:1rem}
-    .history-empty p{font-size:.9rem;line-height:1.6}
-    .history-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1rem 1.25rem;margin-bottom:.7rem;cursor:pointer;transition:all .2s}
-    .history-item:hover{border-color:rgba(167,139,250,.45);background:rgba(255,255,255,.08)}
-    .history-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
-    .history-item-tags{display:flex;flex-wrap:wrap;gap:.35rem}
-    .history-tag{font-size:.7rem;padding:.2rem .6rem;border-radius:100px;background:rgba(124,106,255,.2);color:var(--accent2);border:1px solid rgba(124,106,255,.3)}
-    .history-tag.surprise{background:rgba(165,243,252,.1);color:var(--cyan);border-color:rgba(165,243,252,.25)}
-    .history-date{font-size:.72rem;color:var(--muted)}
-    .history-songs-preview{font-size:.8rem;color:rgba(220,220,255,.55);line-height:1.6}
-    .history-count{font-size:.72rem;color:var(--accent2);font-weight:500}
-    .history-actions{display:flex;gap:.75rem;margin-top:1rem}
+    /* MINI PLAYER */
+    .mini-player{position:fixed;bottom:0;left:0;right:0;background:#0d0e1f;border-top:1px solid rgba(255,255,255,.12);padding:.75rem 1.25rem;display:none;align-items:center;gap:.875rem;z-index:500}
+    .mini-player.visible{display:flex}
+    .mini-player-info{flex:1;min-width:0}
+    .mini-player-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mini-player-artist{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mini-player-progress{position:absolute;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s linear;width:0}
+    .mini-player-btn{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .mini-player-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:.25rem;flex-shrink:0}
+    .mini-player-close:hover{color:#fff}
 
     /* SHARE MODAL */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-end;justify-content:center}
@@ -138,1143 +167,645 @@
     .modal-close{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer}
     .share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1rem}
     .share-item{display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.75rem .5rem;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:all .2s}
-    .share-item:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-2px)}
+    .share-item:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
     .share-item .share-icon{font-size:1.5rem}
     .share-item .share-label{font-size:.68rem;color:var(--muted);text-align:center;line-height:1.3}
     .share-text-preview{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.875rem;font-size:.78rem;color:var(--muted);line-height:1.6;margin-top:.5rem;white-space:pre-wrap;word-break:break-word}
 
-
-    /* MINI LECTEUR */
-    .mini-player{position:fixed;bottom:0;left:0;right:0;background:#0d0e1f;border-top:1px solid rgba(255,255,255,.12);padding:.75rem 1.25rem;display:none;align-items:center;gap:.875rem;z-index:500;backdrop-filter:blur(20px)}
-    .mini-player.visible{display:flex}
-    .mini-player-info{flex:1;min-width:0}
-    .mini-player-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .mini-player-artist{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .mini-player-progress{position:absolute;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s linear;width:0}
-    .mini-player-btn{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s}
-    .mini-player-btn:hover{transform:scale(1.08)}
-    .mini-player-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:.25rem;flex-shrink:0}
-    .mini-player-close:hover{color:#fff}
-    /* BOUTON PREVIEW SUR CARD */
-    .preview-btn{width:32px;height:32px;border-radius:50%;background:rgba(124,106,255,.15);border:1px solid rgba(124,106,255,.3);color:var(--accent2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-    .preview-btn:hover{background:rgba(124,106,255,.3);transform:scale(1.08)}
-    .preview-btn.playing{background:rgba(124,106,255,.35);border-color:var(--accent);color:#fff}
-    .preview-btn.loading{opacity:.6;cursor:wait}
-    .preview-not-found{font-size:.7rem;color:rgba(255,255,255,.25);padding:.2rem .5rem}
-    /* Ajuster le padding bas des écrans pour le mini lecteur */
-    #results-screen,#saved-screen,#history-screen{padding-bottom:5rem}
-
-
-    /* CARTE PARTAGEABLE */
+    /* SHARE CARD */
     .share-card-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:none;align-items:center;justify-content:center;padding:1rem}
     .share-card-overlay.open{display:flex}
-    .share-card-box{background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:1.25rem;max-width:400px;width:100%}
+    .share-card-box{background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:1.25rem;max-width:340px;width:100%}
     .share-card-box canvas{width:100%;border-radius:12px;display:block}
     .share-card-actions{display:flex;gap:.625rem;margin-top:.875rem}
     .share-card-actions button{flex:1;padding:.7rem;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s}
-    .share-card-actions button:hover{background:rgba(255,255,255,.14);color:#fff}
     .share-card-actions .btn-dl{background:linear-gradient(135deg,#7c6aff,#a78bfa);border-color:transparent;color:#fff!important;-webkit-text-fill-color:#fff;font-weight:600}
 
+    /* HISTORY */
+    #history-screen{gap:0}
+    .history-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
+    .history-empty .icon{font-size:2.5rem;margin-bottom:1rem}
+    .history-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1rem 1.25rem;margin-bottom:.7rem;cursor:pointer;transition:all .2s}
+    .history-item:hover{border-color:rgba(167,139,250,.45);background:rgba(255,255,255,.08)}
+    .history-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+    .history-item-tags{display:flex;flex-wrap:wrap;gap:.35rem}
+    .history-tag{font-size:.7rem;padding:.2rem .6rem;border-radius:100px;background:rgba(124,106,255,.2);color:var(--accent2);border:1px solid rgba(124,106,255,.3)}
+    .history-date{font-size:.72rem;color:var(--muted)}
+    .history-songs-preview{font-size:.8rem;color:rgba(220,220,255,.55);line-height:1.6}
+    .history-count{font-size:.72rem;color:var(--accent2);font-weight:500}
+    .history-actions{display:flex;gap:.75rem;margin-top:1rem}
+
     footer{text-align:center;padding:2rem 1rem 1.5rem;color:rgba(200,200,255,.35);font-size:.75rem;line-height:1.9;margin-top:auto}
-    footer a{color:rgba(196,181,253,.5);text-decoration:none}
   </style>
-  <script>
-    // Fonctions globales définies tôt pour les onclick inline
-    function showScreen(id){
-      if(window._showScreen)return window._showScreen(id);
-      document.addEventListener('DOMContentLoaded',()=>window._showScreen&&window._showScreen(id));
-    }
-    function stepBack(){if(window._stepBack)window._stepBack();}
-    function goStep(n){if(window._goStep)window._goStep(n);}
-    function generate(s){if(window._generate)window._generate(s);}
-    function toggleMultiPill(el){if(window._toggleMultiPill)window._toggleMultiPill(el);}
-    function toggleAllGenres(el){if(window._toggleAllGenres)window._toggleAllGenres(el);}
-    function selectPill(el){if(window._selectPill)window._selectPill(el);}
-    function selectEnergy(el){if(window._selectEnergy)window._selectEnergy(el);}
-    function vote(k,t){if(window._vote)window._vote(k,t);}
-    function playPreview(a,t,b){if(window._playPreview)window._playPreview(a,t,b);}
-    function togglePlay(){if(window._togglePlay)window._togglePlay();}
-    function stopPlayer(){if(window._stopPlayer)window._stopPlayer();}
-    function toggleDropdown(id){if(window._toggleDropdown)window._toggleDropdown(id);}
-    function closeAllDropdowns(){if(window._closeAllDropdowns)window._closeAllDropdowns();}
-    function openShareModal(s,m){if(window._openShareModal)window._openShareModal(s,m);}
-    function openShareCard(s,m){if(window._openShareCard)window._openShareCard(s,m);}
-    function closeShareCard(e){if(window._closeShareCard)window._closeShareCard(e);}
-    function downloadShareCard(){if(window._downloadShareCard)window._downloadShareCard();}
-    function shareWhatsApp(){if(window._shareWhatsApp)window._shareWhatsApp();}
-    function shareFacebook(){if(window._shareFacebook)window._shareFacebook();}
-    function shareTwitter(){if(window._shareTwitter)window._shareTwitter();}
-    function shareLinkedIn(){if(window._shareLinkedIn)window._shareLinkedIn();}
-    function shareSMS(){if(window._shareSMS)window._shareSMS();}
-    function shareEmail(){if(window._shareEmail)window._shareEmail();}
-    function shareTikTok(){if(window._shareTikTok)window._shareTikTok();}
-    function shareInstagram(){if(window._shareInstagram)window._shareInstagram();}
-    function shareNative(){if(window._shareNative)window._shareNative();}
-    function shareTextCopy(){if(window._shareTextCopy)window._shareTextCopy();}
-    function copyText(s,m,i){if(window._copyText)window._copyText(s,m,i);}
-    function downloadTXT(s,m){if(window._downloadTXT)window._downloadTXT(s,m);}
-    function downloadCSV(s,m){if(window._downloadCSV)window._downloadCSV(s,m);}
-    function downloadPDF(s,m){if(window._downloadPDF)window._downloadPDF(s,m);}
-    function downloadWord(s,m){if(window._downloadWord)window._downloadWord(s,m);}
-    function openAllOn(p,s){if(window._openAllOn)window._openAllOn(p,s);}
-    function copyShareUrl(s,m,i){if(window._copyShareUrl)window._copyShareUrl(s,m,i);}
-    function openSaved(id){if(window._openSaved)window._openSaved(id);}
-    function clearHistory(){if(window._clearHistory)window._clearHistory();}
-    function disconnectSpotify(){if(window._disconnectSpotify)window._disconnectSpotify();}
-    function closeModal(){if(window._closeModal)window._closeModal();}
-  </script>
 </head>
 <body>
-  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
 
-  <!-- SHARE MODAL -->
-  <div class="modal-overlay" id="share-modal" onclick="closeShareModal(event)">
-    <div class="modal">
-      <div class="modal-title">
-        Partager la playlist 🚀
-        <button class="modal-close" onclick="closeModal()">✕</button>
-      </div>
-      <div class="share-grid">
-        <div class="share-item" onclick="shareWhatsApp()"><div class="share-icon">💬</div><div class="share-label">WhatsApp</div></div>
-        <div class="share-item" onclick="shareInstagram()"><div class="share-icon">📸</div><div class="share-label">Instagram Story</div></div>
-        <div class="share-item" onclick="shareFacebook()"><div class="share-icon">📘</div><div class="share-label">Facebook</div></div>
-        <div class="share-item" onclick="shareTwitter()"><div class="share-icon">🐦</div><div class="share-label">X / Twitter</div></div>
-        <div class="share-item" onclick="shareTikTok()"><div class="share-icon">🎵</div><div class="share-label">TikTok</div></div>
-        <div class="share-item" onclick="shareLinkedIn()"><div class="share-icon">💼</div><div class="share-label">LinkedIn</div></div>
-        <div class="share-item" onclick="shareSMS()"><div class="share-icon">📱</div><div class="share-label">SMS</div></div>
-        <div class="share-item" onclick="shareEmail()"><div class="share-icon">✉️</div><div class="share-label">Email</div></div>
-        <div class="share-item" onclick="shareNative()"><div class="share-icon">🔗</div><div class="share-label">Copier le lien</div></div>
-        <div class="share-item" onclick="shareTextCopy()"><div class="share-icon">📋</div><div class="share-label">Copier le texte</div></div>
-      </div>
-      <div class="share-text-preview" id="share-preview"></div>
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">Partager la playlist 🚀 <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="share-grid">
+      <div class="share-item" onclick="shareWhatsApp()"><div class="share-icon">💬</div><div class="share-label">WhatsApp</div></div>
+      <div class="share-item" onclick="shareInstagram()"><div class="share-icon">📸</div><div class="share-label">Instagram</div></div>
+      <div class="share-item" onclick="shareFacebook()"><div class="share-icon">📘</div><div class="share-label">Facebook</div></div>
+      <div class="share-item" onclick="shareTwitter()"><div class="share-icon">🐦</div><div class="share-label">X / Twitter</div></div>
+      <div class="share-item" onclick="shareTikTok()"><div class="share-icon">🎵</div><div class="share-label">TikTok</div></div>
+      <div class="share-item" onclick="shareLinkedIn()"><div class="share-icon">💼</div><div class="share-label">LinkedIn</div></div>
+      <div class="share-item" onclick="shareSMS()"><div class="share-icon">📱</div><div class="share-label">SMS</div></div>
+      <div class="share-item" onclick="shareEmail()"><div class="share-icon">✉️</div><div class="share-label">Email</div></div>
+      <div class="share-item" onclick="shareNative()"><div class="share-icon">🔗</div><div class="share-label">Copier le lien</div></div>
+      <div class="share-item" onclick="shareTextCopy()"><div class="share-icon">📋</div><div class="share-label">Copier le texte</div></div>
+    </div>
+    <div class="share-text-preview" id="share-preview"></div>
+  </div>
+</div>
+
+<!-- SHARE CARD -->
+<div class="share-card-overlay" id="share-card-overlay" onclick="if(event.target===this)closeShareCard()">
+  <div class="share-card-box">
+    <canvas id="share-canvas" width="400" height="710"></canvas>
+    <div class="share-card-actions">
+      <button onclick="closeShareCard()">✕ Fermer</button>
+      <button class="btn-dl" onclick="downloadShareCard()">⬇️ Télécharger</button>
     </div>
   </div>
+</div>
 
-  <!-- HERO -->
-  <div id="hero" class="screen active">
-    <div class="logo">🎵 Moodwave</div>
-    <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
-    <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
-    <div class="hero-badges">
-      <span class="hero-badge">😌 Calme → Ambient</span>
-      <span class="hero-badge">🔥 Motivé → Workout</span>
-      <span class="hero-badge">🌙 Nostalgique → Indie</span>
-      <span class="hero-badge">🎲 Mode Surprise</span>
-    </div>
-    <div class="hero-actions">
-      <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
-      <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')" style="display:none">
-        📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span>
-      </button>
-    </div>
-    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+<!-- MINI PLAYER -->
+<div class="mini-player" id="mini-player">
+  <div class="mini-player-progress" id="player-progress"></div>
+  <button class="mini-player-btn" id="player-playpause" onclick="togglePlay()">▶</button>
+  <div class="mini-player-info">
+    <div class="mini-player-title" id="player-title">—</div>
+    <div class="mini-player-artist" id="player-artist">—</div>
   </div>
+  <button class="mini-player-close" onclick="stopPlayer()">✕</button>
+</div>
+<audio id="audio-player" preload="none"></audio>
 
-  <!-- FORMULAIRE STEPPER -->
-  <div id="form-screen" class="screen">
-    <div class="stepper-header">
-      <button class="back-btn" id="step-back-btn" onclick="stepBack()">←</button>
-      <div class="stepper-progress-wrap">
-        <div class="stepper-label">
-          <span id="step-label-text">Genres musicaux</span>
-          <span id="step-counter">1 / 5</span>
-        </div>
-        <div class="stepper-bar"><div class="stepper-fill" id="stepper-fill" style="width:20%"></div></div>
-      </div>
-    </div>
-    <div class="error-msg" id="error-msg"></div>
-
-    <!-- ÉTAPE 1 — Genres -->
-    <div class="step-panel active" id="step-1">
-      <div class="step-question">Quel genre tu écoutes ?</div>
-      <div class="step-hint">Choix multiple — sélectionne tout ce qui te correspond.</div>
-      <div class="pills" id="genre-pills">
-        <div class="pill multi" data-group="genre" data-val="Électronique" onclick="toggleMultiPill(this)">🎛️ Électronique</div>
-        <div class="pill multi" data-group="genre" data-val="Rock" onclick="toggleMultiPill(this)">🎸 Rock</div>
-        <div class="pill multi" data-group="genre" data-val="Rap / Hip-Hop" onclick="toggleMultiPill(this)">🎤 Rap</div>
-        <div class="pill multi" data-group="genre" data-val="Reggae" onclick="toggleMultiPill(this)">🌴 Reggae</div>
-        <div class="pill multi" data-group="genre" data-val="Classique" onclick="toggleMultiPill(this)">🎻 Classique</div>
-        <div class="pill multi" data-group="genre" data-val="R&B / Soul" onclick="toggleMultiPill(this)">🎷 R&B / Soul</div>
-        <div class="pill multi" data-group="genre" data-val="Métal" onclick="toggleMultiPill(this)">🤘 Métal</div>
-        <div class="pill multi" data-group="genre" data-val="Variété / Pop" onclick="toggleMultiPill(this)">🎶 Pop</div>
-        <div class="pill multi" data-group="genre" data-val="Jazz" onclick="toggleMultiPill(this)">🎺 Jazz</div>
-        <div class="pill multi" data-group="genre" data-val="Indie / Alternative" onclick="toggleMultiPill(this)">🌿 Indie</div>
-        <div class="pill multi" data-group="genre" data-val="World Music" onclick="toggleMultiPill(this)">🌍 World</div>
-        <div class="pill multi all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)">✨ De tout</div>
-      </div>
-      <div class="step-nav">
-        <button class="btn-next" onclick="goStep(2)">Suivant →</button>
-      </div>
-    </div>
-
-    <!-- ÉTAPE 2 — Mood -->
-    <div class="step-panel" id="step-2">
-      <div class="step-question">Comment tu te sens ?</div>
-      <div class="step-hint">Choisis le mood qui correspond le mieux à maintenant.</div>
-      <div class="pills">
-        <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)">😌 Calme</div>
-        <div class="pill" data-group="mood" data-val="Stressé" onclick="selectPill(this)">😤 Stressé</div>
-        <div class="pill" data-group="mood" data-val="Heureux" onclick="selectPill(this)">😊 Heureux</div>
-        <div class="pill" data-group="mood" data-val="Triste" onclick="selectPill(this)">😢 Triste</div>
-        <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)">🔥 Motivé</div>
-        <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)">🌙 Nostalgique</div>
-        <div class="pill" data-group="mood" data-val="Focus TDAH" onclick="selectPill(this)">🧠 Focus TDAH</div>
-        <div class="pill" data-group="mood" data-val="Anxieux" onclick="selectPill(this)">😰 Anxieux</div>
-      </div>
-      <div class="step-nav">
-        <button class="btn-next" id="mood-next" onclick="goStep(3)" disabled>Suivant →</button>
-      </div>
-    </div>
-
-    <!-- ÉTAPE 3 — Énergie -->
-    <div class="step-panel" id="step-3">
-      <div class="step-question">Ton niveau d'énergie ?</div>
-      <div class="step-hint">Ça influence le tempo et l'intensité des morceaux.</div>
-      <div class="energy-cards">
-        <div class="energy-card" data-group="energy" data-val="Faible" onclick="selectEnergy(this)">
-          <div class="e-icon">🔋</div>
-          <div class="e-label">Faible</div>
-          <div class="e-desc">Calme, posé</div>
-        </div>
-        <div class="energy-card" data-group="energy" data-val="Moyen" onclick="selectEnergy(this)">
-          <div class="e-icon">⚡</div>
-          <div class="e-label">Moyen</div>
-          <div class="e-desc">Équilibré</div>
-        </div>
-        <div class="energy-card" data-group="energy" data-val="Élevé" onclick="selectEnergy(this)">
-          <div class="e-icon">🚀</div>
-          <div class="e-label">Élevé</div>
-          <div class="e-desc">Intense</div>
-        </div>
-      </div>
-      <div class="step-nav">
-        <button class="btn-next" id="energy-next" onclick="goStep(4)" disabled>Suivant →</button>
-      </div>
-    </div>
-
-    <!-- ÉTAPE 4 — Contexte -->
-    <div class="step-panel" id="step-4">
-      <div class="step-question">Tu vas écouter où ?</div>
-      <div class="step-hint">Le contexte influence les ambiances et les tempos proposés.</div>
-      <div class="pills">
-        <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)">💻 Travail</div>
-        <div class="pill" data-group="context" data-val="Études" onclick="selectPill(this)">📚 Études</div>
-        <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)">🏃 Sport</div>
-        <div class="pill" data-group="context" data-val="Détente" onclick="selectPill(this)">🛋️ Détente</div>
-        <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)">🚇 Trajet</div>
-        <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)">🎉 Fête</div>
-        <div class="pill" data-group="context" data-val="Road trip" onclick="selectPill(this)">🚗 Road trip</div>
-        <div class="pill" data-group="context" data-val="Méditation" onclick="selectPill(this)">🧘 Méditation</div>
-      </div>
-      <div class="step-nav">
-        <button class="btn-next" id="context-next" onclick="goStep(5)" disabled>Suivant →</button>
-      </div>
-    </div>
-
-    <!-- ÉTAPE 5 — Récap + Surprise -->
-    <div class="step-panel" id="step-5">
-      <div class="step-question">C'est parti ? 🎵</div>
-      <div class="step-hint">Voici ta sélection — modifie ou lance la génération.</div>
-      <div class="recap-box" id="recap-box"></div>
-      <div class="surprise-row">
-        <div class="surprise-info">
-          <h4>🎲 Mode Surprise</h4>
-          <p>Découvre des sons totalement inattendus</p>
-        </div>
-        <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
-      </div>
-      <button class="btn-next" onclick="generate(false)">Générer ma playlist ✨</button>
-    </div>
-
-    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+<!-- HERO -->
+<div id="hero" class="screen active">
+  <div class="logo">🎵 Moodwave</div>
+  <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
+  <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
+  <div class="hero-badges">
+    <span class="hero-badge">😌 Calme → Ambient</span>
+    <span class="hero-badge">🔥 Motivé → Workout</span>
+    <span class="hero-badge">🌙 Nostalgique → Indie</span>
+    <span class="hero-badge">🎲 Mode Surprise</span>
   </div>
-
-    <!-- LOADING -->
-  <div id="loading-screen" class="screen">
-    <div class="wave-container">
-      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
-    </div>
-    <p class="loading-text" id="loading-text">Analyse de ta vibe...</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
+    <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')" style="display:none">
+      📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span>
+    </button>
   </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
 
-  <!-- RÉSULTATS -->
-  <div id="results-screen" class="screen">
-    <div class="form-header" style="margin-bottom:.25rem">
-      <button class="back-btn" onclick="showScreen('form-screen')">←</button>
-      <span class="form-title">Ta playlist ✨</span>
-    </div>
-    <p class="results-meta" id="results-meta"></p>
-    <div class="success-msg" id="results-success"></div>
-    <div class="feedback-banner" id="feedback-banner"></div>
-    <div id="results-action-bar"></div>
-    <div id="songs-list"></div>
-    <div class="results-actions">
-      <button class="btn-secondary" onclick="showScreen('form-screen')">🔄 Nouveau mood</button>
-      <button class="btn-secondary" onclick="generate(true)">🎲 Surprise me</button>
-    </div>
-    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
-  </div>
-
-  <!-- HISTORIQUE -->
-  <div id="history-screen" class="screen">
-    <div class="form-header">
-      <button class="back-btn" onclick="showScreen('hero')">←</button>
-      <span class="form-title">Mes playlists 📋</span>
-    </div>
-    <div id="history-list"></div>
-    <div class="history-actions" id="history-actions" style="display:none">
-      <button class="btn-secondary" onclick="showScreen('form-screen')">+ Nouvelle playlist</button>
-      <button class="btn-danger" onclick="clearHistory()">🗑️ Tout effacer</button>
-    </div>
-    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
-  </div>
-
-  <!-- PLAYLIST SAUVEGARDÉE -->
-  <div id="saved-screen" class="screen">
-    <div class="form-header" style="margin-bottom:.25rem">
-      <button class="back-btn" onclick="showScreen('history-screen')">←</button>
-      <span class="form-title">Playlist sauvegardée</span>
-    </div>
-    <p class="results-meta" id="saved-meta"></p>
-    <div class="success-msg" id="saved-success"></div>
-    <div id="saved-action-bar"></div>
-    <div id="saved-songs-list"></div>
-    <div class="results-actions">
-      <button class="btn-secondary" onclick="showScreen('history-screen')">← Historique</button>
-      <button class="btn-secondary" onclick="showScreen('form-screen')">+ Nouveau mood</button>
-    </div>
-    <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
-  </div>
-
-
-
-  <!-- CARTE PARTAGEABLE -->
-  <div class="share-card-overlay" id="share-card-overlay" onclick="closeShareCard(event)">
-    <div class="share-card-box">
-      <canvas id="share-canvas" width="540" height="960"></canvas>
-      <div class="share-card-actions">
-        <button onclick="closeShareCard()">✕ Fermer</button>
-        <button class="btn-dl" onclick="downloadShareCard()">⬇️ Télécharger</button>
-      </div>
+<!-- FORMULAIRE STEPPER -->
+<div id="form-screen" class="screen">
+  <div class="stepper-header">
+    <button class="back-btn" onclick="stepBack()">←</button>
+    <div class="stepper-progress-wrap">
+      <div class="stepper-label"><span id="step-label-text">Genres musicaux</span><span id="step-counter">1 / 5</span></div>
+      <div class="stepper-bar"><div class="stepper-fill" id="stepper-fill" style="width:20%"></div></div>
     </div>
   </div>
+  <div class="error-msg" id="error-msg"></div>
 
-  <!-- MINI LECTEUR AUDIO -->
-  <div class="mini-player" id="mini-player">
-    <div class="mini-player-progress" id="player-progress"></div>
-    <button class="mini-player-btn" id="player-playpause" onclick="togglePlay()">▶</button>
-    <div class="mini-player-info">
-      <div class="mini-player-title" id="player-title">—</div>
-      <div class="mini-player-artist" id="player-artist">—</div>
+  <!-- Étape 1 — Genres -->
+  <div class="step-panel active" id="step-1">
+    <div class="step-question">Quel genre tu écoutes ?</div>
+    <div class="step-hint">Choix multiple — sélectionne tout ce qui te correspond.</div>
+    <div class="pills">
+      <div class="pill" data-group="genre" data-val="Électronique" onclick="toggleMultiPill(this)">🎛️ Électronique</div>
+      <div class="pill" data-group="genre" data-val="Rock" onclick="toggleMultiPill(this)">🎸 Rock</div>
+      <div class="pill" data-group="genre" data-val="Rap / Hip-Hop" onclick="toggleMultiPill(this)">🎤 Rap</div>
+      <div class="pill" data-group="genre" data-val="Reggae" onclick="toggleMultiPill(this)">🌴 Reggae</div>
+      <div class="pill" data-group="genre" data-val="Classique" onclick="toggleMultiPill(this)">🎻 Classique</div>
+      <div class="pill" data-group="genre" data-val="R&B / Soul" onclick="toggleMultiPill(this)">🎷 R&amp;B / Soul</div>
+      <div class="pill" data-group="genre" data-val="Metal" onclick="toggleMultiPill(this)">🤘 Métal</div>
+      <div class="pill" data-group="genre" data-val="Pop" onclick="toggleMultiPill(this)">🎶 Pop</div>
+      <div class="pill" data-group="genre" data-val="Jazz" onclick="toggleMultiPill(this)">🎺 Jazz</div>
+      <div class="pill" data-group="genre" data-val="Indie" onclick="toggleMultiPill(this)">🌿 Indie</div>
+      <div class="pill" data-group="genre" data-val="World Music" onclick="toggleMultiPill(this)">🌍 World</div>
+      <div class="pill all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)">✨ De tout</div>
     </div>
-    <button class="mini-player-close" onclick="stopPlayer()" title="Fermer">✕</button>
+    <div class="step-nav"><button class="btn-next" onclick="goStep(2)">Suivant →</button></div>
   </div>
-  <audio id="audio-player" preload="none"></audio>
 
+  <!-- Étape 2 — Mood -->
+  <div class="step-panel" id="step-2">
+    <div class="step-question">Comment tu te sens ?</div>
+    <div class="step-hint">Choisis le mood qui correspond le mieux à maintenant.</div>
+    <div class="pills">
+      <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)">😌 Calme</div>
+      <div class="pill" data-group="mood" data-val="Stressé" onclick="selectPill(this)">😤 Stressé</div>
+      <div class="pill" data-group="mood" data-val="Heureux" onclick="selectPill(this)">😊 Heureux</div>
+      <div class="pill" data-group="mood" data-val="Triste" onclick="selectPill(this)">😢 Triste</div>
+      <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)">🔥 Motivé</div>
+      <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)">🌙 Nostalgique</div>
+      <div class="pill" data-group="mood" data-val="Focus TDAH" onclick="selectPill(this)">🧠 Focus TDAH</div>
+      <div class="pill" data-group="mood" data-val="Anxieux" onclick="selectPill(this)">😰 Anxieux</div>
+    </div>
+    <div class="step-nav"><button class="btn-next" id="mood-next" onclick="goStep(3)" disabled>Suivant →</button></div>
+  </div>
 
-  <script>
-    const sel={mood:null,energy:null,context:null};
-    let selectedGenres=[];
-    let msgInterval=null,currentSongs=[],currentMeta='',savedSongs=[],savedMeta='';
-    let spotifyToken=null,spotifyUserId=null;
-    let activeDropdown=null;
-    let votes={};
-    const msgs=["Analyse de ta vibe...","Calibrage des fréquences...","Sélection des 10 titres...","Presque prêt..."];
+  <!-- Étape 3 — Energie -->
+  <div class="step-panel" id="step-3">
+    <div class="step-question">Ton niveau d'energie ?</div>
+    <div class="step-hint">Ca influence le tempo et l'intensite des morceaux.</div>
+    <div class="energy-cards">
+      <div class="energy-card" data-val="Faible" onclick="selectEnergy(this)"><div class="e-icon">🔋</div><div class="e-label">Faible</div><div class="e-desc">Calme, pose</div></div>
+      <div class="energy-card" data-val="Moyen" onclick="selectEnergy(this)"><div class="e-icon">⚡</div><div class="e-label">Moyen</div><div class="e-desc">Equilibre</div></div>
+      <div class="energy-card" data-val="Elevé" onclick="selectEnergy(this)"><div class="e-icon">🚀</div><div class="e-label">Eleve</div><div class="e-desc">Intense</div></div>
+    </div>
+    <div class="step-nav"><button class="btn-next" id="energy-next" onclick="goStep(4)" disabled>Suivant →</button></div>
+  </div>
 
-    /* ══ NAV ══ */
-    function showScreen(id){
-      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      window.scrollTo(0,0);
-      closeAllDropdowns();
-      if(id==='history-screen')renderHistory();
-      if(id==='hero'){updateHistoryBadge();updateSpotifyUI();}
-      if(id==='form-screen')resetStepper();
-    }
+  <!-- Étape 4 — Contexte -->
+  <div class="step-panel" id="step-4">
+    <div class="step-question">Tu vas ecouter ou ?</div>
+    <div class="step-hint">Le contexte influence les ambiances proposees.</div>
+    <div class="pills">
+      <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)">💻 Travail</div>
+      <div class="pill" data-group="context" data-val="Etudes" onclick="selectPill(this)">📚 Etudes</div>
+      <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)">🏃 Sport</div>
+      <div class="pill" data-group="context" data-val="Detente" onclick="selectPill(this)">🛋️ Detente</div>
+      <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)">🚇 Trajet</div>
+      <div class="pill" data-group="context" data-val="Fete" onclick="selectPill(this)">🎉 Fete</div>
+      <div class="pill" data-group="context" data-val="Road trip" onclick="selectPill(this)">🚗 Road trip</div>
+      <div class="pill" data-group="context" data-val="Meditation" onclick="selectPill(this)">🧘 Meditation</div>
+    </div>
+    <div class="step-nav"><button class="btn-next" id="context-next" onclick="goStep(5)" disabled>Suivant →</button></div>
+  </div>
 
-    /* ══ STEPPER ══ */
-    let currentStep=1;
-    const TOTAL_STEPS=5;
-    const stepLabels=["Genres musicaux","Ton mood","Niveau d'énergie","Contexte","Récapitulatif"];
+  <!-- Étape 5 — Recap -->
+  <div class="step-panel" id="step-5">
+    <div class="step-question">C'est parti ? 🎵</div>
+    <div class="step-hint">Voici ta selection — modifie ou lance la generation.</div>
+    <div class="recap-box" id="recap-box"></div>
+    <div class="surprise-row">
+      <div class="surprise-info"><h4>🎲 Mode Surprise</h4><p>Decouvre des sons totalement inattendus</p></div>
+      <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <button class="btn-next" onclick="generate(false)">Generer ma playlist ✨</button>
+  </div>
+  <footer>Propulse par l'IA · Fait pour les amoureux de musique</footer>
+</div>
 
-    function goStep(n){
-      // Validation avant d'avancer
-      if(n===2&&selectedGenres.length===0){
-        // Genres optionnels — on peut passer sans sélection
-      }
-      if(n===3&&!sel.mood)return;
-      if(n===4&&!sel.energy)return;
-      if(n===5&&!sel.context)return;
+<!-- LOADING -->
+<div id="loading-screen" class="screen">
+  <div class="wave-container">
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+  </div>
+  <p class="loading-text" id="loading-text">Analyse de ta vibe...</p>
+</div>
 
-      document.getElementById('step-'+currentStep).classList.remove('active');
-      currentStep=n;
-      document.getElementById('step-'+currentStep).classList.add('active');
-      updateStepperUI();
-      if(n===5)renderRecap();
-    }
+<!-- RESULTATS -->
+<div id="results-screen" class="screen">
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.25rem;padding-top:.5rem">
+    <button class="back-btn" onclick="showScreen('form-screen')">←</button>
+    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff">Ta playlist ✨</span>
+  </div>
+  <p class="results-meta" id="results-meta"></p>
+  <div class="success-msg" id="results-success"></div>
+  <div class="feedback-banner" id="feedback-banner"></div>
+  <div id="results-action-bar"></div>
+  <div id="songs-list"></div>
+  <div class="results-actions">
+    <button class="btn-secondary" onclick="showScreen('form-screen')">🔄 Nouveau mood</button>
+    <button class="btn-secondary" onclick="generate(true)">🎲 Surprise me</button>
+  </div>
+  <footer>Propulse par l'IA · Fait pour les amoureux de musique</footer>
+</div>
 
-    function stepBack(){
-      if(currentStep===1){showScreen('hero');return;}
-      goStep(currentStep-1);
-    }
+<!-- HISTORIQUE -->
+<div id="history-screen" class="screen">
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:2rem;padding-top:.5rem">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff">Mes playlists 📋</span>
+  </div>
+  <div id="history-list"></div>
+  <div class="history-actions" id="history-actions" style="display:none">
+    <button class="btn-secondary" onclick="showScreen('form-screen')">+ Nouvelle playlist</button>
+    <button class="btn-danger" onclick="clearHistory()">🗑️ Tout effacer</button>
+  </div>
+  <footer>Propulse par l'IA · Fait pour les amoureux de musique</footer>
+</div>
 
-    function updateStepperUI(){
-      document.getElementById('stepper-fill').style.width=(currentStep/TOTAL_STEPS*100)+'%';
-      document.getElementById('step-label-text').textContent=stepLabels[currentStep-1];
-      document.getElementById('step-counter').textContent=currentStep+' / '+TOTAL_STEPS;
-    }
+<!-- PLAYLIST SAUVEGARDEE -->
+<div id="saved-screen" class="screen">
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.25rem;padding-top:.5rem">
+    <button class="back-btn" onclick="showScreen('history-screen')">←</button>
+    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff">Playlist sauvegardee</span>
+  </div>
+  <p class="results-meta" id="saved-meta"></p>
+  <div class="success-msg" id="saved-success"></div>
+  <div id="saved-action-bar"></div>
+  <div id="saved-songs-list"></div>
+  <div class="results-actions">
+    <button class="btn-secondary" onclick="showScreen('history-screen')">← Historique</button>
+    <button class="btn-secondary" onclick="showScreen('form-screen')">+ Nouveau mood</button>
+  </div>
+  <footer>Propulse par l'IA · Fait pour les amoureux de musique</footer>
+</div>
 
-    function selectEnergy(el){
-      document.querySelectorAll('.energy-card').forEach(c=>c.classList.remove('selected'));
-      el.classList.add('selected');
-      sel.energy=el.dataset.val;
-      document.getElementById('energy-next').disabled=false;
-    }
+<script>
+const sel={mood:null,energy:null,context:null};
+let selectedGenres=[];
+let msgInterval=null,currentSongs=[],currentMeta='',savedSongs=[],savedMeta='';
+let currentStep=1;
+const TOTAL_STEPS=5;
+const stepLabels=["Genres musicaux","Ton mood","Niveau d'energie","Contexte","Recapitulatif"];
+let votes={};
+let activeDropdown=null;
+let currentAudio={url:null,artist:null,title:null,btnEl:null};
+let progressInterval=null;
+let shareContext={songs:[],meta:''};
+const msgs=["Analyse de ta vibe...","Calibrage des frequences...","Selection des 10 titres...","Presque pret..."];
 
-    function renderRecap(){
-      const genres=selectedGenres.length>0?selectedGenres.join(', '):'Tous genres';
-      document.getElementById('recap-box').innerHTML=`
-        <div class="recap-row"><span class="recap-key">🎵 Genres</span><span class="recap-val">${genres}</span></div>
-        <div class="recap-row"><span class="recap-key">😊 Mood</span><span class="recap-val">${sel.mood||'—'}</span></div>
-        <div class="recap-row"><span class="recap-key">⚡ Énergie</span><span class="recap-val">${sel.energy||'—'}</span></div>
-        <div class="recap-row"><span class="recap-key">📍 Contexte</span><span class="recap-val">${sel.context||'—'}</span></div>`;
-    }
+/* NAV */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  closeAllDropdowns();
+  if(id==='history-screen')renderHistory();
+  if(id==='hero')updateHistoryBadge();
+  if(id==='form-screen')resetStepper();
+}
 
-    function resetStepper(){
-      currentStep=1;
-      document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
-      document.getElementById('step-1').classList.add('active');
-      updateStepperUI();
-      // Reset boutons next
-      ['mood-next','energy-next','context-next'].forEach(id=>{
-        const el=document.getElementById(id);if(el)el.disabled=true;
-      });
-    }
+/* STEPPER */
+function goStep(n){
+  if(n===3&&!sel.mood)return;
+  if(n===4&&!sel.energy)return;
+  if(n===5&&!sel.context)return;
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep=n;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  updateStepperUI();
+  if(n===5)renderRecap();
+  window.scrollTo(0,0);
+}
+function stepBack(){
+  if(currentStep===1){showScreen('hero');return;}
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep--;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  updateStepperUI();
+}
+function updateStepperUI(){
+  document.getElementById('stepper-fill').style.width=(currentStep/TOTAL_STEPS*100)+'%';
+  document.getElementById('step-label-text').textContent=stepLabels[currentStep-1];
+  document.getElementById('step-counter').textContent=currentStep+' / '+TOTAL_STEPS;
+}
+function resetStepper(){
+  currentStep=1;
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('step-1').classList.add('active');
+  updateStepperUI();
+  ['mood-next','energy-next','context-next'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=true;});
+}
+function selectEnergy(el){
+  document.querySelectorAll('.energy-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  sel.energy=el.dataset.val;
+  const b=document.getElementById('energy-next');if(b)b.disabled=false;
+}
+function renderRecap(){
+  const genres=selectedGenres.length>0?selectedGenres.join(', '):'Tous genres';
+  document.getElementById('recap-box').innerHTML=
+    '<div class="recap-row"><span class="recap-key">Genres</span><span class="recap-val">'+genres+'</span></div>'+
+    '<div class="recap-row"><span class="recap-key">Mood</span><span class="recap-val">'+(sel.mood||'?')+'</span></div>'+
+    '<div class="recap-row"><span class="recap-key">Energie</span><span class="recap-val">'+(sel.energy||'?')+'</span></div>'+
+    '<div class="recap-row"><span class="recap-key">Contexte</span><span class="recap-val">'+(sel.context||'?')+'</span></div>';
+}
 
+/* PILLS */
+function selectPill(el){
+  const g=el.dataset.group;
+  document.querySelectorAll('.pill[data-group="'+g+'"]').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  sel[g]=el.dataset.val;
+  if(g==='mood'){const b=document.getElementById('mood-next');if(b)b.disabled=false;}
+  if(g==='context'){const b=document.getElementById('context-next');if(b)b.disabled=false;}
+}
+function toggleMultiPill(el){
+  const allBtn=document.querySelector('.all-genres');
+  if(allBtn&&allBtn.classList.contains('selected')){allBtn.classList.remove('selected');selectedGenres=selectedGenres.filter(g=>g!=='De tout');}
+  const val=el.dataset.val;
+  if(el.classList.contains('selected')){el.classList.remove('selected');selectedGenres=selectedGenres.filter(g=>g!==val);}
+  else{el.classList.add('selected');if(!selectedGenres.includes(val))selectedGenres.push(val);}
+}
+function toggleAllGenres(el){
+  document.querySelectorAll('.pill[data-group="genre"]:not(.all-genres)').forEach(p=>p.classList.remove('selected'));
+  selectedGenres=[];
+  if(el.classList.contains('selected')){el.classList.remove('selected');}
+  else{el.classList.add('selected');selectedGenres=['De tout'];}
+}
 
-    function toggleMultiPill(el){
-      // Si "De tout" était sélectionné, le désélectionner
-      const allBtn=document.querySelector('.all-genres');
-      if(allBtn&&allBtn.classList.contains('selected')){
-        allBtn.classList.remove('selected');
-        selectedGenres=selectedGenres.filter(g=>g!=='De tout');
-      }
-      const val=el.dataset.val;
-      if(el.classList.contains('selected')){
-        el.classList.remove('selected');
-        selectedGenres=selectedGenres.filter(g=>g!==val);
-      } else {
-        el.classList.add('selected');
-        if(!selectedGenres.includes(val))selectedGenres.push(val);
-      }
-    }
-    function toggleAllGenres(el){
-      // Désélectionner tous les autres genres
-      document.querySelectorAll('.pill.multi:not(.all-genres)').forEach(p=>p.classList.remove('selected'));
-      selectedGenres=[];
-      if(el.classList.contains('selected')){
-        el.classList.remove('selected');
-      } else {
-        el.classList.add('selected');
-        selectedGenres=['De tout'];
-      }
-    }
-        function selectPill(el){
-      const g=el.dataset.group;
-      document.querySelectorAll('.pill[data-group="'+g+'"]').forEach(p=>p.classList.remove('selected'));
-      el.classList.add('selected');sel[g]=el.dataset.val;
-      // Activer bouton suivant
-      if(g==='mood'){const b=document.getElementById('mood-next');if(b)b.disabled=false;}
-      if(g==='context'){const b=document.getElementById('context-next');if(b)b.disabled=false;}
-    }
-    function showError(msg){const el=document.getElementById('error-msg');el.textContent=msg;el.style.display='block';}
-    function hideError(){document.getElementById('error-msg').style.display='none';}
-    function showSuccess(id,msg){const el=document.getElementById(id);if(el){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000);}}
-    function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-    function startLoading(){let i=0;document.getElementById('loading-text').textContent=msgs[0];msgInterval=setInterval(()=>{i=(i+1)%msgs.length;document.getElementById('loading-text').textContent=msgs[i];},2200);}
-    function stopLoading(){clearInterval(msgInterval);}
+/* MESSAGES */
+function showError(msg){const el=document.getElementById('error-msg');el.textContent=msg;el.style.display='block';}
+function hideError(){document.getElementById('error-msg').style.display='none';}
+function showSuccess(id,msg){const el=document.getElementById(id);if(el){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000);}}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-    /* ══ DROPDOWN ══ */
-    function toggleDropdown(id){
-      const menu=document.getElementById(id);
-      const btn=menu.previousElementSibling;
-      const isOpen=menu.classList.contains('open');
-      closeAllDropdowns();
-      if(!isOpen){menu.classList.add('open');btn.classList.add('open');activeDropdown=id;}
-    }
-    function closeAllDropdowns(){
-      document.querySelectorAll('.dropdown-menu.open').forEach(m=>{m.classList.remove('open');if(m.previousElementSibling)m.previousElementSibling.classList.remove('open');});
-      activeDropdown=null;
-    }
-    document.addEventListener('click',e=>{if(!e.target.closest('.dropdown-wrap'))closeAllDropdowns();});
+/* LOADING */
+function startLoading(){let i=0;document.getElementById('loading-text').textContent=msgs[0];msgInterval=setInterval(()=>{i=(i+1)%msgs.length;document.getElementById('loading-text').textContent=msgs[i];},2200);}
+function stopLoading(){clearInterval(msgInterval);}
 
+/* DROPDOWN */
+function toggleDropdown(id){
+  const menu=document.getElementById(id);const btn=menu.previousElementSibling;
+  const isOpen=menu.classList.contains('open');closeAllDropdowns();
+  if(!isOpen){menu.classList.add('open');btn.classList.add('open');activeDropdown=id;}
+}
+function closeAllDropdowns(){
+  document.querySelectorAll('.dropdown-menu.open').forEach(m=>{m.classList.remove('open');if(m.previousElementSibling)m.previousElementSibling.classList.remove('open');});
+  activeDropdown=null;
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.dropdown-wrap'))closeAllDropdowns();});
 
+/* AUDIO PLAYER */
+function stopPlayer(){
+  const audio=document.getElementById('audio-player');
+  audio.pause();audio.src='';
+  document.getElementById('mini-player').classList.remove('visible');
+  document.getElementById('player-progress').style.width='0';
+  clearInterval(progressInterval);
+  if(currentAudio.btnEl){currentAudio.btnEl.textContent='▶';currentAudio.btnEl.classList.remove('playing');}
+  currentAudio={url:null,artist:null,title:null,btnEl:null};
+}
+function togglePlay(){
+  const audio=document.getElementById('audio-player');const btn=document.getElementById('player-playpause');
+  if(audio.paused){audio.play();btn.textContent='⏸';}else{audio.pause();btn.textContent='▶';}
+}
+async function playPreview(artist,title,btnEl){
+  const audio=document.getElementById('audio-player');
+  const isSame=currentAudio.artist===artist&&currentAudio.title===title;
+  if(isSame){togglePlay();return;}
+  if(currentAudio.btnEl){currentAudio.btnEl.textContent='▶';currentAudio.btnEl.classList.remove('playing','loading');}
+  stopPlayer();
+  btnEl.classList.add('loading');btnEl.textContent='...';
+  try{
+    const q=encodeURIComponent(artist+' '+title);
+    const r=await fetch('https://itunes.apple.com/search?term='+q+'&media=music&limit=1&entity=song');
+    const d=await r.json();
+    const track=d.results&&d.results[0];
+    if(!track||!track.previewUrl){btnEl.classList.remove('loading');btnEl.textContent='—';return;}
+    currentAudio={url:track.previewUrl,artist,title,btnEl};
+    audio.src=track.previewUrl;audio.play();
+    btnEl.classList.remove('loading');btnEl.classList.add('playing');btnEl.textContent='⏸';
+    document.getElementById('player-title').textContent=title;
+    document.getElementById('player-artist').textContent=artist;
+    document.getElementById('player-playpause').textContent='⏸';
+    document.getElementById('mini-player').classList.add('visible');
+    clearInterval(progressInterval);
+    progressInterval=setInterval(()=>{if(audio.duration){document.getElementById('player-progress').style.width=(audio.currentTime/audio.duration*100)+'%';}},500);
+    audio.onended=()=>{btnEl.textContent='▶';btnEl.classList.remove('playing');document.getElementById('player-playpause').textContent='▶';clearInterval(progressInterval);};
+  }catch(e){btnEl.classList.remove('loading');btnEl.textContent='▶';}
+}
 
-    /* ══ CARTE PARTAGEABLE (Canvas) ══ */
-    let shareCardSongs=[];let shareCardMeta='';
+/* VOTES */
+function loadVotes(){try{return JSON.parse(localStorage.getItem('moodwave_votes')||'{}');}catch(e){return {};}}
+function saveVotes(){localStorage.setItem('moodwave_votes',JSON.stringify(votes));}
+function voteKey(song){return (String(song.artist)+String(song.title)).replace(/[^a-zA-Z0-9]/g,'').toLowerCase().slice(0,40);}
+function vote(key,type){
+  if(votes[key]===type){delete votes[key];}else{votes[key]=type;}
+  saveVotes();
+  const like=document.getElementById('like-'+key);const dislike=document.getElementById('dislike-'+key);
+  if(like)like.className='like-btn'+(votes[key]==='like'?' liked':'');
+  if(dislike)dislike.className='like-btn'+(votes[key]==='dislike'?' disliked':'');
+  updateFeedbackBanner();
+}
+function updateFeedbackBanner(){
+  const banner=document.getElementById('feedback-banner');if(!banner)return;
+  const likes=Object.values(votes).filter(v=>v==='like').length;
+  const dislikes=Object.values(votes).filter(v=>v==='dislike').length;
+  if(likes+dislikes===0){banner.style.display='none';return;}
+  banner.style.display='block';
+  banner.textContent='👍 '+likes+' aimé · 👎 '+dislikes+' rejeté — ces préférences améliorent tes prochaines playlists !';
+}
+function getLikedDisliked(){
+  const v=loadVotes();const liked=[];const disliked=[];
+  Object.entries(v).forEach(([key,val])=>{
+    if(val==='like')liked.push(key);else if(val==='dislike')disliked.push(key);
+  });
+  return {liked,disliked};
+}
 
-    function openShareCard(songs,meta){
-      shareCardSongs=songs;shareCardMeta=meta;
-      drawShareCard(songs,meta);
-      document.getElementById('share-card-overlay').classList.add('open');
-    }
-    function closeShareCard(e){
-      if(!e||e.target===document.getElementById('share-card-overlay'))
-        document.getElementById('share-card-overlay').classList.remove('open');
-    }
+/* EXPORT */
+function playlistToText(songs,meta){
+  let t='MOODWAVE — '+meta+'\n'+'─'.repeat(36)+'\n\n';
+  songs.forEach((s,i)=>{t+=String(i+1).padStart(2,'0')+'. '+s.artist+' — '+s.title+' ['+s.genre+']\n   '+s.reason+'\n\n';});
+  t+='─'.repeat(36)+'\nmoodwave.app\n';return t;
+}
+function copyText(songs,meta,successId){
+  const t=songs.map((s,i)=>(i+1)+'. '+s.artist+' — '+s.title).join('\n');
+  const full='Moodwave · '+meta+'\n\n'+t+'\n\nmoodwave.app';
+  navigator.clipboard.writeText(full).then(()=>showSuccess(successId,'Copié !')).catch(()=>{const ta=document.createElement('textarea');ta.value=full;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showSuccess(successId,'Copié !');});
+}
+function downloadTXT(songs,meta){const blob=new Blob([playlistToText(songs,meta)],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave.txt';a.click();}
+function downloadCSV(songs,meta){
+  let csv='N,Artiste,Titre,Genre,Raison\n';
+  songs.forEach((s,i)=>{csv+=i+1+',"'+(s.artist||'').replace(/"/g,'""')+'","'+(s.title||'').replace(/"/g,'""')+'","'+(s.genre||'').replace(/"/g,'""')+'","'+(s.reason||'').replace(/"/g,'""')+'"\n';});
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave.csv';a.click();
+}
+function downloadPDF(songs,meta){
+  const w=window.open('','_blank');
+  const rows=songs.map((s,i)=>'<tr><td>'+String(i+1).padStart(2,'0')+'</td><td><b>'+esc(s.artist)+'</b></td><td>'+esc(s.title)+'</td><td style="color:#7c6aff">'+esc(s.genre)+'</td><td style="color:#888;font-style:italic">'+esc(s.reason)+'</td></tr>').join('');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial;padding:40px;max-width:800px;margin:0 auto}h1{color:#7c6aff}table{width:100%;border-collapse:collapse;margin-top:20px}th{background:#7c6aff;color:#fff;padding:8px;text-align:left}td{padding:7px 8px;border-bottom:1px solid #eee}@media print{.np{display:none}}</style></head><body><h1>Moodwave</h1><p style="color:#888">'+esc(meta)+'</p><table><thead><tr><th>N</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>'+rows+'</tbody></table><br><button class="np" onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">Enregistrer en PDF</button></body></html>');
+  w.document.close();
+}
+function downloadWord(songs,meta){
+  const rows=songs.map((s,i)=>'<tr><td>'+String(i+1).padStart(2,'0')+'</td><td><b>'+s.artist+'</b></td><td>'+s.title+'</td><td style="color:#7c6aff">'+s.genre+'</td><td style="color:#666;font-style:italic">'+s.reason+'</td></tr>').join('');
+  const html='<html><head><meta charset="UTF-8"></head><body><h1 style="color:#7c6aff">Moodwave — '+meta+'</h1><table border="1" style="border-collapse:collapse;width:100%"><thead><tr style="background:#7c6aff;color:#fff"><th>N</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>';
+  const blob=new Blob([html],{type:'application/msword'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave.doc';a.click();
+}
+function openAllOn(platform,songs){
+  const fns={spotify:s=>'https://open.spotify.com/search/'+encodeURIComponent(s.artist+' '+s.title),deezer:s=>'https://www.deezer.com/search/'+encodeURIComponent(s.artist+' '+s.title),youtube:s=>'https://www.youtube.com/results?search_query='+encodeURIComponent(s.artist+' '+s.title),applemusic:s=>'https://music.apple.com/search?term='+encodeURIComponent(s.artist+' '+s.title),soundcloud:s=>'https://soundcloud.com/search?q='+encodeURIComponent(s.artist+' '+s.title)};
+  const fn=fns[platform];if(!fn)return;
+  songs.forEach((s,i)=>setTimeout(()=>window.open(fn(s),'_blank'),i*350));
+}
 
-    function drawShareCard(songs,meta){
-      const canvas=document.getElementById('share-canvas');
-      const ctx=canvas.getContext('2d');
-      const W=540,H=960;
-      canvas.width=W;canvas.height=H;
+/* SHARE CARD */
+function openShareCard(songs,meta){
+  drawShareCard(songs,meta);document.getElementById('share-card-overlay').classList.add('open');
+}
+function closeShareCard(){document.getElementById('share-card-overlay').classList.remove('open');}
+function drawShareCard(songs,meta){
+  const canvas=document.getElementById('share-canvas');
+  const ctx=canvas.getContext('2d');const W=400,H=710;
+  canvas.width=W;canvas.height=H;
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#07080f');bg.addColorStop(.5,'#1a1040');bg.addColorStop(1,'#0d1a2e');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const o1=ctx.createRadialGradient(60,100,0,60,100,200);o1.addColorStop(0,'rgba(124,106,255,.38)');o1.addColorStop(1,'transparent');ctx.fillStyle=o1;ctx.fillRect(0,0,W,H);
+  const o2=ctx.createRadialGradient(W-40,H-80,0,W-40,H-80,180);o2.addColorStop(0,'rgba(8,145,178,.28)');o2.addColorStop(1,'transparent');ctx.fillStyle=o2;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(196,181,253,.9)';ctx.font='bold 20px Arial';ctx.fillText('MOODWAVE',32,52);
+  ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(32,62,W-64,1);
+  ctx.fillStyle='rgba(196,181,253,.7)';ctx.font='13px Arial';ctx.fillText(meta.slice(0,50),32,84);
+  const sy=102,ch=56,gap=6;
+  songs.slice(0,10).forEach((s,i)=>{
+    const y=sy+i*(ch+gap);
+    ctx.fillStyle='rgba(255,255,255,.05)';
+    ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
+    roundRect(ctx,32,y,W-64,ch,10);ctx.fill();ctx.stroke();
+    ctx.fillStyle='rgba(196,181,253,.5)';ctx.font='bold 11px Arial';ctx.fillText(String(i+1).padStart(2,'0'),46,y+22);
+    ctx.fillStyle='#c4b5fd';ctx.font='12px Arial';ctx.fillText(trunc(s.artist,28),66,y+22);
+    ctx.fillStyle='#ffffff';ctx.font='bold 14px Arial';ctx.fillText(trunc(s.title,30),66,y+42);
+    ctx.fillStyle='rgba(165,243,252,.6)';ctx.font='10px Arial';ctx.textAlign='right';ctx.fillText(s.genre.slice(0,14),W-40,y+42);ctx.textAlign='left';
+  });
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(32,H-46,W-64,1);
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='12px Arial';ctx.fillText('Genere sur moodwave.app',32,H-22);
+}
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function trunc(s,max){return s&&s.length>max?s.slice(0,max-1)+'…':s||'';}
+function downloadShareCard(){const a=document.createElement('a');a.download='moodwave-playlist.png';a.href=document.getElementById('share-canvas').toDataURL('image/png');a.click();}
 
-      // Fond dégradé
-      const grad=ctx.createLinearGradient(0,0,W,H);
-      grad.addColorStop(0,'#07080f');
-      grad.addColorStop(0.5,'#1a1040');
-      grad.addColorStop(1,'#0d1a2e');
-      ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+/* SHARE SOCIAL */
+function buildShareText(songs,meta){return 'Ma playlist Moodwave · '+meta+'\n\n'+songs.slice(0,5).map((s,i)=>(i+1)+'. '+s.artist+' — '+s.title).join('\n')+'\n\nmoodwave.app';}
+function openShareModal(songs,meta){shareContext={songs,meta};document.getElementById('share-preview').textContent=buildShareText(songs,meta);document.getElementById('share-modal').classList.add('open');}
+function closeModal(){document.getElementById('share-modal').classList.remove('open');}
+function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta)),'_blank');}
+function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://project-0mjoz.vercel.app'),'_blank');}
+function shareTwitter(){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta).slice(0,240)),'_blank');}
+function shareLinkedIn(){window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent('https://project-0mjoz.vercel.app'),'_blank');}
+function shareSMS(){window.open('sms:?body='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta)));}
+function shareEmail(){window.open('mailto:?subject=Ma playlist Moodwave&body='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta)));}
+function shareTikTok(){navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(()=>alert('Texte copié ! Colle-le dans ta vidéo TikTok'));}
+function shareInstagram(){navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(()=>alert('Texte copié ! Colle-le dans ta story Instagram'));}
+function shareNative(){if(navigator.share)navigator.share({title:'Moodwave',text:buildShareText(shareContext.songs,shareContext.meta),url:'https://project-0mjoz.vercel.app'});else navigator.clipboard.writeText('https://project-0mjoz.vercel.app').then(()=>alert('Lien copié !'));}
+function shareTextCopy(){navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(closeModal);}
+function copyShareUrl(songs,meta,successId){
+  const id=Date.now().toString(36);
+  localStorage.setItem('mw_p_'+id,JSON.stringify({songs,meta}));
+  const url=window.location.origin+'/?p='+id;
+  navigator.clipboard.writeText(url).then(()=>showSuccess(successId,'Lien copié !')).catch(()=>showSuccess(successId,url));
+}
 
-      // Orbes décoratifs
-      const orb1=ctx.createRadialGradient(80,120,0,80,120,260);
-      orb1.addColorStop(0,'rgba(124,106,255,0.35)');orb1.addColorStop(1,'transparent');
-      ctx.fillStyle=orb1;ctx.fillRect(0,0,W,H);
-      const orb2=ctx.createRadialGradient(W-60,H-100,0,W-60,H-100,220);
-      orb2.addColorStop(0,'rgba(8,145,178,0.25)');orb2.addColorStop(1,'transparent');
-      ctx.fillStyle=orb2;ctx.fillRect(0,0,W,H);
+/* ACTION BAR */
+function actionBarHTML(songs,meta,prefix,successId){
+  const p=prefix;
+  return '<div class="action-bar">'+
+    '<div class="dropdown-wrap"><button class="dropdown-btn" onclick="toggleDropdown(\'dd-listen-'+p+'\')">🎧 Ecouter sur <span class="arrow">▼</span></button><div class="dropdown-menu" id="dd-listen-'+p+'">'+
+    '<button class="dropdown-item" onclick="openAllOn(\'spotify\','+p+'Songs);closeAllDropdowns()"><span class="di">🎵</span> Spotify</button>'+
+    '<button class="dropdown-item" onclick="openAllOn(\'deezer\','+p+'Songs);closeAllDropdowns()"><span class="di">🎶</span> Deezer</button>'+
+    '<button class="dropdown-item" onclick="openAllOn(\'youtube\','+p+'Songs);closeAllDropdowns()"><span class="di">▶️</span> YouTube</button>'+
+    '<button class="dropdown-item" onclick="openAllOn(\'applemusic\','+p+'Songs);closeAllDropdowns()"><span class="di">🍎</span> Apple Music</button>'+
+    '<button class="dropdown-item" onclick="openAllOn(\'soundcloud\','+p+'Songs);closeAllDropdowns()"><span class="di">☁️</span> SoundCloud</button>'+
+    '</div></div>'+
+    '<div class="dropdown-wrap"><button class="dropdown-btn" onclick="toggleDropdown(\'dd-export-'+p+'\')">📤 Exporter <span class="arrow">▼</span></button><div class="dropdown-menu" id="dd-export-'+p+'">'+
+    '<button class="dropdown-item" onclick="openShareCard('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'.\');closeAllDropdowns()"><span class="di">🖼️</span> Carte Instagram/TikTok</button>'+
+    '<button class="dropdown-item" onclick="copyShareUrl('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'.\',\''+successId+'\');closeAllDropdowns()"><span class="di">🔗</span> Copier le lien</button>'+
+    '<button class="dropdown-item sep" onclick="copyText('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\',\''+successId+'\');closeAllDropdowns()"><span class="di">📋</span> Copier la liste</button>'+
+    '<button class="dropdown-item" onclick="downloadTXT('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">📄</span> Fichier .txt</button>'+
+    '<button class="dropdown-item" onclick="downloadCSV('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">📊</span> Fichier .csv</button>'+
+    '<button class="dropdown-item" onclick="downloadPDF('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">📕</span> PDF</button>'+
+    '<button class="dropdown-item" onclick="downloadWord('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">📘</span> Word</button>'+
+    '</div></div>'+
+    '<button class="btn-secondary" style="flex:0;padding:.7rem 1rem;border-radius:12px;white-space:nowrap" onclick="openShareModal('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\')">🚀 Partager</button>'+
+    '</div>';
+}
 
-      // Logo
-      ctx.fillStyle='rgba(196,181,253,0.9)';
-      ctx.font='500 28px DM Sans, sans-serif';
-      ctx.fillText('🎵 MOODWAVE',44,70);
+/* SONG CARDS */
+function songCardsHTML(songs){
+  votes=loadVotes();
+  return songs.map((s,i)=>{
+    const key=voteKey(s);const v=votes[key];
+    const a=String(s.artist||'').replace(/'/g,"\\'");const t=String(s.title||'').replace(/'/g,"\\'");
+    return '<div class="song-card"><div class="song-card-top">'+
+      '<button class="preview-btn" onclick="playPreview(\''+a+'\',\''+t+'\',this)">▶</button>'+
+      '<div class="song-info"><div class="song-num">'+String(i+1).padStart(2,'0')+'</div>'+
+      '<div class="song-artist">'+esc(s.artist)+'</div>'+
+      '<div class="song-title">'+esc(s.title)+'</div>'+
+      '<span class="genre-tag">'+esc(s.genre)+'</span>'+
+      '<div class="reason">'+esc(s.reason)+'</div></div>'+
+      '<div class="like-btns">'+
+      '<button class="like-btn'+(v==='like'?' liked':'')+'" id="like-'+key+'" onclick="vote(\''+key+'\',\'like\')">👍</button>'+
+      '<button class="like-btn'+(v==='dislike'?' disliked':'')+'" id="dislike-'+key+'" onclick="vote(\''+key+'\',\'dislike\')">👎</button>'+
+      '</div></div></div>';
+  }).join('');
+}
 
-      // Mood pill
-      const pillX=44,pillY=95,pillW=Math.min(W-88,ctx.measureText(meta).width+40),pillH=36;
-      ctx.fillStyle='rgba(124,106,255,0.25)';
-      ctx.strokeStyle='rgba(167,139,250,0.5)';ctx.lineWidth=1;
-      roundRect(ctx,pillX,pillY,pillW,pillH,18);
-      ctx.fill();ctx.stroke();
-      ctx.fillStyle='#c4b5fd';ctx.font='500 18px DM Sans, sans-serif';
-      ctx.fillText(meta.slice(0,40),pillX+20,pillY+24);
+/* GENERATION */
+async function generate(isSurprise){
+  hideError();
+  if(!isSurprise&&(!sel.mood||!sel.energy||!sel.context)){showError('Selectionne toutes les options avant de generer.');return;}
+  const withSurprise=isSurprise||document.getElementById('surprise-toggle').classList.contains('on');
+  showScreen('loading-screen');startLoading();
+  const genreLabel=selectedGenres.length>0&&!selectedGenres.includes('De tout')?selectedGenres.join('-')+' / ':'';
+  const meta=isSurprise?'Mode Surprise':genreLabel+(sel.mood||'')+' / '+(sel.energy||'')+' / '+(sel.context||'')+(withSurprise?' · Surprise':'');
+  const {liked,disliked}=getLikedDisliked();
+  const body=isSurprise?{type:'surprise',likedSongs:liked,dislikedSongs:disliked}:{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres,likedSongs:liked,dislikedSongs:disliked};
+  try{
+    const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'Erreur ('+res.status+')');}
+    const songs=await res.json();
+    if(!Array.isArray(songs)||!songs.length)throw new Error('Playlist vide');
+    stopLoading();currentSongs=songs;currentMeta=meta;votes={};
+    saveToHistory(songs,meta);renderResults(songs,meta);
+  }catch(e){stopLoading();showScreen('form-screen');showError('Erreur : '+e.message);}
+}
+function renderResults(songs,meta){
+  document.getElementById('results-meta').textContent=meta;
+  document.getElementById('results-success').style.display='none';
+  const fb=document.getElementById('feedback-banner');if(fb)fb.style.display='none';
+  document.getElementById('results-action-bar').innerHTML=actionBarHTML(songs,meta,'current','results-success');
+  document.getElementById('songs-list').innerHTML=songCardsHTML(songs);
+  showScreen('results-screen');
+}
 
-      // Titre section
-      ctx.fillStyle='rgba(255,255,255,0.4)';
-      ctx.font='400 15px DM Sans, sans-serif';
-      ctx.fillText('Ta playlist du moment',44,170);
+/* HISTORIQUE */
+function getHistory(){try{return JSON.parse(localStorage.getItem('moodwave_history')||'[]');}catch(e){return[];}}
+function saveToHistory(songs,meta){
+  const h=getHistory();
+  h.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs});
+  if(h.length>20)h.pop();
+  localStorage.setItem('moodwave_history',JSON.stringify(h));updateHistoryBadge();
+}
+function updateHistoryBadge(){
+  const n=getHistory().length;
+  document.getElementById('history-count-badge').textContent=n;
+  document.getElementById('btn-history-hero').style.display=n>0?'block':'none';
+}
+function renderHistory(){
+  const h=getHistory();const list=document.getElementById('history-list');const actions=document.getElementById('history-actions');
+  if(!h.length){list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist.<br>Genere ta premiere playlist !</p></div>';actions.style.display='none';return;}
+  actions.style.display='flex';
+  list.innerHTML=h.map(e=>{
+    const preview=e.songs.slice(0,3).map(s=>s.artist+' – '+s.title).join(' · ');
+    const tags=e.meta.split(' / ').map(t=>'<span class="history-tag">'+esc(t.trim())+'</span>').join('');
+    return '<div class="history-item" onclick="openSaved('+e.id+')"><div class="history-item-header"><div class="history-item-tags">'+tags+'</div><span class="history-date">'+esc(e.date)+'</span></div><div class="history-songs-preview">'+esc(preview)+'...</div><span class="history-count">'+e.songs.length+' titres</span></div>';
+  }).join('');
+}
+function openSaved(id){
+  const entry=getHistory().find(e=>e.id===id);if(!entry)return;
+  savedSongs=entry.songs;savedMeta=entry.meta;
+  document.getElementById('saved-meta').textContent=entry.meta+' · '+entry.date;
+  document.getElementById('saved-success').style.display='none';
+  document.getElementById('saved-action-bar').innerHTML=actionBarHTML(entry.songs,entry.meta,'saved','saved-success');
+  document.getElementById('saved-songs-list').innerHTML=songCardsHTML(entry.songs);
+  showScreen('saved-screen');
+}
+function clearHistory(){
+  if(!confirm('Effacer toutes tes playlists ?'))return;
+  localStorage.removeItem('moodwave_history');updateHistoryBadge();renderHistory();
+}
 
-      // Cards titres
-      const startY=190;const cardH=70;const gap=10;
-      const displaySongs=songs.slice(0,9);
-      displaySongs.forEach((s,i)=>{
-        const y=startY+i*(cardH+gap);
-        // Card bg
-        ctx.fillStyle='rgba(255,255,255,0.05)';
-        ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;
-        roundRect(ctx,44,y,W-88,cardH,14);
-        ctx.fill();ctx.stroke();
-        // Numéro
-        ctx.fillStyle='rgba(196,181,253,0.5)';
-        ctx.font='500 14px DM Sans, sans-serif';
-        ctx.fillText(String(i+1).padStart(2,'0'),64,y+28);
-        // Artiste
-        ctx.fillStyle='#c4b5fd';
-        ctx.font='500 14px DM Sans, sans-serif';
-        ctx.fillText(truncate(s.artist,32),94,y+28);
-        // Titre
-        ctx.fillStyle='#ffffff';
-        ctx.font='700 17px Syne, sans-serif';
-        ctx.fillText(truncate(s.title,34),94,y+52);
-        // Genre tag — aligné à droite de la card
-        const genreText=s.genre.slice(0,16);
-        ctx.font='500 12px DM Sans, sans-serif';
-        const gW=Math.min(ctx.measureText(genreText).width+20,140);
-        const gX=W-44-gW; // bord droit de la card moins padding
-        ctx.fillStyle='rgba(165,243,252,0.12)';
-        ctx.strokeStyle='rgba(165,243,252,0.25)';ctx.lineWidth=1;
-        roundRect(ctx,gX,y+40,gW,22,11);
-        ctx.fill();ctx.stroke();
-        ctx.fillStyle='#a5f3fc';
-        ctx.textAlign='center';
-        ctx.fillText(genreText,gX+gW/2,y+55);
-        ctx.textAlign='left';
-      });
+/* PWA */
+function registerSW(){if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});}
 
-      // Footer
-      ctx.fillStyle='rgba(255,255,255,0.2)';
-      ctx.font='400 16px DM Sans, sans-serif';
-      ctx.fillText('Génère la tienne sur moodwave.app',44,H-32);
-
-      // Ligne déco
-      const lineGrad=ctx.createLinearGradient(44,0,W-44,0);
-      lineGrad.addColorStop(0,'transparent');
-      lineGrad.addColorStop(0.3,'rgba(124,106,255,0.6)');
-      lineGrad.addColorStop(0.7,'rgba(196,181,253,0.6)');
-      lineGrad.addColorStop(1,'transparent');
-      ctx.strokeStyle=lineGrad;ctx.lineWidth=1;
-      ctx.beginPath();ctx.moveTo(44,H-50);ctx.lineTo(W-44,H-50);ctx.stroke();
-    }
-
-    function roundRect(ctx,x,y,w,h,r){
-      ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
-      ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
-      ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
-      ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
-      ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
-    }
-    function truncate(str,max){return str&&str.length>max?str.slice(0,max-1)+'…':str||'';}
-
-    function downloadShareCard(){
-      const canvas=document.getElementById('share-canvas');
-      const a=document.createElement('a');
-      a.download='moodwave-playlist.png';
-      a.href=canvas.toDataURL('image/png');
-      a.click();
-    }
-
-    /* ══ URL PERMANENTE (partage via lien court) ══ */
-    function generatePlaylistId(){
-      return Date.now().toString(36)+Math.random().toString(36).slice(2,6);
-    }
-    function getShareUrl(playlistId){
-      return window.location.origin+'/?p='+playlistId;
-    }
-    function savePlaylistForSharing(songs,meta){
-      const id=generatePlaylistId();
-      const data={songs,meta,date:new Date().toISOString()};
-      localStorage.setItem('mw_shared_'+id,JSON.stringify(data));
-      return id;
-    }
-    function copyShareUrl(songs,meta,successId){
-      const id=savePlaylistForSharing(songs,meta);
-      const url=getShareUrl(id);
-      navigator.clipboard.writeText(url)
-        .then(()=>showSuccess(successId,'🔗 Lien copié ! Valable sur cet appareil.'))
-        .catch(()=>showSuccess(successId,'🔗 '+url));
-    }
-    function loadSharedPlaylist(){
-      const params=new URLSearchParams(window.location.search);
-      const p=params.get('p');
-      if(!p)return;
-      const raw=localStorage.getItem('mw_shared_'+p);
-      if(!raw)return;
-      try{
-        const {songs,meta}=JSON.parse(raw);
-        currentSongs=songs;currentMeta=meta;
-        renderResults(songs,meta);
-      }catch(e){}
-    }
-
-    /* ══ SERVICE WORKER (PWA) ══ */
-    function registerSW(){
-      if('serviceWorker' in navigator){
-        navigator.serviceWorker.register('/sw.js').catch(()=>{});
-      }
-    }
-
-    /* ══ AUDIO PLAYER ══ */
-    let currentAudio={url:null,artist:null,title:null,btnEl:null};
-    let progressInterval=null;
-
-    function stopPlayer(){
-      const audio=document.getElementById('audio-player');
-      audio.pause();audio.src='';
-      document.getElementById('mini-player').classList.remove('visible');
-      document.getElementById('player-progress').style.width='0';
-      clearInterval(progressInterval);
-      if(currentAudio.btnEl){currentAudio.btnEl.textContent='▶';currentAudio.btnEl.classList.remove('playing');}
-      currentAudio={url:null,artist:null,title:null,btnEl:null};
-    }
-
-    function togglePlay(){
-      const audio=document.getElementById('audio-player');
-      const btn=document.getElementById('player-playpause');
-      if(audio.paused){audio.play();btn.textContent='⏸';}
-      else{audio.pause();btn.textContent='▶';}
-    }
-
-    async function playPreview(artist,title,btnEl){
-      const audio=document.getElementById('audio-player');
-      const isSame=currentAudio.url&&currentAudio.artist===artist&&currentAudio.title===title;
-      if(isSame){togglePlay();return;}
-
-      // Réinitialiser l'ancien bouton
-      if(currentAudio.btnEl){currentAudio.btnEl.textContent='▶';currentAudio.btnEl.classList.remove('playing','loading');}
-      stopPlayer();
-
-      btnEl.classList.add('loading');
-      btnEl.textContent='…';
-
-      try{
-        // Recherche iTunes
-        const q=encodeURIComponent(artist+' '+title);
-        const r=await fetch('https://itunes.apple.com/search?term='+q+'&media=music&limit=1&entity=song');
-        const d=await r.json();
-        const track=d.results?.[0];
-
-        if(!track||!track.previewUrl){
-          btnEl.classList.remove('loading');
-          btnEl.textContent='—';
-          btnEl.title='Preview non disponible';
-          return;
-        }
-
-        currentAudio={url:track.previewUrl,artist,title,btnEl};
-        audio.src=track.previewUrl;
-        audio.play();
-
-        btnEl.classList.remove('loading');
-        btnEl.classList.add('playing');
-        btnEl.textContent='⏸';
-
-        // Mini lecteur
-        document.getElementById('player-title').textContent=title;
-        document.getElementById('player-artist').textContent=artist;
-        document.getElementById('player-playpause').textContent='⏸';
-        document.getElementById('mini-player').classList.add('visible');
-
-        // Barre de progression
-        clearInterval(progressInterval);
-        progressInterval=setInterval(()=>{
-          if(audio.duration){
-            const pct=(audio.currentTime/audio.duration*100).toFixed(1);
-            document.getElementById('player-progress').style.width=pct+'%';
-          }
-        },500);
-
-        // Fin de lecture
-        audio.onended=()=>{
-          btnEl.textContent='▶';btnEl.classList.remove('playing');
-          document.getElementById('player-playpause').textContent='▶';
-          document.getElementById('player-progress').style.width='100%';
-          clearInterval(progressInterval);
-        };
-
-      }catch(e){
-        btnEl.classList.remove('loading');
-        btnEl.textContent='▶';
-      }
-    }
-
-    /* ══ SPOTIFY AUTH ══ */
-    function generateRandomString(n){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';return Array.from(crypto.getRandomValues(new Uint8Array(n))).map(b=>c[b%c.length]).join('');}
-    async function sha256(p){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));}
-    function b64url(buf){return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
-    async function handleCallback(){
-      const params=new URLSearchParams(window.location.search);const code=params.get('code');if(!code)return;
-      const cv=sessionStorage.getItem('spotify_code_verifier');
-      const res=await fetch('/api/spotify-token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,codeVerifier:cv,redirectUri:window.location.origin+'/callback'})});
-      const data=await res.json();
-      if(data.access_token){
-        spotifyToken=data.access_token;
-        localStorage.setItem('spotify_token',data.access_token);
-        localStorage.setItem('spotify_token_expires',Date.now()+data.expires_in*1000);
-        if(data.refresh_token)localStorage.setItem('spotify_refresh_token',data.refresh_token);
-        await fetchSpotifyUser();
-        window.history.replaceState({},'','/');updateSpotifyUI();
-      }
-    }
-    function loadSpotifySession(){
-      const token=localStorage.getItem('spotify_token');const expires=parseInt(localStorage.getItem('spotify_token_expires')||'0');
-      if(token&&expires>Date.now()){spotifyToken=token;spotifyUserId=localStorage.getItem('spotify_user_id');}
-      else{spotifyToken=null;spotifyUserId=null;}
-    }
-    function updateSpotifyUI(){return;//
-      const ok=!!spotifyToken;
-      document.getElementById('btn-connect-spotify').style.display=ok?'none':'flex';
-      document.getElementById('spotify-banner').style.display=ok?'flex':'none';
-      if(ok)document.getElementById('spotify-username').textContent=localStorage.getItem('spotify_user_name')||'Connecté';
-    }
-
-    /* ══ LIKE / DISLIKE ══ */
-    function loadVotes(){try{return JSON.parse(localStorage.getItem('moodwave_votes')||'{}');}catch(e){return {};}}
-    function saveVotes(){localStorage.setItem('moodwave_votes',JSON.stringify(votes));}
-    function vote(key,type){
-      const prev=votes[key];
-      if(prev===type){delete votes[key];}else{votes[key]=type;}
-      saveVotes();
-      renderVoteBtns(key);
-      updateFeedbackBanner();
-    }
-    function renderVoteBtns(key){
-      const v=votes[key];
-      const likeEl=document.getElementById('like-'+key);
-      const dislikeEl=document.getElementById('dislike-'+key);
-      if(likeEl){likeEl.className='like-btn'+(v==='like'?' liked':'');}
-      if(dislikeEl){dislikeEl.className='like-btn'+(v==='dislike'?' disliked':'');}
-    }
-    function updateFeedbackBanner(){
-      const banner=document.getElementById('feedback-banner');
-      if(!banner)return;
-      const likes=Object.values(votes).filter(v=>v==='like').length;
-      const dislikes=Object.values(votes).filter(v=>v==='dislike').length;
-      if(likes+dislikes===0){banner.style.display='none';return;}
-      banner.style.display='block';
-      banner.textContent='👍 '+likes+' titre'+(likes>1?'s':'')+'  aimé'+(likes>1?'s':'')+' · 👎 '+dislikes+' rejeté'+(dislikes>1?'s':'')+' — ces préférences améliorent tes prochaines playlists !';
-    }
-    function voteKey(song){return (song.artist+'-'+song.title).replace(/\s+/g,'').toLowerCase().slice(0,40);}
-
-    /* ══ EXPORT ══ */
-    function playlistToText(songs,meta){
-      let t='🎵 MOODWAVE — '+meta+'\n'+'─'.repeat(38)+'\n\n';
-      songs.forEach((s,i)=>{t+=String(i+1).padStart(2,'0')+'. '+s.artist+' — '+s.title+' ['+s.genre+']\n    '+s.reason+'\n\n';});
-      t+='─'.repeat(38)+'\nGénérée par Moodwave\n';return t;
-    }
-    function copyText(songs,meta,successId){
-      const t=songs.map((s,i)=>`${i+1}. ${s.artist} — ${s.title}`).join('\n');
-      const full='🎵 Moodwave · '+meta+'\n\n'+t+'\n\nmoodwave.app';
-      navigator.clipboard.writeText(full).then(()=>showSuccess(successId,'✅ Copié dans le presse-papier !')).catch(()=>{const ta=document.createElement('textarea');ta.value=full;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showSuccess(successId,'✅ Copié !');});
-    }
-    function downloadTXT(songs,meta){
-      const blob=new Blob([playlistToText(songs,meta)],{type:'text/plain;charset=utf-8'});
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave-'+meta.replace(/[^a-zA-Z0-9]/g,'-').slice(0,40)+'.txt';a.click();
-    }
-    function downloadCSV(songs,meta){
-      let csv='Numéro,Artiste,Titre,Genre,Raison\n';
-      songs.forEach((s,i)=>{csv+=`${i+1},"${(s.artist||'').replace(/"/g,'""')}","${(s.title||'').replace(/"/g,'""')}","${(s.genre||'').replace(/"/g,'""')}","${(s.reason||'').replace(/"/g,'""')}"\n`;});
-      const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave-'+meta.replace(/[^a-zA-Z0-9]/g,'-').slice(0,40)+'.csv';a.click();
-    }
-    function downloadPDF(songs,meta){
-      const w=window.open('','_blank');
-      const rows=songs.map((s,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td><b>${esc(s.artist)}</b></td><td>${esc(s.title)}</td><td style="color:#7c6aff">${esc(s.genre)}</td><td style="color:#888;font-style:italic">${esc(s.reason)}</td></tr>`).join('');
-      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto}h1{color:#7c6aff}table{width:100%;border-collapse:collapse;margin-top:20px}th{background:#7c6aff;color:#fff;padding:8px;text-align:left}td{padding:7px 8px;border-bottom:1px solid #eee}tr:nth-child(even){background:#f8f8ff}footer{margin-top:30px;color:#aaa;font-size:11px;text-align:center}@media print{.no-print{display:none}}</style>  <script>
-    // Fonctions globales définies tôt pour les onclick inline
-    function showScreen(id){
-      if(window._showScreen)return window._showScreen(id);
-      document.addEventListener('DOMContentLoaded',()=>window._showScreen&&window._showScreen(id));
-    }
-    function stepBack(){if(window._stepBack)window._stepBack();}
-    function goStep(n){if(window._goStep)window._goStep(n);}
-    function generate(s){if(window._generate)window._generate(s);}
-    function toggleMultiPill(el){if(window._toggleMultiPill)window._toggleMultiPill(el);}
-    function toggleAllGenres(el){if(window._toggleAllGenres)window._toggleAllGenres(el);}
-    function selectPill(el){if(window._selectPill)window._selectPill(el);}
-    function selectEnergy(el){if(window._selectEnergy)window._selectEnergy(el);}
-    function vote(k,t){if(window._vote)window._vote(k,t);}
-    function playPreview(a,t,b){if(window._playPreview)window._playPreview(a,t,b);}
-    function togglePlay(){if(window._togglePlay)window._togglePlay();}
-    function stopPlayer(){if(window._stopPlayer)window._stopPlayer();}
-    function toggleDropdown(id){if(window._toggleDropdown)window._toggleDropdown(id);}
-    function closeAllDropdowns(){if(window._closeAllDropdowns)window._closeAllDropdowns();}
-    function openShareModal(s,m){if(window._openShareModal)window._openShareModal(s,m);}
-    function openShareCard(s,m){if(window._openShareCard)window._openShareCard(s,m);}
-    function closeShareCard(e){if(window._closeShareCard)window._closeShareCard(e);}
-    function downloadShareCard(){if(window._downloadShareCard)window._downloadShareCard();}
-    function shareWhatsApp(){if(window._shareWhatsApp)window._shareWhatsApp();}
-    function shareFacebook(){if(window._shareFacebook)window._shareFacebook();}
-    function shareTwitter(){if(window._shareTwitter)window._shareTwitter();}
-    function shareLinkedIn(){if(window._shareLinkedIn)window._shareLinkedIn();}
-    function shareSMS(){if(window._shareSMS)window._shareSMS();}
-    function shareEmail(){if(window._shareEmail)window._shareEmail();}
-    function shareTikTok(){if(window._shareTikTok)window._shareTikTok();}
-    function shareInstagram(){if(window._shareInstagram)window._shareInstagram();}
-    function shareNative(){if(window._shareNative)window._shareNative();}
-    function shareTextCopy(){if(window._shareTextCopy)window._shareTextCopy();}
-    function copyText(s,m,i){if(window._copyText)window._copyText(s,m,i);}
-    function downloadTXT(s,m){if(window._downloadTXT)window._downloadTXT(s,m);}
-    function downloadCSV(s,m){if(window._downloadCSV)window._downloadCSV(s,m);}
-    function downloadPDF(s,m){if(window._downloadPDF)window._downloadPDF(s,m);}
-    function downloadWord(s,m){if(window._downloadWord)window._downloadWord(s,m);}
-    function openAllOn(p,s){if(window._openAllOn)window._openAllOn(p,s);}
-    function copyShareUrl(s,m,i){if(window._copyShareUrl)window._copyShareUrl(s,m,i);}
-    function openSaved(id){if(window._openSaved)window._openSaved(id);}
-    function clearHistory(){if(window._clearHistory)window._clearHistory();}
-    function disconnectSpotify(){if(window._disconnectSpotify)window._disconnectSpotify();}
-    function closeModal(){if(window._closeModal)window._closeModal();}
-  </script>
-</head><body><h1>🎵 Moodwave</h1><p style="color:#888">${esc(meta)}</p><table><thead><tr><th>#</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>${rows}</tbody></table><footer>Générée par Moodwave · Propulsé par l'IA</footer><br><button class="no-print" onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">🖨️ Enregistrer en PDF</button></body></html>`);
-      w.document.close();
-    }
-    function downloadWord(songs,meta){
-      const rows=songs.map((s,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td><b>${s.artist}</b></td><td>${s.title}</td><td style="color:#7c6aff">${s.genre}</td><td style="color:#666;font-style:italic">${s.reason}</td></tr>`).join('');
-      const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="UTF-8">  <script>
-    // Fonctions globales définies tôt pour les onclick inline
-    function showScreen(id){
-      if(window._showScreen)return window._showScreen(id);
-      document.addEventListener('DOMContentLoaded',()=>window._showScreen&&window._showScreen(id));
-    }
-    function stepBack(){if(window._stepBack)window._stepBack();}
-    function goStep(n){if(window._goStep)window._goStep(n);}
-    function generate(s){if(window._generate)window._generate(s);}
-    function toggleMultiPill(el){if(window._toggleMultiPill)window._toggleMultiPill(el);}
-    function toggleAllGenres(el){if(window._toggleAllGenres)window._toggleAllGenres(el);}
-    function selectPill(el){if(window._selectPill)window._selectPill(el);}
-    function selectEnergy(el){if(window._selectEnergy)window._selectEnergy(el);}
-    function vote(k,t){if(window._vote)window._vote(k,t);}
-    function playPreview(a,t,b){if(window._playPreview)window._playPreview(a,t,b);}
-    function togglePlay(){if(window._togglePlay)window._togglePlay();}
-    function stopPlayer(){if(window._stopPlayer)window._stopPlayer();}
-    function toggleDropdown(id){if(window._toggleDropdown)window._toggleDropdown(id);}
-    function closeAllDropdowns(){if(window._closeAllDropdowns)window._closeAllDropdowns();}
-    function openShareModal(s,m){if(window._openShareModal)window._openShareModal(s,m);}
-    function openShareCard(s,m){if(window._openShareCard)window._openShareCard(s,m);}
-    function closeShareCard(e){if(window._closeShareCard)window._closeShareCard(e);}
-    function downloadShareCard(){if(window._downloadShareCard)window._downloadShareCard();}
-    function shareWhatsApp(){if(window._shareWhatsApp)window._shareWhatsApp();}
-    function shareFacebook(){if(window._shareFacebook)window._shareFacebook();}
-    function shareTwitter(){if(window._shareTwitter)window._shareTwitter();}
-    function shareLinkedIn(){if(window._shareLinkedIn)window._shareLinkedIn();}
-    function shareSMS(){if(window._shareSMS)window._shareSMS();}
-    function shareEmail(){if(window._shareEmail)window._shareEmail();}
-    function shareTikTok(){if(window._shareTikTok)window._shareTikTok();}
-    function shareInstagram(){if(window._shareInstagram)window._shareInstagram();}
-    function shareNative(){if(window._shareNative)window._shareNative();}
-    function shareTextCopy(){if(window._shareTextCopy)window._shareTextCopy();}
-    function copyText(s,m,i){if(window._copyText)window._copyText(s,m,i);}
-    function downloadTXT(s,m){if(window._downloadTXT)window._downloadTXT(s,m);}
-    function downloadCSV(s,m){if(window._downloadCSV)window._downloadCSV(s,m);}
-    function downloadPDF(s,m){if(window._downloadPDF)window._downloadPDF(s,m);}
-    function downloadWord(s,m){if(window._downloadWord)window._downloadWord(s,m);}
-    function openAllOn(p,s){if(window._openAllOn)window._openAllOn(p,s);}
-    function copyShareUrl(s,m,i){if(window._copyShareUrl)window._copyShareUrl(s,m,i);}
-    function openSaved(id){if(window._openSaved)window._openSaved(id);}
-    function clearHistory(){if(window._clearHistory)window._clearHistory();}
-    function disconnectSpotify(){if(window._disconnectSpotify)window._disconnectSpotify();}
-    function closeModal(){if(window._closeModal)window._closeModal();}
-  </script>
-</head><body><h1 style="color:#7c6aff">🎵 Moodwave — ${meta}</h1><table border="1" style="border-collapse:collapse;width:100%"><thead><tr style="background:#7c6aff;color:#fff"><th>#</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>${rows}</tbody></table><p style="color:#aaa;font-size:11px;margin-top:24px">Générée par Moodwave</p></body></html>`;
-      const blob=new Blob([html],{type:'application/msword'});
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave-'+meta.replace(/[^a-zA-Z0-9]/g,'-').slice(0,40)+'.doc';a.click();
-    }
-    function openAllOn(platform,songs){
-      const urls={
-        spotify:s=>'https://open.spotify.com/search/'+encodeURIComponent(s.artist+' '+s.title),
-        deezer:s=>'https://www.deezer.com/search/'+encodeURIComponent(s.artist+' '+s.title),
-        youtube:s=>'https://www.youtube.com/results?search_query='+encodeURIComponent(s.artist+' '+s.title),
-        applemusic:s=>'https://music.apple.com/search?term='+encodeURIComponent(s.artist+' '+s.title),
-        tidal:s=>'https://tidal.com/search?q='+encodeURIComponent(s.artist+' '+s.title),
-        soundcloud:s=>'https://soundcloud.com/search?q='+encodeURIComponent(s.artist+' '+s.title)
-      };
-      const fn=urls[platform];if(!fn)return;
-      songs.forEach((s,i)=>setTimeout(()=>window.open(fn(s),'_blank'),i*350));
-    }
-
-    /* ══ PARTAGE RÉSEAUX SOCIAUX ══ */
-    let shareContext={songs:[],meta:''};
-    function buildShareText(songs,meta){
-      const top=songs.slice(0,5).map((s,i)=>`${i+1}. ${s.artist} — ${s.title}`).join('\n');
-      return `🎵 Ma playlist Moodwave · ${meta}\n\n${top}\n\n👉 Génère la tienne sur moodwave.app`;
-    }
-    function openShareModal(songs,meta){
-      shareContext={songs,meta};
-      document.getElementById('share-preview').textContent=buildShareText(songs,meta);
-      document.getElementById('share-modal').classList.add('open');
-    }
-    function closeModal(){document.getElementById('share-modal').classList.remove('open');}
-    function closeShareModal(e){if(e.target===document.getElementById('share-modal'))closeModal();}
-    function shareWhatsApp(){const t=encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta));window.open('https://wa.me/?text='+t,'_blank');}
-    function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://project-0mjoz.vercel.app')+'&quote='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta)),'_blank');}
-    function shareTwitter(){const t=encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta).slice(0,240));window.open('https://twitter.com/intent/tweet?text='+t,'_blank');}
-    function shareLinkedIn(){window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent('https://project-0mjoz.vercel.app'),'_blank');}
-    function shareSMS(){const t=encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta));window.open('sms:?body='+t);}
-    function shareEmail(){const t=buildShareText(shareContext.songs,shareContext.meta);window.open('mailto:?subject='+encodeURIComponent('🎵 Ma playlist Moodwave')+'&body='+encodeURIComponent(t));}
-    function shareTikTok(){navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(()=>alert('Texte copié ! Colle-le dans ta vidéo TikTok 🎵'));}
-    function shareInstagram(){navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(()=>alert('Texte copié ! Colle-le dans ta story Instagram 📸'));}
-    function shareNative(){
-      if(navigator.share){navigator.share({title:'Moodwave',text:buildShareText(shareContext.songs,shareContext.meta),url:'https://project-0mjoz.vercel.app'});}
-      else{navigator.clipboard.writeText('https://project-0mjoz.vercel.app').then(()=>alert('Lien copié !'));}
-    }
-    function shareTextCopy(){
-      navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(()=>{closeModal();});
-    }
-
-    /* ══ BARRE D'ACTIONS avec dropdowns ══ */
-    function actionBarHTML(songs,meta,prefix,successId){
-      const p=prefix;
-      return `<div class="action-bar">
-        <!-- Écouter sur -->
-        <div class="dropdown-wrap">
-          <button class="dropdown-btn" onclick="toggleDropdown('dd-listen-${p}')">
-            🎧 Écouter sur <span class="arrow">▼</span>
-          </button>
-          <div class="dropdown-menu" id="dd-listen-${p}">
-            <button class="dropdown-item" onclick="openAllOn('spotify',${p}Songs);closeAllDropdowns()"><span class="di">🎵</span> Spotify</button>
-            <button class="dropdown-item" onclick="openAllOn('deezer',${p}Songs);closeAllDropdowns()"><span class="di">🎶</span> Deezer</button>
-            <button class="dropdown-item" onclick="openAllOn('youtube',${p}Songs);closeAllDropdowns()"><span class="di">▶️</span> YouTube Music</button>
-            <button class="dropdown-item" onclick="openAllOn('applemusic',${p}Songs);closeAllDropdowns()"><span class="di">🍎</span> Apple Music</button>
-            <button class="dropdown-item" onclick="openAllOn('tidal',${p}Songs);closeAllDropdowns()"><span class="di">🌊</span> Tidal</button>
-            <button class="dropdown-item" onclick="openAllOn('soundcloud',${p}Songs);closeAllDropdowns()"><span class="di">☁️</span> SoundCloud</button>
-          </div>
-        </div>
-        <!-- Exporter -->
-        <div class="dropdown-wrap">
-          <button class="dropdown-btn" onclick="toggleDropdown('dd-export-${p}')">
-            📤 Exporter <span class="arrow">▼</span>
-          </button>
-          <div class="dropdown-menu" id="dd-export-${p}">
-            <button class="dropdown-item" onclick="openShareCard(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">🖼️</span> Carte Instagram/TikTok</button>
-            <button class="dropdown-item" onclick="copyShareUrl(${p}Songs,'${meta.replace(/'/g,"\\'")}','${successId}');closeAllDropdowns()"><span class="di">🔗</span> Copier le lien</button>
-            <button class="dropdown-item sep" onclick="copyText(${p}Songs,'${meta.replace(/'/g,"\\'")}','${successId}');closeAllDropdowns()"><span class="di">📋</span> Copier la liste</button>
-            <button class="dropdown-item" onclick="downloadTXT(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">📄</span> Fichier .txt</button>
-            <button class="dropdown-item" onclick="downloadCSV(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">📊</span> Fichier .csv (Excel)</button>
-            <button class="dropdown-item sep" onclick="downloadPDF(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">📕</span> Exporter en PDF</button>
-            <button class="dropdown-item" onclick="downloadWord(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">📘</span> Exporter Word (.doc)</button>
-          </div>
-        </div>
-        <!-- Partager -->
-        <button class="btn-secondary" style="flex:0;padding:.7rem 1rem;border-radius:12px;white-space:nowrap" onclick="openShareModal(${p}Songs,'${meta.replace(/'/g,"\\'")}')">🚀 Partager</button>
-      </div>`;
-    }
-
-    /* ══ CARDS CHANSONS ══ */
-    function songCardsHTML(songs){
-      votes=loadVotes();
-      return songs.map((s,i)=>{
-        const key=voteKey(s);
-        const v=votes[key];
-        const btnId='prev-'+key;
-        return `<div class="song-card">
-          <div class="song-card-top">
-            <button class="preview-btn" id="${btnId}" onclick="playPreview('${esc(s.artist).replace(/'/g,"\'")}','${esc(s.title).replace(/'/g,"\'")}',this)" title="Preview 30s">▶</button>
-            <div class="song-info" style="flex:1;min-width:0">
-              <div class="song-num">${String(i+1).padStart(2,'0')}</div>
-              <div class="song-artist">${esc(s.artist)}</div>
-              <div class="song-title">${esc(s.title)}</div>
-              <span class="genre-tag">${esc(s.genre)}</span>
-              <div class="reason">${esc(s.reason)}</div>
-            </div>
-            <div class="like-btns">
-              <button class="like-btn${v==='like'?' liked':''}" id="like-${key}" onclick="vote('${key}','like')" title="J'aime">👍</button>
-              <button class="like-btn${v==='dislike'?' disliked':''}" id="dislike-${key}" onclick="vote('${key}','dislike')" title="Je n'aime pas">👎</button>
-            </div>
-          </div>
-        </div>`;
-      }).join('');
-    }
-
-
-    function getLikedDisliked(){
-      const v=loadVotes();
-      const liked=[];const disliked=[];
-      Object.entries(v).forEach(([key,val])=>{
-        const label=key.replace(/([a-z])([A-Z])/g,'$1 $2');
-        if(val==='like')liked.push(label);
-        else if(val==='dislike')disliked.push(label);
-      });
-      return {liked,disliked};
-    }
-
-    /* ══ GÉNÉRATION ══ */
-    async function generate(isSurprise){
-      hideError();
-      if(!isSurprise&&(!sel.mood||!sel.energy||!sel.context)){showError("Sélectionne un mood, un niveau d'énergie et un contexte.");return;}
-      const withSurprise=isSurprise||document.getElementById('surprise-toggle').classList.contains('on');
-      showScreen('loading-screen');startLoading();
-      const {liked,disliked}=getLikedDisliked();
-      const body=isSurprise
-        ?{type:'surprise',likedSongs:liked,dislikedSongs:disliked}
-        :{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres,likedSongs:liked,dislikedSongs:disliked};
-      try{
-        const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-        if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'Erreur ('+res.status+')');}
-        const songs=await res.json();
-        if(!Array.isArray(songs)||!songs.length)throw new Error('Playlist vide');
-        stopLoading();
-        const genreLabel=selectedGenres.length>0&&!selectedGenres.includes('De tout')?selectedGenres.join('-')+' / ':'';
-        const meta=isSurprise?'Mode Surprise 🎲':`${genreLabel}${sel.mood} / ${sel.energy} / ${sel.context}${withSurprise?' · Surprise 🎲':''}`;
-        currentSongs=songs;currentMeta=meta;votes={};
-        saveToHistory(songs,meta);
-        renderResults(songs,meta);
-      }catch(e){stopLoading();showScreen('form-screen');showError('Erreur : '+e.message);}
-    }
-
-    function renderResults(songs,meta){
-      document.getElementById('results-meta').textContent=meta;
-      document.getElementById('results-success').style.display='none';
-      const fb=document.getElementById('feedback-banner');if(fb)fb.style.display='none';
-      document.getElementById('results-action-bar').innerHTML=actionBarHTML(songs,meta,'current','results-success');
-      document.getElementById('songs-list').innerHTML=songCardsHTML(songs);
-      showScreen('results-screen');
-    }
-
-    /* ══ HISTORIQUE ══ */
-    function getHistory(){try{return JSON.parse(localStorage.getItem('moodwave_history')||'[]');}catch(e){return[];}}
-    function saveToHistory(songs,meta){
-      const h=getHistory();
-      h.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs});
-      if(h.length>20)h.pop();
-      localStorage.setItem('moodwave_history',JSON.stringify(h));updateHistoryBadge();
-    }
-    function updateHistoryBadge(){
-      const n=getHistory().length;
-      document.getElementById('history-count-badge').textContent=n;
-      document.getElementById('btn-history-hero').style.display=n>0?'block':'none';
-    }
-    function renderHistory(){
-      const h=getHistory();const list=document.getElementById('history-list');const actions=document.getElementById('history-actions');
-      if(!h.length){list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist sauvegardée.<br>Génère ta première playlist !</p></div>';actions.style.display='none';return;}
-      actions.style.display='flex';
-      list.innerHTML=h.map(e=>{
-        const preview=e.songs.slice(0,3).map(s=>s.artist+' – '+s.title).join(' · ');
-        const tags=e.meta.includes('Surprise')?'<span class="history-tag surprise">🎲 Surprise</span>':e.meta.split(' · ').map(t=>'<span class="history-tag">'+esc(t)+'</span>').join('');
-        return '<div class="history-item" onclick="openSaved('+e.id+')"><div class="history-item-header"><div class="history-item-tags">'+tags+'</div><span class="history-date">'+esc(e.date)+'</span></div><div class="history-songs-preview">'+esc(preview)+'…</div><div style="margin-top:.4rem"><span class="history-count">'+e.songs.length+' titres</span></div></div>';
-      }).join('');
-    }
-    function openSaved(id){
-      const entry=getHistory().find(e=>e.id===id);if(!entry)return;
-      savedSongs=entry.songs;savedMeta=entry.meta;
-      document.getElementById('saved-meta').textContent=entry.meta+' · '+entry.date;
-      document.getElementById('saved-success').style.display='none';
-      document.getElementById('saved-action-bar').innerHTML=actionBarHTML(entry.songs,entry.meta,'saved','saved-success');
-      document.getElementById('saved-songs-list').innerHTML=songCardsHTML(entry.songs);
-      showScreen('saved-screen');
-    }
-    function clearHistory(){
-      if(!confirm('Effacer toutes tes playlists ?'))return;
-      localStorage.removeItem('moodwave_history');updateHistoryBadge();renderHistory();
-    }
-
-
-    /* ══ ALIAS WINDOW pour onclick inline ══ */
-    window._showScreen=showScreen;
-    window._stepBack=stepBack;
-    window._goStep=goStep;
-    window._generate=generate;
-    window._toggleMultiPill=toggleMultiPill;
-    window._toggleAllGenres=toggleAllGenres;
-    window._selectPill=selectPill;
-    window._selectEnergy=selectEnergy;
-    window._vote=vote;
-    window._playPreview=playPreview;
-    window._togglePlay=togglePlay;
-    window._stopPlayer=stopPlayer;
-    window._toggleDropdown=toggleDropdown;
-    window._closeAllDropdowns=closeAllDropdowns;
-    window._openShareModal=openShareModal;
-    window._openShareCard=openShareCard;
-    window._closeShareCard=closeShareCard;
-    window._downloadShareCard=downloadShareCard;
-    window._shareWhatsApp=shareWhatsApp;
-    window._shareFacebook=shareFacebook;
-    window._shareTwitter=shareTwitter;
-    window._shareLinkedIn=shareLinkedIn;
-    window._shareSMS=shareSMS;
-    window._shareEmail=shareEmail;
-    window._shareTikTok=shareTikTok;
-    window._shareInstagram=shareInstagram;
-    window._shareNative=shareNative;
-    window._shareTextCopy=shareTextCopy;
-    window._copyText=copyText;
-    window._downloadTXT=downloadTXT;
-    window._downloadCSV=downloadCSV;
-    window._downloadPDF=downloadPDF;
-    window._downloadWord=downloadWord;
-    window._openAllOn=openAllOn;
-    window._copyShareUrl=copyShareUrl;
-    window._openSaved=openSaved;
-    window._clearHistory=clearHistory;
-    window._disconnectSpotify=disconnectSpotify;
-    window._closeModal=closeModal;
-
-    /* ══ INIT ══ */
-    votes=loadVotes();
-    updateHistoryBadge();
-    registerSW();
-    loadSharedPlaylist();
-    if(window.location.search.includes('code='))handleCallback();
-  </script>
+/* INIT */
+votes=loadVotes();
+updateHistoryBadge();
+registerSW();
+const urlp=new URLSearchParams(window.location.search).get('p');
+if(urlp){const raw=localStorage.getItem('mw_p_'+urlp);if(raw)try{const d=JSON.parse(raw);currentSongs=d.songs;currentMeta=d.meta;saveToHistory(d.songs,d.meta);renderResults(d.songs,d.meta);}catch(e){}}
+</script>
 </body>
 </html>

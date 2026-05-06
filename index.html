@@ -29,7 +29,7 @@
     /* HERO */
     #hero{align-items:center;justify-content:center;text-align:center;gap:1.5rem;padding-bottom:2rem}
     .logo{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.22em;color:var(--accent2);text-transform:uppercase}
-    .hero-title{font-family:'Syne',sans-serif;font-size:clamp(1.8rem,6vw,2.8rem);font-weight:800;line-height:1.15;color:#fff;max-width:420px}
+    .hero-title{font-family:'Syne',sans-serif;font-size:clamp(1.75rem,5.5vw,2.6rem);font-weight:800;line-height:1.25;color:#fff;max-width:420px;letter-spacing:-.01em}
     .hero-title span{color:var(--accent2)}
     .hero-sub{color:var(--muted);font-size:1rem;max-width:320px;line-height:1.65}
     .hero-badges{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;max-width:380px}
@@ -58,8 +58,8 @@
     .stepper-bar{height:3px;background:rgba(255,255,255,.1);border-radius:100px;overflow:hidden}
     .stepper-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .4s ease}
     .step-panel{display:none}.step-panel.active{display:block}
-    .step-question{font-family:'Syne',sans-serif;font-size:1.35rem;font-weight:800;color:#fff;margin-bottom:.4rem;line-height:1.2}
-    .step-hint{font-size:.82rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.5}
+    .step-question{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.6rem;line-height:1.35}
+    .step-hint{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
 
     /* PILLS */
     .pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
@@ -125,7 +125,7 @@
     .genre-tag{font-size:.7rem;padding:.22rem .7rem;border-radius:100px;background:rgba(165,243,252,.1);color:var(--cyan);border:1px solid rgba(165,243,252,.22);font-weight:500;display:inline-block}
     .reason{font-size:.78rem;color:rgba(220,220,255,.6);line-height:1.5;margin-top:.4rem;font-style:italic}
     .like-btns{display:flex;flex-direction:column;gap:.35rem;flex-shrink:0}
-    .like-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+    .like-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);cursor:pointer;font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;transition:all .2s;font-family:'Apple Color Emoji','Segoe UI Emoji',sans-serif}
     .like-btn.liked{background:rgba(74,222,128,.2);border-color:rgba(74,222,128,.5)}
     .like-btn.disliked{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.5)}
     .preview-btn{width:32px;height:32px;border-radius:50%;background:rgba(124,106,255,.15);border:1px solid rgba(124,106,255,.3);color:var(--accent2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
@@ -204,7 +204,7 @@
 <!-- SHARE MODAL -->
 <div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <div class="modal-title">Partager la playlist 🚀 <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-title"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><rect width="28" height="28" rx="7" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><rect x="5" y="12" width="3" height="9" rx="1.5" fill="rgba(196,181,253,0.9)"/><rect x="9.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/><rect x="14" y="5" width="3" height="18" rx="1.5" fill="rgba(124,106,255,1)"/><rect x="18.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/></svg>Partager 🚀 <button class="modal-close" onclick="closeModal()">✕</button></div>
     <div class="share-grid">
       <div class="share-item" onclick="shareWhatsApp()"><div class="share-icon">💬</div><div class="share-label">WhatsApp</div></div>
       <div class="share-item" onclick="shareInstagram()"><div class="share-icon">📸</div><div class="share-label">Instagram</div></div>
@@ -224,7 +224,7 @@
 <!-- SHARE CARD -->
 <div class="share-card-overlay" id="share-card-overlay" onclick="if(event.target===this)closeShareCard()">
   <div class="share-card-box">
-    <canvas id="share-canvas" width="400" height="710"></canvas>
+    <canvas id="share-canvas" width="400" height="760"></canvas>
     <div class="share-card-actions">
       <button onclick="closeShareCard()">✕ Fermer</button>
       <button class="btn-dl" onclick="downloadShareCard()">⬇️ Télécharger</button>
@@ -246,7 +246,7 @@
 
 <!-- HERO -->
 <div id="hero" class="screen active">
-  <div class="logo">🎵 Moodwave</div>
+  <div class="logo"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><rect width="28" height="28" rx="7" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><rect x="5" y="12" width="3" height="9" rx="1.5" fill="rgba(196,181,253,0.9)"/><rect x="9.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/><rect x="14" y="5" width="3" height="18" rx="1.5" fill="rgba(124,106,255,1)"/><rect x="18.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/></svg>Moodwave</div>
   <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
   <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
   <div class="hero-badges">
@@ -313,31 +313,31 @@
     <div class="step-nav"><button class="btn-next" id="mood-next" onclick="goStep(3)" disabled>Suivant →</button></div>
   </div>
 
-  <!-- Étape 3 — Energie -->
+  <!-- Étape 3 — Énergie -->
   <div class="step-panel" id="step-3">
-    <div class="step-question">Ton niveau d'energie ?</div>
-    <div class="step-hint">Ca influence le tempo et l'intensite des morceaux.</div>
+    <div class="step-question">Ton niveau d'énergie ?</div>
+    <div class="step-hint">Ça influence le tempo et l'intensité des morceaux.</div>
     <div class="energy-cards">
-      <div class="energy-card" data-val="Faible" onclick="selectEnergy(this)"><div class="e-icon">🔋</div><div class="e-label">Faible</div><div class="e-desc">Calme, pose</div></div>
-      <div class="energy-card" data-val="Moyen" onclick="selectEnergy(this)"><div class="e-icon">⚡</div><div class="e-label">Moyen</div><div class="e-desc">Equilibre</div></div>
-      <div class="energy-card" data-val="Elevé" onclick="selectEnergy(this)"><div class="e-icon">🚀</div><div class="e-label">Eleve</div><div class="e-desc">Intense</div></div>
+      <div class="energy-card" data-val="Faible" onclick="selectEnergy(this)"><div class="e-icon">🔋</div><div class="e-label">Faible</div><div class="e-desc">Calme, posé</div></div>
+      <div class="energy-card" data-val="Moyen" onclick="selectEnergy(this)"><div class="e-icon">⚡</div><div class="e-label">Moyen</div><div class="e-desc">Équilibré</div></div>
+      <div class="energy-card" data-val="Elevé" onclick="selectEnergy(this)"><div class="e-icon">🚀</div><div class="e-label">Élevé</div><div class="e-desc">Intense</div></div>
     </div>
     <div class="step-nav"><button class="btn-next" id="energy-next" onclick="goStep(4)" disabled>Suivant →</button></div>
   </div>
 
   <!-- Étape 4 — Contexte -->
   <div class="step-panel" id="step-4">
-    <div class="step-question">Tu vas ecouter ou ?</div>
-    <div class="step-hint">Le contexte influence les ambiances proposees.</div>
+    <div class="step-question">Tu vas écouter où ?</div>
+    <div class="step-hint">Le contexte influence les ambiances proposées.</div>
     <div class="pills">
       <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)">💻 Travail</div>
-      <div class="pill" data-group="context" data-val="Etudes" onclick="selectPill(this)">📚 Etudes</div>
+      <div class="pill" data-group="context" data-val="Études" onclick="selectPill(this)">📚 Études</div>
       <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)">🏃 Sport</div>
-      <div class="pill" data-group="context" data-val="Detente" onclick="selectPill(this)">🛋️ Detente</div>
+      <div class="pill" data-group="context" data-val="Détente" onclick="selectPill(this)">🛋️ Détente</div>
       <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)">🚇 Trajet</div>
-      <div class="pill" data-group="context" data-val="Fete" onclick="selectPill(this)">🎉 Fete</div>
+      <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)">🎉 Fête</div>
       <div class="pill" data-group="context" data-val="Road trip" onclick="selectPill(this)">🚗 Road trip</div>
-      <div class="pill" data-group="context" data-val="Meditation" onclick="selectPill(this)">🧘 Meditation</div>
+      <div class="pill" data-group="context" data-val="Méditation" onclick="selectPill(this)">🧘 Méditation</div>
     </div>
     <div class="step-nav"><button class="btn-next" id="context-next" onclick="goStep(5)" disabled>Suivant →</button></div>
   </div>
@@ -345,15 +345,15 @@
   <!-- Étape 5 — Recap -->
   <div class="step-panel" id="step-5">
     <div class="step-question">C'est parti ? 🎵</div>
-    <div class="step-hint">Voici ta selection — modifie ou lance la generation.</div>
+    <div class="step-hint">Voici ta sélection — modifie ou lance la génération.</div>
     <div class="recap-box" id="recap-box"></div>
     <div class="surprise-row">
-      <div class="surprise-info"><h4>🎲 Mode Surprise</h4><p>Decouvre des sons totalement inattendus</p></div>
+      <div class="surprise-info"><h4>🎲 Mode Surprise</h4><p>Découvre des sons totalement inattendus</p></div>
       <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
     </div>
-    <button class="btn-next" onclick="generate(false)">Generer ma playlist ✨</button>
+    <button class="btn-next" onclick="generate(false)">Générer ma playlist ✨</button>
   </div>
-  <footer>Propulse par l'IA · Fait pour les amoureux de musique</footer>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>
 
 <!-- LOADING -->
@@ -370,7 +370,7 @@
 <div id="results-screen" class="screen">
   <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.25rem;padding-top:.5rem">
     <button class="back-btn" onclick="showScreen('form-screen')">←</button>
-    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff">Ta playlist ✨</span>
+    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><rect width="28" height="28" rx="7" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><rect x="5" y="12" width="3" height="9" rx="1.5" fill="rgba(196,181,253,0.9)"/><rect x="9.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/><rect x="14" y="5" width="3" height="18" rx="1.5" fill="rgba(124,106,255,1)"/><rect x="18.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/></svg>Ta playlist ✨</span>
   </div>
   <p class="results-meta" id="results-meta"></p>
   <div class="success-msg" id="results-success"></div>
@@ -381,28 +381,28 @@
     <button class="btn-secondary" onclick="showScreen('form-screen')">🔄 Nouveau mood</button>
     <button class="btn-secondary" onclick="generate(true)">🎲 Surprise me</button>
   </div>
-  <footer>Propulse par l'IA · Fait pour les amoureux de musique</footer>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>
 
 <!-- HISTORIQUE -->
 <div id="history-screen" class="screen">
   <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:2rem;padding-top:.5rem">
     <button class="back-btn" onclick="showScreen('hero')">←</button>
-    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff">Mes playlists 📋</span>
+    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><rect width="28" height="28" rx="7" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><rect x="5" y="12" width="3" height="9" rx="1.5" fill="rgba(196,181,253,0.9)"/><rect x="9.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/><rect x="14" y="5" width="3" height="18" rx="1.5" fill="rgba(124,106,255,1)"/><rect x="18.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/></svg>Mes playlists 📋</span>
   </div>
   <div id="history-list"></div>
   <div class="history-actions" id="history-actions" style="display:none">
     <button class="btn-secondary" onclick="showScreen('form-screen')">+ Nouvelle playlist</button>
     <button class="btn-danger" onclick="clearHistory()">🗑️ Tout effacer</button>
   </div>
-  <footer>Propulse par l'IA · Fait pour les amoureux de musique</footer>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>
 
 <!-- PLAYLIST SAUVEGARDEE -->
 <div id="saved-screen" class="screen">
   <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.25rem;padding-top:.5rem">
     <button class="back-btn" onclick="showScreen('history-screen')">←</button>
-    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff">Playlist sauvegardee</span>
+    <span style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;color:#fff"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><rect width="28" height="28" rx="7" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><rect x="5" y="12" width="3" height="9" rx="1.5" fill="rgba(196,181,253,0.9)"/><rect x="9.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/><rect x="14" y="5" width="3" height="18" rx="1.5" fill="rgba(124,106,255,1)"/><rect x="18.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/></svg>Playlist sauvegardée</span>
   </div>
   <p class="results-meta" id="saved-meta"></p>
   <div class="success-msg" id="saved-success"></div>
@@ -412,7 +412,7 @@
     <button class="btn-secondary" onclick="showScreen('history-screen')">← Historique</button>
     <button class="btn-secondary" onclick="showScreen('form-screen')">+ Nouveau mood</button>
   </div>
-  <footer>Propulse par l'IA · Fait pour les amoureux de musique</footer>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>
 
 <script>
@@ -421,13 +421,13 @@ let selectedGenres=[];
 let msgInterval=null,currentSongs=[],currentMeta='',savedSongs=[],savedMeta='';
 let currentStep=1;
 const TOTAL_STEPS=5;
-const stepLabels=["Genres musicaux","Ton mood","Niveau d'energie","Contexte","Recapitulatif"];
+const stepLabels=["Genres musicaux","Ton mood","Niveau d'énergie","Contexte","Récapitulatif"];
 let votes={};
 let activeDropdown=null;
 let currentAudio={url:null,artist:null,title:null,btnEl:null};
 let progressInterval=null;
 let shareContext={songs:[],meta:''};
-const msgs=["Analyse de ta vibe...","Calibrage des frequences...","Selection des 10 titres...","Presque pret..."];
+const msgs=["Analyse de ta vibe...","Calibrage des fréquences...","Sélection des 10 titres...","Presque prêt..."];
 
 /* NAV */
 function showScreen(id){
@@ -482,7 +482,7 @@ function renderRecap(){
   document.getElementById('recap-box').innerHTML=
     '<div class="recap-row"><span class="recap-key">Genres</span><span class="recap-val">'+genres+'</span></div>'+
     '<div class="recap-row"><span class="recap-key">Mood</span><span class="recap-val">'+(sel.mood||'?')+'</span></div>'+
-    '<div class="recap-row"><span class="recap-key">Energie</span><span class="recap-val">'+(sel.energy||'?')+'</span></div>'+
+    '<div class="recap-row"><span class="recap-key">Énergie</span><span class="recap-val">'+(sel.energy||'?')+'</span></div>'+
     '<div class="recap-row"><span class="recap-key">Contexte</span><span class="recap-val">'+(sel.context||'?')+'</span></div>';
 }
 
@@ -640,35 +640,54 @@ function openShareCard(songs,meta){
 function closeShareCard(){document.getElementById('share-card-overlay').classList.remove('open');}
 function drawShareCard(songs,meta){
   const canvas=document.getElementById('share-canvas');
-  const ctx=canvas.getContext('2d');const W=400,H=710;
+  const ctx=canvas.getContext('2d');const W=400,H=760;
   canvas.width=W;canvas.height=H;
   const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#07080f');bg.addColorStop(.5,'#1a1040');bg.addColorStop(1,'#0d1a2e');
   ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
   const o1=ctx.createRadialGradient(60,100,0,60,100,200);o1.addColorStop(0,'rgba(124,106,255,.38)');o1.addColorStop(1,'transparent');ctx.fillStyle=o1;ctx.fillRect(0,0,W,H);
   const o2=ctx.createRadialGradient(W-40,H-80,0,W-40,H-80,180);o2.addColorStop(0,'rgba(8,145,178,.28)');o2.addColorStop(1,'transparent');ctx.fillStyle=o2;ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='rgba(196,181,253,.9)';ctx.font='bold 20px Arial';ctx.fillText('MOODWAVE',32,52);
+  // Logo waveform sur canvas
+const bars=[9,13,18,13];const bw=5,bstart=32,bcy=36;
+bars.forEach((bh,i)=>{
+  const bx=bstart+i*8;const by=bcy-bh/2;
+  const bg2=ctx.createLinearGradient(0,by,0,by+bh);
+  bg2.addColorStop(0,'rgba(196,181,253,.9)');bg2.addColorStop(1,'rgba(124,106,255,.9)');
+  ctx.fillStyle=bg2;
+  roundRect(ctx,bx,by,bw,bh,2.5);ctx.fill();
+});
+ctx.fillStyle='rgba(196,181,253,.9)';ctx.font='bold 18px Arial';ctx.fillText('MOODWAVE',76,46);
   ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(32,62,W-64,1);
   ctx.fillStyle='rgba(196,181,253,.7)';ctx.font='13px Arial';ctx.fillText(meta.slice(0,50),32,84);
-  const sy=102,ch=56,gap=6;
+  // 10 titres sur canvas 400x760 — hauteur de card adaptée
+  const sy=102,ch=58,gap=4;
   songs.slice(0,10).forEach((s,i)=>{
     const y=sy+i*(ch+gap);
     ctx.fillStyle='rgba(255,255,255,.05)';
-    ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
-    roundRect(ctx,32,y,W-64,ch,10);ctx.fill();ctx.stroke();
-    ctx.fillStyle='rgba(196,181,253,.5)';ctx.font='bold 11px Arial';ctx.fillText(String(i+1).padStart(2,'0'),46,y+22);
-    ctx.fillStyle='#c4b5fd';ctx.font='12px Arial';ctx.fillText(trunc(s.artist,28),66,y+22);
-    ctx.fillStyle='#ffffff';ctx.font='bold 14px Arial';ctx.fillText(trunc(s.title,30),66,y+42);
-    ctx.fillStyle='rgba(165,243,252,.6)';ctx.font='10px Arial';ctx.textAlign='right';ctx.fillText(s.genre.slice(0,14),W-40,y+42);ctx.textAlign='left';
+    ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=1;
+    roundRect(ctx,28,y,W-56,ch,9);ctx.fill();ctx.stroke();
+    // Numéro
+    ctx.fillStyle='rgba(196,181,253,.45)';ctx.font='bold 10px Arial';
+    ctx.textAlign='left';ctx.fillText(String(i+1).padStart(2,'0'),40,y+20);
+    // Artiste
+    ctx.fillStyle='#c4b5fd';ctx.font='500 11px Arial';
+    ctx.fillText(trunc(s.artist,26),60,y+20);
+    // Titre
+    ctx.fillStyle='#ffffff';ctx.font='bold 13px Arial';
+    ctx.fillText(trunc(s.title,28),60,y+38);
+    // Genre à droite
+    ctx.fillStyle='rgba(165,243,252,.55)';ctx.font='10px Arial';
+    ctx.textAlign='right';ctx.fillText(s.genre.slice(0,13),W-32,y+38);
+    ctx.textAlign='left';
   });
   ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(32,H-46,W-64,1);
-  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='12px Arial';ctx.fillText('Genere sur moodwave.app',32,H-22);
+  ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='12px Arial';ctx.fillText('Générée sur moodwave.app',32,H-22);
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
 function trunc(s,max){return s&&s.length>max?s.slice(0,max-1)+'…':s||'';}
 function downloadShareCard(){const a=document.createElement('a');a.download='moodwave-playlist.png';a.href=document.getElementById('share-canvas').toDataURL('image/png');a.click();}
 
 /* SHARE SOCIAL */
-function buildShareText(songs,meta){return 'Ma playlist Moodwave · '+meta+'\n\n'+songs.slice(0,5).map((s,i)=>(i+1)+'. '+s.artist+' — '+s.title).join('\n')+'\n\nmoodwave.app';}
+function buildShareText(songs,meta){return 'Ma playlist Moodwave · '+meta+'\n\n'+songs.slice(0,10).map((s,i)=>(i+1)+'. '+s.artist+' — '+s.title).join('\n')+'\n\nmoodwave.app';}
 function openShareModal(songs,meta){shareContext={songs,meta};document.getElementById('share-preview').textContent=buildShareText(songs,meta);document.getElementById('share-modal').classList.add('open');}
 function closeModal(){document.getElementById('share-modal').classList.remove('open');}
 function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta)),'_blank');}
@@ -692,7 +711,7 @@ function copyShareUrl(songs,meta,successId){
 function actionBarHTML(songs,meta,prefix,successId){
   const p=prefix;
   return '<div class="action-bar">'+
-    '<div class="dropdown-wrap"><button class="dropdown-btn" onclick="toggleDropdown(\'dd-listen-'+p+'\')">🎧 Ecouter sur <span class="arrow">▼</span></button><div class="dropdown-menu" id="dd-listen-'+p+'">'+
+    '<div class="dropdown-wrap"><button class="dropdown-btn" onclick="toggleDropdown(\'dd-listen-'+p+'\')">🎧 Écouter sur <span class="arrow">▼</span></button><div class="dropdown-menu" id="dd-listen-'+p+'">'+
     '<button class="dropdown-item" onclick="openAllOn(\'spotify\','+p+'Songs);closeAllDropdowns()"><span class="di">🎵</span> Spotify</button>'+
     '<button class="dropdown-item" onclick="openAllOn(\'deezer\','+p+'Songs);closeAllDropdowns()"><span class="di">🎶</span> Deezer</button>'+
     '<button class="dropdown-item" onclick="openAllOn(\'youtube\','+p+'Songs);closeAllDropdowns()"><span class="di">▶️</span> YouTube</button>'+
@@ -735,7 +754,7 @@ function songCardsHTML(songs){
 /* GENERATION */
 async function generate(isSurprise){
   hideError();
-  if(!isSurprise&&(!sel.mood||!sel.energy||!sel.context)){showError('Selectionne toutes les options avant de generer.');return;}
+  if(!isSurprise&&(!sel.mood||!sel.energy||!sel.context)){showError('Sélectionne toutes les options avant de générer.');return;}
   const withSurprise=isSurprise||document.getElementById('surprise-toggle').classList.contains('on');
   showScreen('loading-screen');startLoading();
   const genreLabel=selectedGenres.length>0&&!selectedGenres.includes('De tout')?selectedGenres.join('-')+' / ':'';
@@ -775,7 +794,7 @@ function updateHistoryBadge(){
 }
 function renderHistory(){
   const h=getHistory();const list=document.getElementById('history-list');const actions=document.getElementById('history-actions');
-  if(!h.length){list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist.<br>Genere ta premiere playlist !</p></div>';actions.style.display='none';return;}
+  if(!h.length){list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist.<br>Génère ta première playlist !</p></div>';actions.style.display='none';return;}
   actions.style.display='flex';
   list.innerHTML=h.map(e=>{
     const preview=e.songs.slice(0,3).map(s=>s.artist+' – '+s.title).join(' · ');

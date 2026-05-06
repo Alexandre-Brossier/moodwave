@@ -60,6 +60,7 @@
     .pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.875rem;padding:.48rem 1rem;border-radius:100px;cursor:pointer;transition:all .2s;user-select:none}
     .pill:hover{border-color:var(--accent2);color:#fff;background:rgba(255,255,255,.13)}
     .pill.selected{background:rgba(124,106,255,.32);border-color:#a78bfa;color:#fff;font-weight:500}
+    .pill.multi.all-genres.selected{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.5);color:#fde68a}
     .surprise-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:16px;padding:1rem 1.25rem;margin-bottom:1.75rem}
     .surprise-info h4{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.2rem}
     .surprise-info p{font-size:.8rem;color:var(--muted)}
@@ -211,6 +212,22 @@
       <span class="form-title">Dis-moi comment tu te sens</span>
     </div>
     <div class="error-msg" id="error-msg"></div>
+    <p class="section-label">Tes genres préférés <span style="color:var(--muted);font-size:.65rem;letter-spacing:0;text-transform:none;font-weight:400">(choix multiple)</span></p>
+    <div class="pills" id="genre-pills">
+      <div class="pill multi" data-group="genre" data-val="Électronique" onclick="toggleMultiPill(this)">🎛️ Électronique</div>
+      <div class="pill multi" data-group="genre" data-val="Rock" onclick="toggleMultiPill(this)">🎸 Rock</div>
+      <div class="pill multi" data-group="genre" data-val="Rap / Hip-Hop" onclick="toggleMultiPill(this)">🎤 Rap / Hip-Hop</div>
+      <div class="pill multi" data-group="genre" data-val="Reggae" onclick="toggleMultiPill(this)">🌴 Reggae</div>
+      <div class="pill multi" data-group="genre" data-val="Classique" onclick="toggleMultiPill(this)">🎻 Classique</div>
+      <div class="pill multi" data-group="genre" data-val="R&amp;B / Soul" onclick="toggleMultiPill(this)">🎷 R&amp;B / Soul</div>
+      <div class="pill multi" data-group="genre" data-val="Métal" onclick="toggleMultiPill(this)">🤘 Métal</div>
+      <div class="pill multi" data-group="genre" data-val="Variété / Pop" onclick="toggleMultiPill(this)">🎶 Variété / Pop</div>
+      <div class="pill multi" data-group="genre" data-val="Jazz" onclick="toggleMultiPill(this)">🎺 Jazz</div>
+      <div class="pill multi" data-group="genre" data-val="Indie / Alternative" onclick="toggleMultiPill(this)">🌿 Indie</div>
+      <div class="pill multi" data-group="genre" data-val="World Music" onclick="toggleMultiPill(this)">🌍 World Music</div>
+      <div class="pill multi all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)">✨ De tout</div>
+    </div>
+
     <p class="section-label">Ton mood</p>
     <div class="pills">
       <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)">😌 Calme</div>
@@ -311,6 +328,7 @@
 
   <script>
     const sel={mood:null,energy:null,context:null};
+    let selectedGenres=[];
     let msgInterval=null,currentSongs=[],currentMeta='',savedSongs=[],savedMeta='';
     let spotifyToken=null,spotifyUserId=null;
     let activeDropdown=null;
@@ -326,7 +344,35 @@
       if(id==='history-screen')renderHistory();
       if(id==='hero'){updateHistoryBadge();updateSpotifyUI();}
     }
-    function selectPill(el){
+
+    function toggleMultiPill(el){
+      // Si "De tout" était sélectionné, le désélectionner
+      const allBtn=document.querySelector('.all-genres');
+      if(allBtn&&allBtn.classList.contains('selected')){
+        allBtn.classList.remove('selected');
+        selectedGenres=selectedGenres.filter(g=>g!=='De tout');
+      }
+      const val=el.dataset.val;
+      if(el.classList.contains('selected')){
+        el.classList.remove('selected');
+        selectedGenres=selectedGenres.filter(g=>g!==val);
+      } else {
+        el.classList.add('selected');
+        if(!selectedGenres.includes(val))selectedGenres.push(val);
+      }
+    }
+    function toggleAllGenres(el){
+      // Désélectionner tous les autres genres
+      document.querySelectorAll('.pill.multi:not(.all-genres)').forEach(p=>p.classList.remove('selected'));
+      selectedGenres=[];
+      if(el.classList.contains('selected')){
+        el.classList.remove('selected');
+      } else {
+        el.classList.add('selected');
+        selectedGenres=['De tout'];
+      }
+    }
+        function selectPill(el){
       const g=el.dataset.group;
       document.querySelectorAll('.pill[data-group="'+g+'"]').forEach(p=>p.classList.remove('selected'));
       el.classList.add('selected');sel[g]=el.dataset.val;
@@ -567,7 +613,7 @@
       if(!isSurprise&&(!sel.mood||!sel.energy||!sel.context)){showError("Sélectionne un mood, un niveau d'énergie et un contexte.");return;}
       const withSurprise=isSurprise||document.getElementById('surprise-toggle').classList.contains('on');
       showScreen('loading-screen');startLoading();
-      const body=isSurprise?{type:'surprise'}:{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise};
+      const body=isSurprise?{type:'surprise'}:{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres};
       try{
         const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
         if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'Erreur ('+res.status+')');}

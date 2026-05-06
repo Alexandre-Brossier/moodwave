@@ -9,6 +9,13 @@
   <meta property="og:description" content="Découvre Moodwave : une IA qui génère ta playlist selon ton mood !">
   <meta property="og:image" content="https://project-0mjoz.vercel.app/og-image.png">
   <meta property="og:url" content="https://project-0mjoz.vercel.app">
+  <meta name="theme-color" content="#07080f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Moodwave">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <script defer src="/_vercel/insights/script.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
@@ -155,6 +162,17 @@
     .preview-not-found{font-size:.7rem;color:rgba(255,255,255,.25);padding:.2rem .5rem}
     /* Ajuster le padding bas des écrans pour le mini lecteur */
     #results-screen,#saved-screen,#history-screen{padding-bottom:5rem}
+
+
+    /* CARTE PARTAGEABLE */
+    .share-card-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:none;align-items:center;justify-content:center;padding:1rem}
+    .share-card-overlay.open{display:flex}
+    .share-card-box{background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:1.25rem;max-width:400px;width:100%}
+    .share-card-box canvas{width:100%;border-radius:12px;display:block}
+    .share-card-actions{display:flex;gap:.625rem;margin-top:.875rem}
+    .share-card-actions button{flex:1;padding:.7rem;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;transition:all .2s}
+    .share-card-actions button:hover{background:rgba(255,255,255,.14);color:#fff}
+    .share-card-actions .btn-dl{background:linear-gradient(135deg,#7c6aff,#a78bfa);border-color:transparent;color:#fff!important;-webkit-text-fill-color:#fff;font-weight:600}
 
     footer{text-align:center;padding:2rem 1rem 1.5rem;color:rgba(200,200,255,.35);font-size:.75rem;line-height:1.9;margin-top:auto}
     footer a{color:rgba(196,181,253,.5);text-decoration:none}
@@ -330,6 +348,18 @@
   </div>
 
 
+
+  <!-- CARTE PARTAGEABLE -->
+  <div class="share-card-overlay" id="share-card-overlay" onclick="closeShareCard(event)">
+    <div class="share-card-box">
+      <canvas id="share-canvas" width="540" height="960"></canvas>
+      <div class="share-card-actions">
+        <button onclick="closeShareCard()">✕ Fermer</button>
+        <button class="btn-dl" onclick="downloadShareCard()">⬇️ Télécharger</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MINI LECTEUR AUDIO -->
   <div class="mini-player" id="mini-player">
     <div class="mini-player-progress" id="player-progress"></div>
@@ -414,6 +444,164 @@
     }
     document.addEventListener('click',e=>{if(!e.target.closest('.dropdown-wrap'))closeAllDropdowns();});
 
+
+
+    /* ══ CARTE PARTAGEABLE (Canvas) ══ */
+    let shareCardSongs=[];let shareCardMeta='';
+
+    function openShareCard(songs,meta){
+      shareCardSongs=songs;shareCardMeta=meta;
+      drawShareCard(songs,meta);
+      document.getElementById('share-card-overlay').classList.add('open');
+    }
+    function closeShareCard(e){
+      if(!e||e.target===document.getElementById('share-card-overlay'))
+        document.getElementById('share-card-overlay').classList.remove('open');
+    }
+
+    function drawShareCard(songs,meta){
+      const canvas=document.getElementById('share-canvas');
+      const ctx=canvas.getContext('2d');
+      const W=540,H=960;
+      canvas.width=W;canvas.height=H;
+
+      // Fond dégradé
+      const grad=ctx.createLinearGradient(0,0,W,H);
+      grad.addColorStop(0,'#07080f');
+      grad.addColorStop(0.5,'#1a1040');
+      grad.addColorStop(1,'#0d1a2e');
+      ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+
+      // Orbes décoratifs
+      const orb1=ctx.createRadialGradient(80,120,0,80,120,260);
+      orb1.addColorStop(0,'rgba(124,106,255,0.35)');orb1.addColorStop(1,'transparent');
+      ctx.fillStyle=orb1;ctx.fillRect(0,0,W,H);
+      const orb2=ctx.createRadialGradient(W-60,H-100,0,W-60,H-100,220);
+      orb2.addColorStop(0,'rgba(8,145,178,0.25)');orb2.addColorStop(1,'transparent');
+      ctx.fillStyle=orb2;ctx.fillRect(0,0,W,H);
+
+      // Logo
+      ctx.fillStyle='rgba(196,181,253,0.9)';
+      ctx.font='500 28px DM Sans, sans-serif';
+      ctx.fillText('🎵 MOODWAVE',44,70);
+
+      // Mood pill
+      const pillX=44,pillY=95,pillW=Math.min(W-88,ctx.measureText(meta).width+40),pillH=36;
+      ctx.fillStyle='rgba(124,106,255,0.25)';
+      ctx.strokeStyle='rgba(167,139,250,0.5)';ctx.lineWidth=1;
+      roundRect(ctx,pillX,pillY,pillW,pillH,18);
+      ctx.fill();ctx.stroke();
+      ctx.fillStyle='#c4b5fd';ctx.font='500 18px DM Sans, sans-serif';
+      ctx.fillText(meta.slice(0,40),pillX+20,pillY+24);
+
+      // Titre section
+      ctx.fillStyle='rgba(255,255,255,0.4)';
+      ctx.font='400 15px DM Sans, sans-serif';
+      ctx.fillText('Ta playlist du moment',44,170);
+
+      // Cards titres
+      const startY=190;const cardH=70;const gap=10;
+      const displaySongs=songs.slice(0,9);
+      displaySongs.forEach((s,i)=>{
+        const y=startY+i*(cardH+gap);
+        // Card bg
+        ctx.fillStyle='rgba(255,255,255,0.05)';
+        ctx.strokeStyle='rgba(255,255,255,0.1)';ctx.lineWidth=1;
+        roundRect(ctx,44,y,W-88,cardH,14);
+        ctx.fill();ctx.stroke();
+        // Numéro
+        ctx.fillStyle='rgba(196,181,253,0.5)';
+        ctx.font='500 14px DM Sans, sans-serif';
+        ctx.fillText(String(i+1).padStart(2,'0'),64,y+28);
+        // Artiste
+        ctx.fillStyle='#c4b5fd';
+        ctx.font='500 14px DM Sans, sans-serif';
+        ctx.fillText(truncate(s.artist,32),94,y+28);
+        // Titre
+        ctx.fillStyle='#ffffff';
+        ctx.font='700 17px Syne, sans-serif';
+        ctx.fillText(truncate(s.title,34),94,y+52);
+        // Genre tag
+        const gW=ctx.measureText(s.genre).width+16;
+        ctx.fillStyle='rgba(165,243,252,0.12)';
+        ctx.strokeStyle='rgba(165,243,252,0.25)';ctx.lineWidth=1;
+        roundRect(ctx,W-88-gW,y+38,gW,22,11);
+        ctx.fill();ctx.stroke();
+        ctx.fillStyle='#a5f3fc';ctx.font='500 12px DM Sans, sans-serif';
+        ctx.fillText(s.genre.slice(0,18),W-88-gW+8,y+53);
+      });
+
+      // Footer
+      ctx.fillStyle='rgba(255,255,255,0.2)';
+      ctx.font='400 16px DM Sans, sans-serif';
+      ctx.fillText('Génère la tienne sur moodwave.app',44,H-32);
+
+      // Ligne déco
+      const lineGrad=ctx.createLinearGradient(44,0,W-44,0);
+      lineGrad.addColorStop(0,'transparent');
+      lineGrad.addColorStop(0.3,'rgba(124,106,255,0.6)');
+      lineGrad.addColorStop(0.7,'rgba(196,181,253,0.6)');
+      lineGrad.addColorStop(1,'transparent');
+      ctx.strokeStyle=lineGrad;ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(44,H-50);ctx.lineTo(W-44,H-50);ctx.stroke();
+    }
+
+    function roundRect(ctx,x,y,w,h,r){
+      ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
+      ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
+      ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
+      ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
+      ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+    }
+    function truncate(str,max){return str&&str.length>max?str.slice(0,max-1)+'…':str||'';}
+
+    function downloadShareCard(){
+      const canvas=document.getElementById('share-canvas');
+      const a=document.createElement('a');
+      a.download='moodwave-playlist.png';
+      a.href=canvas.toDataURL('image/png');
+      a.click();
+    }
+
+    /* ══ URL PERMANENTE (partage via lien court) ══ */
+    function generatePlaylistId(){
+      return Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    }
+    function getShareUrl(playlistId){
+      return window.location.origin+'/?p='+playlistId;
+    }
+    function savePlaylistForSharing(songs,meta){
+      const id=generatePlaylistId();
+      const data={songs,meta,date:new Date().toISOString()};
+      localStorage.setItem('mw_shared_'+id,JSON.stringify(data));
+      return id;
+    }
+    function copyShareUrl(songs,meta,successId){
+      const id=savePlaylistForSharing(songs,meta);
+      const url=getShareUrl(id);
+      navigator.clipboard.writeText(url)
+        .then(()=>showSuccess(successId,'🔗 Lien copié ! Valable sur cet appareil.'))
+        .catch(()=>showSuccess(successId,'🔗 '+url));
+    }
+    function loadSharedPlaylist(){
+      const params=new URLSearchParams(window.location.search);
+      const p=params.get('p');
+      if(!p)return;
+      const raw=localStorage.getItem('mw_shared_'+p);
+      if(!raw)return;
+      try{
+        const {songs,meta}=JSON.parse(raw);
+        currentSongs=songs;currentMeta=meta;
+        renderResults(songs,meta);
+      }catch(e){}
+    }
+
+    /* ══ SERVICE WORKER (PWA) ══ */
+    function registerSW(){
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('/sw.js').catch(()=>{});
+      }
+    }
 
     /* ══ AUDIO PLAYER ══ */
     let currentAudio={url:null,artist:null,title:null,btnEl:null};
@@ -656,7 +844,9 @@
             📤 Exporter <span class="arrow">▼</span>
           </button>
           <div class="dropdown-menu" id="dd-export-${p}">
-            <button class="dropdown-item" onclick="copyText(${p}Songs,'${meta.replace(/'/g,"\\'")}','${successId}');closeAllDropdowns()"><span class="di">📋</span> Copier la liste</button>
+            <button class="dropdown-item" onclick="openShareCard(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">🖼️</span> Carte Instagram/TikTok</button>
+            <button class="dropdown-item" onclick="copyShareUrl(${p}Songs,'${meta.replace(/'/g,"\\'")}','${successId}');closeAllDropdowns()"><span class="di">🔗</span> Copier le lien</button>
+            <button class="dropdown-item sep" onclick="copyText(${p}Songs,'${meta.replace(/'/g,"\\'")}','${successId}');closeAllDropdowns()"><span class="di">📋</span> Copier la liste</button>
             <button class="dropdown-item" onclick="downloadTXT(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">📄</span> Fichier .txt</button>
             <button class="dropdown-item" onclick="downloadCSV(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">📊</span> Fichier .csv (Excel)</button>
             <button class="dropdown-item sep" onclick="downloadPDF(${p}Songs,'${meta.replace(/'/g,"\\'")}');closeAllDropdowns()"><span class="di">📕</span> Exporter en PDF</button>
@@ -778,6 +968,8 @@
     /* ══ INIT ══ */
     votes=loadVotes();
     updateHistoryBadge();
+    registerSW();
+    loadSharedPlaylist();
     if(window.location.search.includes('code='))handleCallback();
   </script>
 </body>

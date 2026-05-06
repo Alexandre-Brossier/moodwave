@@ -23,12 +23,12 @@ export default async function handler(req, res) {
   · Métal → doom metal, black metal, post-metal, metalcore, djent...
   · Jazz → bebop, jazz fusion, nu-jazz, jazz manouche, smooth jazz...
   · Indie → shoegaze, dream pop, lo-fi indie, folk indie...
-  Répartis les 9 titres équitablement entre les genres sélectionnés.`;
+  Répartis les 10 titres équitablement entre les genres sélectionnés.`;
     }
   }
 
   const systemPrompt = `Tu es un expert en musique avec une culture encyclopédique couvrant tous les genres et sous-genres.
-Tu dois répondre UNIQUEMENT avec un tableau JSON valide de 9 objets, sans markdown, sans texte avant ou après.
+Tu dois répondre UNIQUEMENT avec un tableau JSON valide de 10 objets, sans markdown, sans texte avant ou après.
 Chaque objet doit avoir exactement ces champs :
 - "artist" : nom de l'artiste (string)
 - "title" : titre du morceau (string)  
@@ -38,11 +38,11 @@ Assure-toi que les artistes et titres existent vraiment sur Spotify.`;
 
   let userPrompt;
   if (type === 'surprise') {
-    userPrompt = `Génère une playlist surprise de 9 titres musicaux totalement inattendus.
+    userPrompt = `Génère une playlist surprise de 10 titres musicaux totalement inattendus.
 Mélange les genres, les décennies (des années 60 à aujourd'hui) et les cultures du monde entier.
 Sois audacieux, inattendu, et choisis des titres que peu de gens connaissent.`;
   } else {
-    userPrompt = `Génère une playlist de 9 titres musicaux pour quelqu'un avec :
+    userPrompt = `Génère une playlist de 10 titres musicaux pour quelqu'un avec :
 - Mood : "${mood}"
 - Niveau d'énergie : "${energy}"
 - Contexte : "${context}"
@@ -66,7 +66,7 @@ Varie les artistes, évite de mettre deux titres du même artiste.`;
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-5',
-        max_tokens: 1500,
+        max_tokens: 2000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }]
       })

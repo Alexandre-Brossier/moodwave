@@ -177,6 +177,51 @@
     footer{text-align:center;padding:2rem 1rem 1.5rem;color:rgba(200,200,255,.35);font-size:.75rem;line-height:1.9;margin-top:auto}
     footer a{color:rgba(196,181,253,.5);text-decoration:none}
   </style>
+  <script>
+    // Fonctions globales définies tôt pour les onclick inline
+    function showScreen(id){
+      if(window._showScreen)return window._showScreen(id);
+      document.addEventListener('DOMContentLoaded',()=>window._showScreen&&window._showScreen(id));
+    }
+    function stepBack(){if(window._stepBack)window._stepBack();}
+    function goStep(n){if(window._goStep)window._goStep(n);}
+    function generate(s){if(window._generate)window._generate(s);}
+    function toggleMultiPill(el){if(window._toggleMultiPill)window._toggleMultiPill(el);}
+    function toggleAllGenres(el){if(window._toggleAllGenres)window._toggleAllGenres(el);}
+    function selectPill(el){if(window._selectPill)window._selectPill(el);}
+    function selectEnergy(el){if(window._selectEnergy)window._selectEnergy(el);}
+    function vote(k,t){if(window._vote)window._vote(k,t);}
+    function playPreview(a,t,b){if(window._playPreview)window._playPreview(a,t,b);}
+    function togglePlay(){if(window._togglePlay)window._togglePlay();}
+    function stopPlayer(){if(window._stopPlayer)window._stopPlayer();}
+    function toggleDropdown(id){if(window._toggleDropdown)window._toggleDropdown(id);}
+    function closeAllDropdowns(){if(window._closeAllDropdowns)window._closeAllDropdowns();}
+    function openShareModal(s,m){if(window._openShareModal)window._openShareModal(s,m);}
+    function openShareCard(s,m){if(window._openShareCard)window._openShareCard(s,m);}
+    function closeShareCard(e){if(window._closeShareCard)window._closeShareCard(e);}
+    function downloadShareCard(){if(window._downloadShareCard)window._downloadShareCard();}
+    function shareWhatsApp(){if(window._shareWhatsApp)window._shareWhatsApp();}
+    function shareFacebook(){if(window._shareFacebook)window._shareFacebook();}
+    function shareTwitter(){if(window._shareTwitter)window._shareTwitter();}
+    function shareLinkedIn(){if(window._shareLinkedIn)window._shareLinkedIn();}
+    function shareSMS(){if(window._shareSMS)window._shareSMS();}
+    function shareEmail(){if(window._shareEmail)window._shareEmail();}
+    function shareTikTok(){if(window._shareTikTok)window._shareTikTok();}
+    function shareInstagram(){if(window._shareInstagram)window._shareInstagram();}
+    function shareNative(){if(window._shareNative)window._shareNative();}
+    function shareTextCopy(){if(window._shareTextCopy)window._shareTextCopy();}
+    function copyText(s,m,i){if(window._copyText)window._copyText(s,m,i);}
+    function downloadTXT(s,m){if(window._downloadTXT)window._downloadTXT(s,m);}
+    function downloadCSV(s,m){if(window._downloadCSV)window._downloadCSV(s,m);}
+    function downloadPDF(s,m){if(window._downloadPDF)window._downloadPDF(s,m);}
+    function downloadWord(s,m){if(window._downloadWord)window._downloadWord(s,m);}
+    function openAllOn(p,s){if(window._openAllOn)window._openAllOn(p,s);}
+    function copyShareUrl(s,m,i){if(window._copyShareUrl)window._copyShareUrl(s,m,i);}
+    function openSaved(id){if(window._openSaved)window._openSaved(id);}
+    function clearHistory(){if(window._clearHistory)window._clearHistory();}
+    function disconnectSpotify(){if(window._disconnectSpotify)window._disconnectSpotify();}
+    function closeModal(){if(window._closeModal)window._closeModal();}
+  </script>
 </head>
 <body>
   <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
@@ -894,12 +939,102 @@
     function downloadPDF(songs,meta){
       const w=window.open('','_blank');
       const rows=songs.map((s,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td><b>${esc(s.artist)}</b></td><td>${esc(s.title)}</td><td style="color:#7c6aff">${esc(s.genre)}</td><td style="color:#888;font-style:italic">${esc(s.reason)}</td></tr>`).join('');
-      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto}h1{color:#7c6aff}table{width:100%;border-collapse:collapse;margin-top:20px}th{background:#7c6aff;color:#fff;padding:8px;text-align:left}td{padding:7px 8px;border-bottom:1px solid #eee}tr:nth-child(even){background:#f8f8ff}footer{margin-top:30px;color:#aaa;font-size:11px;text-align:center}@media print{.no-print{display:none}}</style></head><body><h1>🎵 Moodwave</h1><p style="color:#888">${esc(meta)}</p><table><thead><tr><th>#</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>${rows}</tbody></table><footer>Générée par Moodwave · Propulsé par l'IA</footer><br><button class="no-print" onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">🖨️ Enregistrer en PDF</button></body></html>`);
+      w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave</title><style>body{font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto}h1{color:#7c6aff}table{width:100%;border-collapse:collapse;margin-top:20px}th{background:#7c6aff;color:#fff;padding:8px;text-align:left}td{padding:7px 8px;border-bottom:1px solid #eee}tr:nth-child(even){background:#f8f8ff}footer{margin-top:30px;color:#aaa;font-size:11px;text-align:center}@media print{.no-print{display:none}}</style>  <script>
+    // Fonctions globales définies tôt pour les onclick inline
+    function showScreen(id){
+      if(window._showScreen)return window._showScreen(id);
+      document.addEventListener('DOMContentLoaded',()=>window._showScreen&&window._showScreen(id));
+    }
+    function stepBack(){if(window._stepBack)window._stepBack();}
+    function goStep(n){if(window._goStep)window._goStep(n);}
+    function generate(s){if(window._generate)window._generate(s);}
+    function toggleMultiPill(el){if(window._toggleMultiPill)window._toggleMultiPill(el);}
+    function toggleAllGenres(el){if(window._toggleAllGenres)window._toggleAllGenres(el);}
+    function selectPill(el){if(window._selectPill)window._selectPill(el);}
+    function selectEnergy(el){if(window._selectEnergy)window._selectEnergy(el);}
+    function vote(k,t){if(window._vote)window._vote(k,t);}
+    function playPreview(a,t,b){if(window._playPreview)window._playPreview(a,t,b);}
+    function togglePlay(){if(window._togglePlay)window._togglePlay();}
+    function stopPlayer(){if(window._stopPlayer)window._stopPlayer();}
+    function toggleDropdown(id){if(window._toggleDropdown)window._toggleDropdown(id);}
+    function closeAllDropdowns(){if(window._closeAllDropdowns)window._closeAllDropdowns();}
+    function openShareModal(s,m){if(window._openShareModal)window._openShareModal(s,m);}
+    function openShareCard(s,m){if(window._openShareCard)window._openShareCard(s,m);}
+    function closeShareCard(e){if(window._closeShareCard)window._closeShareCard(e);}
+    function downloadShareCard(){if(window._downloadShareCard)window._downloadShareCard();}
+    function shareWhatsApp(){if(window._shareWhatsApp)window._shareWhatsApp();}
+    function shareFacebook(){if(window._shareFacebook)window._shareFacebook();}
+    function shareTwitter(){if(window._shareTwitter)window._shareTwitter();}
+    function shareLinkedIn(){if(window._shareLinkedIn)window._shareLinkedIn();}
+    function shareSMS(){if(window._shareSMS)window._shareSMS();}
+    function shareEmail(){if(window._shareEmail)window._shareEmail();}
+    function shareTikTok(){if(window._shareTikTok)window._shareTikTok();}
+    function shareInstagram(){if(window._shareInstagram)window._shareInstagram();}
+    function shareNative(){if(window._shareNative)window._shareNative();}
+    function shareTextCopy(){if(window._shareTextCopy)window._shareTextCopy();}
+    function copyText(s,m,i){if(window._copyText)window._copyText(s,m,i);}
+    function downloadTXT(s,m){if(window._downloadTXT)window._downloadTXT(s,m);}
+    function downloadCSV(s,m){if(window._downloadCSV)window._downloadCSV(s,m);}
+    function downloadPDF(s,m){if(window._downloadPDF)window._downloadPDF(s,m);}
+    function downloadWord(s,m){if(window._downloadWord)window._downloadWord(s,m);}
+    function openAllOn(p,s){if(window._openAllOn)window._openAllOn(p,s);}
+    function copyShareUrl(s,m,i){if(window._copyShareUrl)window._copyShareUrl(s,m,i);}
+    function openSaved(id){if(window._openSaved)window._openSaved(id);}
+    function clearHistory(){if(window._clearHistory)window._clearHistory();}
+    function disconnectSpotify(){if(window._disconnectSpotify)window._disconnectSpotify();}
+    function closeModal(){if(window._closeModal)window._closeModal();}
+  </script>
+</head><body><h1>🎵 Moodwave</h1><p style="color:#888">${esc(meta)}</p><table><thead><tr><th>#</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>${rows}</tbody></table><footer>Générée par Moodwave · Propulsé par l'IA</footer><br><button class="no-print" onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">🖨️ Enregistrer en PDF</button></body></html>`);
       w.document.close();
     }
     function downloadWord(songs,meta){
       const rows=songs.map((s,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td><b>${s.artist}</b></td><td>${s.title}</td><td style="color:#7c6aff">${s.genre}</td><td style="color:#666;font-style:italic">${s.reason}</td></tr>`).join('');
-      const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="UTF-8"></head><body><h1 style="color:#7c6aff">🎵 Moodwave — ${meta}</h1><table border="1" style="border-collapse:collapse;width:100%"><thead><tr style="background:#7c6aff;color:#fff"><th>#</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>${rows}</tbody></table><p style="color:#aaa;font-size:11px;margin-top:24px">Générée par Moodwave</p></body></html>`;
+      const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="UTF-8">  <script>
+    // Fonctions globales définies tôt pour les onclick inline
+    function showScreen(id){
+      if(window._showScreen)return window._showScreen(id);
+      document.addEventListener('DOMContentLoaded',()=>window._showScreen&&window._showScreen(id));
+    }
+    function stepBack(){if(window._stepBack)window._stepBack();}
+    function goStep(n){if(window._goStep)window._goStep(n);}
+    function generate(s){if(window._generate)window._generate(s);}
+    function toggleMultiPill(el){if(window._toggleMultiPill)window._toggleMultiPill(el);}
+    function toggleAllGenres(el){if(window._toggleAllGenres)window._toggleAllGenres(el);}
+    function selectPill(el){if(window._selectPill)window._selectPill(el);}
+    function selectEnergy(el){if(window._selectEnergy)window._selectEnergy(el);}
+    function vote(k,t){if(window._vote)window._vote(k,t);}
+    function playPreview(a,t,b){if(window._playPreview)window._playPreview(a,t,b);}
+    function togglePlay(){if(window._togglePlay)window._togglePlay();}
+    function stopPlayer(){if(window._stopPlayer)window._stopPlayer();}
+    function toggleDropdown(id){if(window._toggleDropdown)window._toggleDropdown(id);}
+    function closeAllDropdowns(){if(window._closeAllDropdowns)window._closeAllDropdowns();}
+    function openShareModal(s,m){if(window._openShareModal)window._openShareModal(s,m);}
+    function openShareCard(s,m){if(window._openShareCard)window._openShareCard(s,m);}
+    function closeShareCard(e){if(window._closeShareCard)window._closeShareCard(e);}
+    function downloadShareCard(){if(window._downloadShareCard)window._downloadShareCard();}
+    function shareWhatsApp(){if(window._shareWhatsApp)window._shareWhatsApp();}
+    function shareFacebook(){if(window._shareFacebook)window._shareFacebook();}
+    function shareTwitter(){if(window._shareTwitter)window._shareTwitter();}
+    function shareLinkedIn(){if(window._shareLinkedIn)window._shareLinkedIn();}
+    function shareSMS(){if(window._shareSMS)window._shareSMS();}
+    function shareEmail(){if(window._shareEmail)window._shareEmail();}
+    function shareTikTok(){if(window._shareTikTok)window._shareTikTok();}
+    function shareInstagram(){if(window._shareInstagram)window._shareInstagram();}
+    function shareNative(){if(window._shareNative)window._shareNative();}
+    function shareTextCopy(){if(window._shareTextCopy)window._shareTextCopy();}
+    function copyText(s,m,i){if(window._copyText)window._copyText(s,m,i);}
+    function downloadTXT(s,m){if(window._downloadTXT)window._downloadTXT(s,m);}
+    function downloadCSV(s,m){if(window._downloadCSV)window._downloadCSV(s,m);}
+    function downloadPDF(s,m){if(window._downloadPDF)window._downloadPDF(s,m);}
+    function downloadWord(s,m){if(window._downloadWord)window._downloadWord(s,m);}
+    function openAllOn(p,s){if(window._openAllOn)window._openAllOn(p,s);}
+    function copyShareUrl(s,m,i){if(window._copyShareUrl)window._copyShareUrl(s,m,i);}
+    function openSaved(id){if(window._openSaved)window._openSaved(id);}
+    function clearHistory(){if(window._clearHistory)window._clearHistory();}
+    function disconnectSpotify(){if(window._disconnectSpotify)window._disconnectSpotify();}
+    function closeModal(){if(window._closeModal)window._closeModal();}
+  </script>
+</head><body><h1 style="color:#7c6aff">🎵 Moodwave — ${meta}</h1><table border="1" style="border-collapse:collapse;width:100%"><thead><tr style="background:#7c6aff;color:#fff"><th>#</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>${rows}</tbody></table><p style="color:#aaa;font-size:11px;margin-top:24px">Générée par Moodwave</p></body></html>`;
       const blob=new Blob([html],{type:'application/msword'});
       const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave-'+meta.replace(/[^a-zA-Z0-9]/g,'-').slice(0,40)+'.doc';a.click();
     }
@@ -1090,6 +1225,48 @@
       if(!confirm('Effacer toutes tes playlists ?'))return;
       localStorage.removeItem('moodwave_history');updateHistoryBadge();renderHistory();
     }
+
+
+    /* ══ ALIAS WINDOW pour onclick inline ══ */
+    window._showScreen=showScreen;
+    window._stepBack=stepBack;
+    window._goStep=goStep;
+    window._generate=generate;
+    window._toggleMultiPill=toggleMultiPill;
+    window._toggleAllGenres=toggleAllGenres;
+    window._selectPill=selectPill;
+    window._selectEnergy=selectEnergy;
+    window._vote=vote;
+    window._playPreview=playPreview;
+    window._togglePlay=togglePlay;
+    window._stopPlayer=stopPlayer;
+    window._toggleDropdown=toggleDropdown;
+    window._closeAllDropdowns=closeAllDropdowns;
+    window._openShareModal=openShareModal;
+    window._openShareCard=openShareCard;
+    window._closeShareCard=closeShareCard;
+    window._downloadShareCard=downloadShareCard;
+    window._shareWhatsApp=shareWhatsApp;
+    window._shareFacebook=shareFacebook;
+    window._shareTwitter=shareTwitter;
+    window._shareLinkedIn=shareLinkedIn;
+    window._shareSMS=shareSMS;
+    window._shareEmail=shareEmail;
+    window._shareTikTok=shareTikTok;
+    window._shareInstagram=shareInstagram;
+    window._shareNative=shareNative;
+    window._shareTextCopy=shareTextCopy;
+    window._copyText=copyText;
+    window._downloadTXT=downloadTXT;
+    window._downloadCSV=downloadCSV;
+    window._downloadPDF=downloadPDF;
+    window._downloadWord=downloadWord;
+    window._openAllOn=openAllOn;
+    window._copyShareUrl=copyShareUrl;
+    window._openSaved=openSaved;
+    window._clearHistory=clearHistory;
+    window._disconnectSpotify=disconnectSpotify;
+    window._closeModal=closeModal;
 
     /* ══ INIT ══ */
     votes=loadVotes();

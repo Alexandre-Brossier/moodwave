@@ -195,6 +195,20 @@
     .history-count{font-size:.72rem;color:var(--accent2);font-weight:500}
     .history-actions{display:flex;gap:.75rem;margin-top:1rem}
 
+
+    /* REGÉNÉRER UN TITRE */
+    .regen-btn{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;margin-top:2px}
+    .regen-btn:hover{background:rgba(124,106,255,.2);border-color:rgba(124,106,255,.4);color:var(--accent2);transform:rotate(30deg)}
+    .regen-btn.spinning{animation:spin .6s linear;pointer-events:none;opacity:.6}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    /* TEXTE LIBRE MOOD */
+    .mood-text-wrap{margin-bottom:1.25rem}
+    .mood-textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:14px;color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem 1rem;resize:none;min-height:72px;transition:border-color .2s;line-height:1.5}
+    .mood-textarea:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,.09)}
+    .mood-textarea::placeholder{color:rgba(200,200,255,.3)}
+    /* ÉPOQUE */
+    .era-pills{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1.5rem}
+
     footer{text-align:center;padding:2rem 1rem 1.5rem;color:rgba(200,200,255,.35);font-size:.75rem;line-height:1.9;margin-top:auto}
   </style>
 </head>
@@ -293,6 +307,16 @@
       <div class="pill" data-group="genre" data-val="World Music" onclick="toggleMultiPill(this)">🌍 World</div>
       <div class="pill all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)">✨ De tout</div>
     </div>
+    <div style="font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:.6rem;margin-top:.25rem">Époque musicale <span style="color:var(--muted);font-size:.65rem;letter-spacing:0;text-transform:none;font-weight:400">(optionnel)</span></div>
+    <div class="era-pills">
+      <div class="pill" data-group="era" data-val="Années 70" onclick="selectPill(this)">📼 70s</div>
+      <div class="pill" data-group="era" data-val="Années 80" onclick="selectPill(this)">🎸 80s</div>
+      <div class="pill" data-group="era" data-val="Années 90" onclick="selectPill(this)">💿 90s</div>
+      <div class="pill" data-group="era" data-val="Années 2000" onclick="selectPill(this)">📱 2000s</div>
+      <div class="pill" data-group="era" data-val="Années 2010" onclick="selectPill(this)">🎧 2010s</div>
+      <div class="pill" data-group="era" data-val="Actuel" onclick="selectPill(this)">✨ Actuel</div>
+      <div class="pill" data-group="era" data-val="Mixte" onclick="selectPill(this)">🔀 Mixte</div>
+    </div>
     <div class="step-nav"><button class="btn-next" onclick="goStep(2)">Suivant →</button></div>
   </div>
 
@@ -309,6 +333,9 @@
       <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)">🌙 Nostalgique</div>
       <div class="pill" data-group="mood" data-val="Focus TDAH" onclick="selectPill(this)">🧠 Focus TDAH</div>
       <div class="pill" data-group="mood" data-val="Anxieux" onclick="selectPill(this)">😰 Anxieux</div>
+    </div>
+    <div class="mood-text-wrap">
+      <textarea class="mood-textarea" id="mood-free-text" placeholder="Optionnel — décris ton mood en quelques mots... ex: &quot;je rentre d'une longue journée, j'ai besoin de me vider la tête&quot;" maxlength="200" rows="2"></textarea>
     </div>
     <div class="step-nav"><button class="btn-next" id="mood-next" onclick="goStep(3)" disabled>Suivant →</button></div>
   </div>
@@ -416,7 +443,7 @@
 </div>
 
 <script>
-const sel={mood:null,energy:null,context:null};
+const sel={mood:null,energy:null,context:null,era:null};
 let selectedGenres=[];
 let msgInterval=null,currentSongs=[],currentMeta='',savedSongs=[],savedMeta='';
 let currentStep=1;
@@ -494,6 +521,11 @@ function selectPill(el){
   sel[g]=el.dataset.val;
   if(g==='mood'){const b=document.getElementById('mood-next');if(b)b.disabled=false;}
   if(g==='context'){const b=document.getElementById('context-next');if(b)b.disabled=false;}
+  if(g==='era'){
+    // toggle pour l'époque — peut se désélectionner
+    if(sel.era===el.dataset.val){el.classList.remove('selected');sel.era=null;}
+    else{sel.era=el.dataset.val;}
+  }
 }
 function toggleMultiPill(el){
   const allBtn=document.querySelector('.all-genres');
@@ -751,6 +783,63 @@ function songCardsHTML(songs){
   }).join('');
 }
 
+
+/* REGÉNÉRER UN SEUL TITRE */
+async function regenSong(idx,songs,meta,listId,successId){
+  const card=document.getElementById('song-card-'+idx);
+  if(!card)return;
+  const btn=card.querySelector('.regen-btn');
+  if(btn){btn.classList.add('spinning');btn.style.pointerEvents='none';}
+
+  const otherSongs=songs.filter((_,i)=>i!==idx).map(s=>s.artist+' — '+s.title);
+  const song=songs[idx];
+
+  try{
+    const res=await fetch('/api/regen',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        song:{artist:song.artist,title:song.title},
+        otherSongs,
+        meta,
+        genres:selectedGenres,
+        era:sel.era
+      })
+    });
+    if(!res.ok)throw new Error('Erreur '+res.status);
+    const newSong=await res.json();
+    // Remplacer dans le tableau
+    songs[idx]=newSong;
+    // Mettre à jour localStorage si c'est l'historique
+    saveToHistory(songs,meta,true);
+    // Re-render uniquement la carte
+    const v=votes[voteKey(newSong)]||null;
+    const a=String(newSong.artist||'').replace(/'/g,"\'");
+    const t=String(newSong.title||'').replace(/'/g,"\'");
+    const key=voteKey(newSong);
+    card.innerHTML=
+      '<div class="song-card-top">'+
+      '<button class="preview-btn" onclick="playPreview(''+a+'',''+t+'',this)">▶</button>'+
+      '<div class="song-info"><div class="song-num">'+String(idx+1).padStart(2,'0')+'</div>'+
+      '<div class="song-artist">'+esc(newSong.artist)+'</div>'+
+      '<div class="song-title">'+esc(newSong.title)+'</div>'+
+      '<span class="genre-tag">'+esc(newSong.genre)+'</span>'+
+      '<div class="reason">'+esc(newSong.reason)+'</div></div>'+
+      '<div class="like-btns" style="gap:.25rem">'+
+      '<button class="regen-btn" onclick="regenSong('+idx+','+listId+'Songs,''+meta.replace(/'/g,"\'")+'',''+listId+'',''+successId+'')" title="Regénérer ce titre">↻</button>'+
+      '<button class="like-btn'+(v==='like'?' liked':'')+'" id="like-'+key+'" onclick="vote(''+key+'','like')">👍</button>'+
+      '<button class="like-btn'+(v==='dislike'?' disliked':'')+'" id="dislike-'+key+'" onclick="vote(''+key+'','dislike')">👎</button>'+
+      '</div></div>';
+    // Ajouter animation d'entrée
+    card.style.opacity='0';card.style.transform='translateY(-8px)';
+    requestAnimationFrame(()=>{card.style.transition='opacity .3s,transform .3s';card.style.opacity='1';card.style.transform='translateY(0)';});
+    showSuccess(successId,'✨ Titre remplacé !');
+  }catch(e){
+    if(btn){btn.classList.remove('spinning');btn.style.pointerEvents='';}
+    showSuccess(successId,'Erreur : '+e.message);
+  }
+}
+
 /* GENERATION */
 async function generate(isSurprise){
   hideError();
@@ -758,9 +847,15 @@ async function generate(isSurprise){
   const withSurprise=isSurprise||document.getElementById('surprise-toggle').classList.contains('on');
   showScreen('loading-screen');startLoading();
   const genreLabel=selectedGenres.length>0&&!selectedGenres.includes('De tout')?selectedGenres.join('-')+' / ':'';
-  const meta=isSurprise?'Mode Surprise':genreLabel+(sel.mood||'')+' / '+(sel.energy||'')+' / '+(sel.context||'')+(withSurprise?' · Surprise':'');
+  const eraLabel=sel.era&&sel.era!=='Mixte'?' ('+sel.era+')':'';
+  const meta=isSurprise?'Mode Surprise':genreLabel+(sel.mood||'')+eraLabel+' / '+(sel.energy||'')+' / '+(sel.context||'')+(withSurprise?' · Surprise':'');
   const {liked,disliked}=getLikedDisliked();
-  const body=isSurprise?{type:'surprise',likedSongs:liked,dislikedSongs:disliked}:{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres,likedSongs:liked,dislikedSongs:disliked};
+  const freeText=document.getElementById('mood-free-text')?.value?.trim()||'';
+  const body=isSurprise
+    ?{type:'surprise',likedSongs:liked,dislikedSongs:disliked}
+    :{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,
+      surprise:withSurprise,genres:selectedGenres,era:sel.era,
+      freeText:freeText,likedSongs:liked,dislikedSongs:disliked};
   try{
     const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'Erreur ('+res.status+')');}
@@ -775,14 +870,18 @@ function renderResults(songs,meta){
   document.getElementById('results-success').style.display='none';
   const fb=document.getElementById('feedback-banner');if(fb)fb.style.display='none';
   document.getElementById('results-action-bar').innerHTML=actionBarHTML(songs,meta,'current','results-success');
-  document.getElementById('songs-list').innerHTML=songCardsHTML(songs);
+  document.getElementById('songs-list').innerHTML=songCardsHTML(songs,'current',meta,'results-success');
   showScreen('results-screen');
 }
 
 /* HISTORIQUE */
 function getHistory(){try{return JSON.parse(localStorage.getItem('moodwave_history')||'[]');}catch(e){return[];}}
-function saveToHistory(songs,meta){
+function saveToHistory(songs,meta,update){
   const h=getHistory();
+  if(update){
+    const idx=h.findIndex(e=>e.meta===meta);
+    if(idx>=0){h[idx].songs=songs;localStorage.setItem('moodwave_history',JSON.stringify(h));return;}
+  }
   h.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs});
   if(h.length>20)h.pop();
   localStorage.setItem('moodwave_history',JSON.stringify(h));updateHistoryBadge();
@@ -808,7 +907,7 @@ function openSaved(id){
   document.getElementById('saved-meta').textContent=entry.meta+' · '+entry.date;
   document.getElementById('saved-success').style.display='none';
   document.getElementById('saved-action-bar').innerHTML=actionBarHTML(entry.songs,entry.meta,'saved','saved-success');
-  document.getElementById('saved-songs-list').innerHTML=songCardsHTML(entry.songs);
+  document.getElementById('saved-songs-list').innerHTML=songCardsHTML(entry.songs,'saved',entry.meta,'saved-success');
   showScreen('saved-screen');
 }
 function clearHistory(){

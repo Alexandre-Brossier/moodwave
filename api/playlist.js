@@ -5,16 +5,16 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'Clé API manquante' });
 
-  const { type, mood, energy, context, surprise, genres, likedSongs, dislikedSongs } = req.body;
+  const { type, mood, energy, context, surprise, genres, era, freeText, likedSongs, dislikedSongs } = req.body;
 
-  // Construction de la contrainte genres
+  // Instruction genres
   let genreInstruction = '';
   if (type !== 'surprise' && genres && genres.length > 0) {
     if (genres.includes('De tout')) {
       genreInstruction = `- Genres : tous genres confondus, sois varié et explore librement.`;
     } else {
       genreInstruction = `- Genres souhaités : ${genres.join(', ')}.
-  Pour chaque genre sélectionné, tu peux explorer des sous-genres pertinents. Par exemple :
+  Explore les sous-genres pertinents :
   · Électronique → ambient, techno, house, drum & bass, synthwave, chillwave...
   · Rock → indie rock, post-rock, grunge, rock progressif, psychédélique...
   · Rap / Hip-Hop → boom bap, trap, lo-fi hip-hop, conscious rap, cloud rap...
@@ -27,12 +27,23 @@ export default async function handler(req, res) {
     }
   }
 
+  // Instruction époque
+  let eraInstruction = '';
+  if (era && era !== 'Mixte') {
+    eraInstruction = `- Époque : privilégie les titres des ${era}. Quelques titres d'autres époques sont acceptés si vraiment pertinents.`;
+  }
+
+  // Instruction texte libre
+  const freeTextInstruction = freeText
+    ? `- Description du mood par l'utilisateur : "${freeText}" — tiens-en compte pour affiner les suggestions.`
+    : '';
+
   const systemPrompt = `Tu es un expert en musique avec une culture encyclopédique couvrant tous les genres et sous-genres.
 Tu dois répondre UNIQUEMENT avec un tableau JSON valide de 10 objets, sans markdown, sans texte avant ou après.
 Chaque objet doit avoir exactement ces champs :
 - "artist" : nom de l'artiste (string)
-- "title" : titre du morceau (string)  
-- "genre" : sous-genre précis et spécifique, ex: "Ambient Techno", "Neo-Soul", "Post-Rock" (string, max 25 caractères)
+- "title" : titre du morceau (string)
+- "genre" : sous-genre précis, ex: "Ambient Techno", "Neo-Soul", "Post-Rock" (string, max 25 caractères)
 - "reason" : phrase courte en français expliquant pourquoi ce titre correspond (string, max 100 caractères)
 Assure-toi que les artistes et titres existent vraiment sur Spotify.`;
 
@@ -40,19 +51,23 @@ Assure-toi que les artistes et titres existent vraiment sur Spotify.`;
   if (type === 'surprise') {
     userPrompt = `Génère une playlist surprise de 10 titres musicaux totalement inattendus.
 Mélange les genres, les décennies (des années 60 à aujourd'hui) et les cultures du monde entier.
-Sois audacieux, inattendu, et choisis des titres que peu de gens connaissent.`;
+Sois audacieux, inattendu, et choisis des titres que peu de gens connaissent.
+${likedSongs && likedSongs.length > 0 ? `- L'utilisateur apprécie ce style : ${likedSongs.join(', ')}.` : ''}
+${dislikedSongs && dislikedSongs.length > 0 ? `- Évite absolument ce style : ${dislikedSongs.join(', ')}.` : ''}`;
   } else {
     userPrompt = `Génère une playlist de 10 titres musicaux pour quelqu'un avec :
 - Mood : "${mood}"
 - Niveau d'énergie : "${energy}"
 - Contexte : "${context}"
 ${genreInstruction}
+${eraInstruction}
+${freeTextInstruction}
 ${surprise ? '- Bonus : inclure 2-3 titres surprenants ou de découverte en plus des classiques.' : ''}
 ${likedSongs && likedSongs.length > 0 ? `- L'utilisateur a aimé ces titres lors de sessions précédentes, inspire-toi de leur style : ${likedSongs.join(', ')}.` : ''}
 ${dislikedSongs && dislikedSongs.length > 0 ? `- L'utilisateur n'aime PAS ces titres/artistes/styles, évite-les absolument : ${dislikedSongs.join(', ')}.` : ''}
 
 Les titres doivent vraiment correspondre à l'ambiance ET aux genres demandés.
-Utilise des sous-genres précis dans le champ "genre" (pas juste "Rock" mais "Post-Rock" ou "Indie Rock" par exemple).
+Utilise des sous-genres précis dans le champ "genre".
 Varie les artistes, évite de mettre deux titres du même artiste.`;
   }
 

@@ -1,6 +1,18 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/callback", "destination": "/public/callback.html" },
+    { "source": "/sw.js", "destination": "/public/sw.js" },
+    { "source": "/manifest.json", "destination": "/public/manifest.json" },
     { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    }
   ]
 }

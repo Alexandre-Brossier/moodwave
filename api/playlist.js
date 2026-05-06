@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'Clé API manquante' });
 
-  const { type, mood, energy, context, surprise, genres } = req.body;
+  const { type, mood, energy, context, surprise, genres, likedSongs, dislikedSongs } = req.body;
 
   // Construction de la contrainte genres
   let genreInstruction = '';
@@ -48,6 +48,8 @@ Sois audacieux, inattendu, et choisis des titres que peu de gens connaissent.`;
 - Contexte : "${context}"
 ${genreInstruction}
 ${surprise ? '- Bonus : inclure 2-3 titres surprenants ou de découverte en plus des classiques.' : ''}
+${likedSongs && likedSongs.length > 0 ? `- L'utilisateur a aimé ces titres lors de sessions précédentes, inspire-toi de leur style : ${likedSongs.join(', ')}.` : ''}
+${dislikedSongs && dislikedSongs.length > 0 ? `- L'utilisateur n'aime PAS ces titres/artistes/styles, évite-les absolument : ${dislikedSongs.join(', ')}.` : ''}
 
 Les titres doivent vraiment correspondre à l'ambiance ET aux genres demandés.
 Utilise des sous-genres précis dans le champ "genre" (pas juste "Rock" mais "Post-Rock" ou "Indie Rock" par exemple).

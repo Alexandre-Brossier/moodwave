@@ -19,7 +19,54 @@
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     :root{--bg:#07080f;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.10);--border:rgba(255,255,255,0.15);--text:#f0f0ff;--muted:rgba(240,240,255,0.65);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc}
     html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
-    .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;opacity:.28;z-index:0}
+
+    /* FOND ANIMÉ */
+    body::before{
+      content:'';
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(79,70,229,.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(124,58,237,.15) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 50% 50%, rgba(8,145,178,.08) 0%, transparent 70%);
+      pointer-events:none;
+      z-index:0;
+    }
+    /* Grille déco subtile */
+    body::after{
+      content:'';
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size:48px 48px;
+      pointer-events:none;
+      z-index:0;
+      mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+      -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+    }
+    /* Orbes animées */
+    .orb{animation:orbFloat 12s ease-in-out infinite}
+    .orb1{animation-duration:14s}
+    .orb2{animation-duration:18s;animation-delay:-6s}
+    .orb3{animation-duration:16s;animation-delay:-3s}
+    @keyframes orbFloat{
+      0%,100%{transform:translate(0,0) scale(1)}
+      33%{transform:translate(30px,-20px) scale(1.05)}
+      66%{transform:translate(-20px,15px) scale(.95)}
+    }
+    /* Particules décoratives */
+    .hero-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+    .particle{position:absolute;width:2px;height:2px;background:rgba(196,181,253,.4);border-radius:50%;animation:particleFloat linear infinite}
+    @keyframes particleFloat{
+      0%{transform:translateY(100vh) translateX(0);opacity:0}
+      10%{opacity:1}
+      90%{opacity:.3}
+      100%{transform:translateY(-20px) translateX(20px);opacity:0}
+    }
+
+    .orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;opacity:.32;z-index:0}
     .orb1{width:500px;height:500px;background:radial-gradient(circle,#4f46e5,transparent);top:-150px;left:-150px}
     .orb2{width:400px;height:400px;background:radial-gradient(circle,#7c3aed,transparent);top:40%;right:-100px}
     .orb3{width:350px;height:350px;background:radial-gradient(circle,#0891b2,transparent);bottom:-80px;left:35%}
@@ -32,8 +79,12 @@
     .hero-title{font-family:'Outfit',sans-serif;font-size:clamp(1.75rem,5.5vw,2.6rem);font-weight:700;line-height:1.4;color:#fff;max-width:420px;letter-spacing:-.02em;word-break:break-word}
     .hero-title span{color:var(--accent2)}
     .hero-sub{color:var(--muted);font-size:1rem;max-width:320px;line-height:1.65}
-    .hero-badges{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;max-width:380px}
-    .hero-badge{font-size:.75rem;padding:.3rem .8rem;border-radius:100px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:var(--muted)}
+    .hero-features{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;width:100%;max-width:360px}
+    .hero-feature{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:.875rem 1rem;text-align:left;transition:border-color .2s,background .2s}
+    .hero-feature:hover{border-color:rgba(124,106,255,.4);background:rgba(255,255,255,.08)}
+    .hero-feature-icon{font-size:1.4rem;margin-bottom:.35rem;display:block}
+    .hero-feature-title{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;color:#fff;margin-bottom:.2rem}
+    .hero-feature-desc{font-size:.72rem;color:var(--muted);line-height:1.45}
     .hero-actions{display:flex;flex-direction:column;align-items:center;gap:.75rem;width:100%;max-width:320px}
     .btn-history{background:transparent;border:1px solid rgba(255,255,255,.18);color:var(--muted)!important;-webkit-text-fill-color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;padding:.75rem 2rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%}
     .btn-history:hover{border-color:var(--accent2);color:#fff!important;-webkit-text-fill-color:#fff}
@@ -315,14 +366,31 @@
 
 <!-- HERO -->
 <div id="hero" class="screen active">
+  <div class="hero-particles" id="hero-particles"></div>
   <div class="logo"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><rect width="28" height="28" rx="7" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><rect x="5" y="12" width="3" height="9" rx="1.5" fill="rgba(196,181,253,0.9)"/><rect x="9.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/><rect x="14" y="5" width="3" height="18" rx="1.5" fill="rgba(124,106,255,1)"/><rect x="18.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/></svg>Moodwave</div>
   <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
   <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
-  <div class="hero-badges">
-    <span class="hero-badge">😌 Calme → Ambient</span>
-    <span class="hero-badge">🔥 Motivé → Workout</span>
-    <span class="hero-badge">🌙 Nostalgique → Indie</span>
-    <span class="hero-badge">🎲 Mode Surprise</span>
+  <div class="hero-features">
+    <div class="hero-feature">
+      <span class="hero-feature-icon">🎭</span>
+      <div class="hero-feature-title">Basée sur ton mood</div>
+      <div class="hero-feature-desc">Calme, stressé, motivé… l'IA s'adapte à comment tu te sens</div>
+    </div>
+    <div class="hero-feature">
+      <span class="hero-feature-icon">🎸</span>
+      <div class="hero-feature-title">Tous les genres</div>
+      <div class="hero-feature-desc">Rock, rap, classique, animé, électro… ou laisse-toi surprendre</div>
+    </div>
+    <div class="hero-feature">
+      <span class="hero-feature-icon">🔊</span>
+      <div class="hero-feature-title">Preview intégrée</div>
+      <div class="hero-feature-desc">Écoute 30 secondes de chaque titre directement dans l'app</div>
+    </div>
+    <div class="hero-feature">
+      <span class="hero-feature-icon">📤</span>
+      <div class="hero-feature-title">Export & partage</div>
+      <div class="hero-feature-desc">Spotify, Deezer, YouTube, carte Instagram, PDF et plus</div>
+    </div>
   </div>
   <div class="hero-actions">
     <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
@@ -893,6 +961,24 @@ function attachCardEvents(containerId,songsRef,listId,meta,successId){
 }
 
 
+
+/* PARTICULES HERO */
+function initParticles(){
+  const container=document.getElementById('hero-particles');
+  if(!container)return;
+  const count=18;
+  for(let i=0;i<count;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.left=Math.random()*100+'%';
+    p.style.animationDuration=(8+Math.random()*12)+'s';
+    p.style.animationDelay=(-Math.random()*15)+'s';
+    p.style.width=p.style.height=(1+Math.random()*2)+'px';
+    p.style.opacity=.2+Math.random()*.4;
+    container.appendChild(p);
+  }
+}
+
 /* REGEN */
 async function regenSong(idx,songs,meta,listId,successId){
   const card=document.getElementById('song-card-'+idx);
@@ -1007,6 +1093,7 @@ function registerSW(){if('serviceWorker' in navigator)navigator.serviceWorker.re
 
 /* INIT */
 votes=loadVotes();
+initParticles();
 updateHistoryBadge();
 registerSW();
 const urlp=new URLSearchParams(window.location.search).get('p');

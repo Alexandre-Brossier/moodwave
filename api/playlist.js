@@ -27,10 +27,11 @@ export default async function handler(req, res) {
     }
   }
 
-  // Instruction époque
+  // Instruction époque (tableau de valeurs)
   let eraInstruction = '';
-  if (era && era !== 'Mixte') {
-    eraInstruction = `- Époque : privilégie les titres des ${era}. Quelques titres d'autres époques sont acceptés si vraiment pertinents.`;
+  const erasArr = Array.isArray(era) ? era : (era ? [era] : []);
+  if (erasArr.length > 0) {
+    eraInstruction = `- Époque : privilégie les titres des ${erasArr.join(' et ')}. Quelques titres d'autres époques sont acceptés si vraiment pertinents.`;
   }
 
   // Instruction texte libre

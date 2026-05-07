@@ -764,80 +764,100 @@ function actionBarHTML(songs,meta,prefix,successId){
 }
 
 /* SONG CARDS */
-function songCardsHTML(songs){
+function songCardsHTML(songs,listId,meta,successId){
   votes=loadVotes();
+  listId=listId||'current';
+  meta=meta||currentMeta;
+  successId=successId||'results-success';
   return songs.map((s,i)=>{
-    const key=voteKey(s);const v=votes[key];
-    const a=String(s.artist||'').replace(/'/g,"\\'");const t=String(s.title||'').replace(/'/g,"\\'");
-    return '<div class="song-card"><div class="song-card-top">'+
-      '<button class="preview-btn" onclick="playPreview(\''+a+'\',\''+t+'\',this)">▶</button>'+
-      '<div class="song-info"><div class="song-num">'+String(i+1).padStart(2,'0')+'</div>'+
-      '<div class="song-artist">'+esc(s.artist)+'</div>'+
-      '<div class="song-title">'+esc(s.title)+'</div>'+
-      '<span class="genre-tag">'+esc(s.genre)+'</span>'+
-      '<div class="reason">'+esc(s.reason)+'</div></div>'+
-      '<div class="like-btns">'+
-      '<button class="like-btn'+(v==='like'?' liked':'')+'" id="like-'+key+'" onclick="vote(\''+key+'\',\'like\')">👍</button>'+
-      '<button class="like-btn'+(v==='dislike'?' disliked':'')+'" id="dislike-'+key+'" onclick="vote(\''+key+'\',\'dislike\')">👎</button>'+
-      '</div></div></div>';
+    const key=voteKey(s);
+    const v=votes[key];
+    return [
+      '<div class="song-card" id="song-card-'+i+'" ',
+        'data-idx="'+i+'" ',
+        'data-list="'+esc(listId)+'" ',
+        'data-meta="'+esc(meta)+'" ',
+        'data-success="'+esc(successId)+'">',
+      '<div class="song-card-top">',
+      '<button class="preview-btn" data-artist="'+esc(s.artist)+'" data-title="'+esc(s.title)+'">▶</button>',
+      '<div class="song-info">',
+        '<div class="song-num">'+String(i+1).padStart(2,'0')+'</div>',
+        '<div class="song-artist">'+esc(s.artist)+'</div>',
+        '<div class="song-title">'+esc(s.title)+'</div>',
+        '<span class="genre-tag">'+esc(s.genre)+'</span>',
+        '<div class="reason">'+esc(s.reason)+'</div>',
+      '</div>',
+      '<div class="like-btns" style="gap:.25rem">',
+        '<button class="regen-btn" data-action="regen" title="Regénérer ce titre">↻</button>',
+        '<button class="like-btn'+(v==='like'?' liked':'')+'" id="like-'+key+'" data-action="like" data-key="'+key+'">👍</button>',
+        '<button class="like-btn'+(v==='dislike'?' disliked':'')+'" id="dislike-'+key+'" data-action="dislike" data-key="'+key+'">👎</button>',
+      '</div>',
+      '</div></div>'
+    ].join('');
   }).join('');
 }
 
+// Délégation d'événements pour les cards — évite les onclick inline
+function attachCardEvents(containerId,songsRef,listId,meta,successId){
+  const container=document.getElementById(containerId);
+  if(!container)return;
+  container.addEventListener('click',function(e){
+    const btn=e.target.closest('button');
+    if(!btn)return;
+    const card=btn.closest('.song-card');
+    if(!card)return;
+    const idx=parseInt(card.dataset.idx);
+    const action=btn.dataset.action;
+    if(action==='regen'){
+      regenSong(idx,songsRef,card.dataset.meta,card.dataset.list,card.dataset.success);
+    } else if(action==='like'){
+      vote(btn.dataset.key,'like');
+    } else if(action==='dislike'){
+      vote(btn.dataset.key,'dislike');
+    } else if(btn.classList.contains('preview-btn')){
+      playPreview(btn.dataset.artist,btn.dataset.title,btn);
+    }
+  });
+}
 
-/* REGÉNÉRER UN SEUL TITRE */
+
+/* REGEN */
 async function regenSong(idx,songs,meta,listId,successId){
   const card=document.getElementById('song-card-'+idx);
   if(!card)return;
   const btn=card.querySelector('.regen-btn');
   if(btn){btn.classList.add('spinning');btn.style.pointerEvents='none';}
-
   const otherSongs=songs.filter((_,i)=>i!==idx).map(s=>s.artist+' — '+s.title);
   const song=songs[idx];
-
   try{
-    const res=await fetch('/api/regen',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        song:{artist:song.artist,title:song.title},
-        otherSongs,
-        meta,
-        genres:selectedGenres,
-        era:sel.era
-      })
-    });
+    const res=await fetch('/api/regen',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({song:{artist:song.artist,title:song.title},otherSongs,meta,genres:selectedGenres,era:sel.era})});
     if(!res.ok)throw new Error('Erreur '+res.status);
     const newSong=await res.json();
-    // Remplacer dans le tableau
     songs[idx]=newSong;
-    // Mettre à jour localStorage si c'est l'historique
     saveToHistory(songs,meta,true);
-    // Re-render uniquement la carte
-    const v=votes[voteKey(newSong)]||null;
-    const a=String(newSong.artist||'').replace(/'/g,"\'");
-    const t=String(newSong.title||'').replace(/'/g,"\'");
-    const key=voteKey(newSong);
-    card.innerHTML=
-      '<div class="song-card-top">'+
-      '<button class="preview-btn" onclick="playPreview(''+a+'',''+t+'',this)">▶</button>'+
-      '<div class="song-info"><div class="song-num">'+String(idx+1).padStart(2,'0')+'</div>'+
-      '<div class="song-artist">'+esc(newSong.artist)+'</div>'+
-      '<div class="song-title">'+esc(newSong.title)+'</div>'+
-      '<span class="genre-tag">'+esc(newSong.genre)+'</span>'+
-      '<div class="reason">'+esc(newSong.reason)+'</div></div>'+
-      '<div class="like-btns" style="gap:.25rem">'+
-      '<button class="regen-btn" onclick="regenSong('+idx+','+listId+'Songs,''+meta.replace(/'/g,"\'")+'',''+listId+'',''+successId+'')" title="Regénérer ce titre">↻</button>'+
-      '<button class="like-btn'+(v==='like'?' liked':'')+'" id="like-'+key+'" onclick="vote(''+key+'','like')">👍</button>'+
-      '<button class="like-btn'+(v==='dislike'?' disliked':'')+'" id="dislike-'+key+'" onclick="vote(''+key+'','dislike')">👎</button>'+
-      '</div></div>';
-    // Ajouter animation d'entrée
+    const v2=votes[voteKey(newSong)]||null;
+    card.dataset.meta=meta;
+    card.innerHTML=[
+      '<div class="song-card-top">',
+      '<button class="preview-btn" data-artist="'+esc(newSong.artist)+'" data-title="'+esc(newSong.title)+'">▶</button>',
+      '<div class="song-info">',
+        '<div class="song-num">'+String(idx+1).padStart(2,'0')+'</div>',
+        '<div class="song-artist">'+esc(newSong.artist)+'</div>',
+        '<div class="song-title">'+esc(newSong.title)+'</div>',
+        '<span class="genre-tag">'+esc(newSong.genre)+'</span>',
+        '<div class="reason">'+esc(newSong.reason)+'</div>',
+      '</div>',
+      '<div class="like-btns" style="gap:.25rem">',
+        '<button class="regen-btn" data-action="regen">↻</button>',
+        '<button class="like-btn'+(v2==='like'?' liked':'')+'" data-action="like" data-key="'+voteKey(newSong)+'">👍</button>',
+        '<button class="like-btn'+(v2==='dislike'?' disliked':'')+'" data-action="dislike" data-key="'+voteKey(newSong)+'">👎</button>',
+      '</div></div>'
+    ].join('');
     card.style.opacity='0';card.style.transform='translateY(-8px)';
     requestAnimationFrame(()=>{card.style.transition='opacity .3s,transform .3s';card.style.opacity='1';card.style.transform='translateY(0)';});
-    showSuccess(successId,'✨ Titre remplacé !');
-  }catch(e){
-    if(btn){btn.classList.remove('spinning');btn.style.pointerEvents='';}
-    showSuccess(successId,'Erreur : '+e.message);
-  }
+    showSuccess(successId||'results-success','✨ Titre remplacé !');
+  }catch(e){if(btn){btn.classList.remove('spinning');btn.style.pointerEvents='';}}
 }
 
 /* GENERATION */
@@ -853,9 +873,7 @@ async function generate(isSurprise){
   const freeText=document.getElementById('mood-free-text')?.value?.trim()||'';
   const body=isSurprise
     ?{type:'surprise',likedSongs:liked,dislikedSongs:disliked}
-    :{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,
-      surprise:withSurprise,genres:selectedGenres,era:sel.era,
-      freeText:freeText,likedSongs:liked,dislikedSongs:disliked};
+    :{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres,era:sel.era,freeText,likedSongs:liked,dislikedSongs:disliked};
   try{
     const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'Erreur ('+res.status+')');}
@@ -865,23 +883,21 @@ async function generate(isSurprise){
     saveToHistory(songs,meta);renderResults(songs,meta);
   }catch(e){stopLoading();showScreen('form-screen');showError('Erreur : '+e.message);}
 }
+
 function renderResults(songs,meta){
   document.getElementById('results-meta').textContent=meta;
   document.getElementById('results-success').style.display='none';
   const fb=document.getElementById('feedback-banner');if(fb)fb.style.display='none';
   document.getElementById('results-action-bar').innerHTML=actionBarHTML(songs,meta,'current','results-success');
   document.getElementById('songs-list').innerHTML=songCardsHTML(songs,'current',meta,'results-success');
+  attachCardEvents('songs-list',currentSongs,'current',meta,'results-success');
   showScreen('results-screen');
 }
 
-/* HISTORIQUE */
 function getHistory(){try{return JSON.parse(localStorage.getItem('moodwave_history')||'[]');}catch(e){return[];}}
 function saveToHistory(songs,meta,update){
   const h=getHistory();
-  if(update){
-    const idx=h.findIndex(e=>e.meta===meta);
-    if(idx>=0){h[idx].songs=songs;localStorage.setItem('moodwave_history',JSON.stringify(h));return;}
-  }
+  if(update){const idx=h.findIndex(e=>e.meta===meta);if(idx>=0){h[idx].songs=songs;localStorage.setItem('moodwave_history',JSON.stringify(h));return;}}
   h.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs});
   if(h.length>20)h.pop();
   localStorage.setItem('moodwave_history',JSON.stringify(h));updateHistoryBadge();
@@ -908,14 +924,13 @@ function openSaved(id){
   document.getElementById('saved-success').style.display='none';
   document.getElementById('saved-action-bar').innerHTML=actionBarHTML(entry.songs,entry.meta,'saved','saved-success');
   document.getElementById('saved-songs-list').innerHTML=songCardsHTML(entry.songs,'saved',entry.meta,'saved-success');
+  attachCardEvents('saved-songs-list',savedSongs,'saved',entry.meta,'saved-success');
   showScreen('saved-screen');
 }
 function clearHistory(){
   if(!confirm('Effacer toutes tes playlists ?'))return;
   localStorage.removeItem('moodwave_history');updateHistoryBadge();renderHistory();
 }
-
-/* PWA */
 function registerSW(){if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});}
 
 /* INIT */

@@ -797,193 +797,144 @@ function closeShareCard(){document.getElementById('card-overlay').classList.remo
 function drawShareCard(songs,meta){
   const canvas=document.getElementById('share-canvas');
   const ctx=canvas.getContext('2d');
-  // Format story 9:16
   const W=540,H=960;canvas.width=W;canvas.height=H;
 
-  // ── FOND : noir profond avec texture ──
+  // ── FOND ──
   ctx.fillStyle='#050310';ctx.fillRect(0,0,W,H);
-
-  // Dégradé diagonal dramatique
   const bgd=ctx.createLinearGradient(0,0,W,H);
-  bgd.addColorStop(0,'rgba(79,46,220,.6)');
-  bgd.addColorStop(.4,'rgba(10,5,40,.8)');
-  bgd.addColorStop(.7,'rgba(5,20,50,.9)');
-  bgd.addColorStop(1,'rgba(180,20,100,.4)');
+  bgd.addColorStop(0,'rgba(79,46,220,.6)');bgd.addColorStop(.4,'rgba(10,5,40,.8)');
+  bgd.addColorStop(.7,'rgba(5,20,50,.9)');bgd.addColorStop(1,'rgba(180,20,100,.4)');
   ctx.fillStyle=bgd;ctx.fillRect(0,0,W,H);
 
-  // Orbe violet explosif en haut à gauche
   const o1=ctx.createRadialGradient(0,0,0,0,0,380);
-  o1.addColorStop(0,'rgba(124,58,237,.9)');
-  o1.addColorStop(.5,'rgba(79,46,220,.4)');
-  o1.addColorStop(1,'transparent');
+  o1.addColorStop(0,'rgba(124,58,237,.9)');o1.addColorStop(.5,'rgba(79,46,220,.4)');o1.addColorStop(1,'transparent');
   ctx.fillStyle=o1;ctx.fillRect(0,0,W,H);
-
-  // Orbe cyan en bas à droite
   const o2=ctx.createRadialGradient(W,H,0,W,H,320);
-  o2.addColorStop(0,'rgba(6,182,212,.7)');
-  o2.addColorStop(.5,'rgba(8,145,178,.3)');
-  o2.addColorStop(1,'transparent');
+  o2.addColorStop(0,'rgba(6,182,212,.7)');o2.addColorStop(.5,'rgba(8,145,178,.3)');o2.addColorStop(1,'transparent');
   ctx.fillStyle=o2;ctx.fillRect(0,0,W,H);
-
-  // Orbe rose au centre-bas
   const o3=ctx.createRadialGradient(W*.6,H*.7,0,W*.6,H*.7,250);
-  o3.addColorStop(0,'rgba(236,72,153,.35)');
-  o3.addColorStop(1,'transparent');
+  o3.addColorStop(0,'rgba(236,72,153,.35)');o3.addColorStop(1,'transparent');
   ctx.fillStyle=o3;ctx.fillRect(0,0,W,H);
 
-  // ── LIGNES DE SCAN (effet écran/glitch) ──
-  for(let y=0;y<H;y+=4){
-    ctx.fillStyle='rgba(0,0,0,.08)';
-    ctx.fillRect(0,y,W,1);
-  }
+  // Lignes de scan
+  for(let y=0;y<H;y+=4){ctx.fillStyle='rgba(0,0,0,.07)';ctx.fillRect(0,y,W,1);}
 
-  // ── GRAND TITRE MOODWAVE en arrière-plan (watermark géant) ──
-  ctx.save();
-  ctx.globalAlpha=.04;
-  ctx.font='bold 130px Arial Black, Arial';
-  ctx.fillStyle='#ffffff';
-  ctx.textAlign='center';
-  ctx.fillText('MOOD',W/2,H*.35);
-  ctx.fillText('WAVE',W/2,H*.5);
+  // Filigrane MOODWAVE
+  ctx.save();ctx.globalAlpha=.04;ctx.font='bold 120px Arial Black,Arial';
+  ctx.fillStyle='#ffffff';ctx.textAlign='center';
+  ctx.fillText('MOOD',W/2,H*.32);ctx.fillText('WAVE',W/2,H*.46);
   ctx.restore();
 
-  // ── BANDES DÉCORATIVES DIAGONALES ──
-  ctx.save();
-  ctx.globalAlpha=.06;
+  // Bandes diagonales
+  ctx.save();ctx.globalAlpha=.05;
   for(let i=0;i<8;i++){
     ctx.fillStyle=i%2===0?'#7c6aff':'#06b6d4';
-    ctx.beginPath();
-    ctx.moveTo(-200+i*120,0);ctx.lineTo(-200+i*120+80,0);
-    ctx.lineTo(-200+i*120+80+H*.3,H);ctx.lineTo(-200+i*120+H*.3,H);
+    ctx.beginPath();ctx.moveTo(-200+i*120,0);ctx.lineTo(-120+i*120,0);
+    ctx.lineTo(-120+i*120+H*.28,H);ctx.lineTo(-200+i*120+H*.28,H);
     ctx.closePath();ctx.fill();
   }
   ctx.restore();
 
   // ── HEADER ──
-  // Pill logo Moodwave
   const pillGrad=ctx.createLinearGradient(30,28,220,28);
-  pillGrad.addColorStop(0,'rgba(124,58,237,.7)');
-  pillGrad.addColorStop(1,'rgba(6,182,212,.4)');
-  ctx.fillStyle=pillGrad;
-  ctx.strokeStyle='rgba(196,181,253,.5)';ctx.lineWidth=1.5;
-  rr(ctx,30,22,200,42,21);ctx.fill();ctx.stroke();
+  pillGrad.addColorStop(0,'rgba(124,58,237,.7)');pillGrad.addColorStop(1,'rgba(6,182,212,.4)');
+  ctx.fillStyle=pillGrad;ctx.strokeStyle='rgba(196,181,253,.5)';ctx.lineWidth=1.5;
+  rr(ctx,30,22,200,40,20);ctx.fill();ctx.stroke();
+  const wh=[10,18,26,18,10];
+  wh.forEach((h,i)=>{const bx=46+i*10;const by=42-h/2;ctx.fillStyle='rgba(255,255,255,.9)';rr(ctx,bx,by,6,h,3);ctx.fill();});
+  ctx.fillStyle='#ffffff';ctx.font='bold 15px Arial';ctx.textAlign='left';ctx.fillText('MOODWAVE',108,48);
 
-  // Mini waveform dans la pill
-  const wh=[12,20,28,20,12];
-  wh.forEach((h,i)=>{
-    const bx=46+i*10;const by=43-h/2;
-    ctx.fillStyle='rgba(255,255,255,.9)';
-    rr(ctx,bx,by,6,h,3);ctx.fill();
-  });
-  ctx.fillStyle='#ffffff';ctx.font='bold 16px Arial';ctx.textAlign='left';
-  ctx.fillText('MOODWAVE',108,50);
-
-  // Badge "✦ IA Generated"
   ctx.fillStyle='rgba(255,255,255,.08)';ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;
-  rr(ctx,W-130,28,100,30,15);ctx.fill();ctx.stroke();
+  rr(ctx,W-130,26,100,28,14);ctx.fill();ctx.stroke();
   ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='10px Arial';ctx.textAlign='center';
-  ctx.fillText('✦ IA Generated',W-80,47);
+  ctx.fillText('✦ IA Generated',W-80,44);
 
-  // ── ZONE CENTRALE : titre mood ──
-  // Grand texte mood
+  // ── MOOD SECTION ──
+  ctx.textAlign='left';
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.font='bold 10px Arial';
+  ctx.fillText('MON MOOD DU MOMENT',34,84);
+  const sepGrad=ctx.createLinearGradient(34,0,W-34,0);
+  sepGrad.addColorStop(0,'rgba(124,106,255,.8)');sepGrad.addColorStop(.5,'rgba(196,181,253,.5)');sepGrad.addColorStop(1,'rgba(6,182,212,.3)');
+  ctx.strokeStyle=sepGrad;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(34,90);ctx.lineTo(W-34,90);ctx.stroke();
+
   const moodParts=meta.split(' / ');
   const mainMood=moodParts[0]||meta;
-
-  ctx.textAlign='left';
-  ctx.fillStyle='rgba(255,255,255,.15)';ctx.font='bold 11px Arial';
-  ctx.letterSpacing='3px';
-  ctx.fillText('MON MOOD DU MOMENT',34,96);
-
-  // Ligne séparatrice lumineuse
-  const sepGrad=ctx.createLinearGradient(34,0,W-34,0);
-  sepGrad.addColorStop(0,'rgba(124,106,255,.8)');
-  sepGrad.addColorStop(.5,'rgba(196,181,253,.5)');
-  sepGrad.addColorStop(1,'rgba(6,182,212,.3)');
-  ctx.strokeStyle=sepGrad;ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(34,103);ctx.lineTo(W-34,103);ctx.stroke();
-
-  // Grand mood text avec glow
-  ctx.shadowColor='rgba(124,106,255,.8)';ctx.shadowBlur=30;
-  ctx.fillStyle='#ffffff';ctx.font='bold 38px Arial';ctx.textAlign='left';
-  ctx.fillText(trunc(mainMood,20),34,148);
-  ctx.shadowBlur=0;
-
-  // Sous-infos (énergie / contexte)
+  ctx.shadowColor='rgba(124,106,255,.8)';ctx.shadowBlur=25;
+  ctx.fillStyle='#ffffff';ctx.font='bold 32px Arial';ctx.textAlign='left';
+  ctx.fillText(trunc(mainMood,22),34,128);ctx.shadowBlur=0;
   if(moodParts.length>1){
-    ctx.fillStyle='rgba(196,181,253,.6)';ctx.font='14px Arial';
-    ctx.fillText(moodParts.slice(1).join(' · ').slice(0,40),34,172);
+    ctx.fillStyle='rgba(196,181,253,.6)';ctx.font='12px Arial';
+    ctx.fillText(moodParts.slice(1).join(' · ').slice(0,48),34,148);
   }
 
-  // ── PLAYLIST TITLE ──
-  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='bold 10px Arial';
-  ctx.fillText('MA PLAYLIST',34,202);
-  // Petite ligne
-  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(34,208);ctx.lineTo(W-34,208);ctx.stroke();
+  // ── PLAYLIST LABEL ──
+  ctx.fillStyle='rgba(255,255,255,.18)';ctx.font='bold 10px Arial';
+  ctx.fillText('MA PLAYLIST',34,170);
+  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(34,176);ctx.lineTo(W-34,176);ctx.stroke();
 
-  // ── SONG CARDS : style moderne ──
-  const sy=216,ch=65,gap=5;
+  // ── SONG CARDS ──
+  // Calculer la hauteur dispo : de 180 à H-70 (footer) = 710px pour 10 titres + gaps
+  const availH=H-70-182;
+  const gap=3;
+  const ch=Math.floor((availH-gap*9)/10); // hauteur card dynamique
+  const sy=182;
+
+  const accentColors=[
+    ['#7c3aed','#06b6d4'],['#2563eb','#7c3aed'],['#db2777','#7c3aed'],
+    ['#0891b2','#06b6d4'],['#7c3aed','#db2777'],['#2563eb','#0891b2'],
+    ['#7c3aed','#06b6d4'],['#db2777','#2563eb'],['#0891b2','#7c3aed'],['#06b6d4','#2563eb']
+  ];
+
   songs.slice(0,10).forEach((s,i)=>{
     const y=sy+i*(ch+gap);
-
-    // Fond card avec glassmorphism
     ctx.fillStyle=i%2===0?'rgba(255,255,255,.06)':'rgba(255,255,255,.03)';
     ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
-    rr(ctx,22,y,W-44,ch,12);ctx.fill();ctx.stroke();
+    rr(ctx,22,y,W-44,ch,10);ctx.fill();ctx.stroke();
 
-    // Accent bar gauche avec dégradé
-    const accentColors=[
-      ['#7c3aed','#06b6d4'],['#2563eb','#7c3aed'],['#db2777','#7c3aed'],
-      ['#0891b2','#06b6d4'],['#7c3aed','#db2777'],['#2563eb','#0891b2'],
-      ['#7c3aed','#06b6d4'],['#db2777','#2563eb'],['#0891b2','#7c3aed'],['#06b6d4','#2563eb']
-    ];
     const ac=accentColors[i];
     const acg=ctx.createLinearGradient(0,y,0,y+ch);
     acg.addColorStop(0,ac[0]);acg.addColorStop(1,ac[1]);
     ctx.fillStyle=acg;rr(ctx,22,y,4,ch,2);ctx.fill();
 
-    // Numéro stylisé
-    ctx.fillStyle='rgba(196,181,253,.35)';ctx.font='bold 10px Arial';ctx.textAlign='left';
-    ctx.fillText(String(i+1).padStart(2,'0'),34,y+20);
-
+    const midY=y+ch/2;
+    // Numéro
+    ctx.fillStyle='rgba(196,181,253,.35)';ctx.font='bold 9px Arial';ctx.textAlign='left';
+    ctx.fillText(String(i+1).padStart(2,'0'),32,midY-8);
     // Artiste
-    ctx.fillStyle='rgba(196,181,253,.85)';ctx.font='500 11px Arial';
-    ctx.fillText(trunc(s.artist,26),34,y+35);
-
-    // Titre en gras blanc
-    ctx.shadowColor=ac[0];ctx.shadowBlur=8;
-    ctx.fillStyle='#ffffff';ctx.font='bold 14px Arial';
-    ctx.fillText(trunc(s.title,24),34,y+52);
+    ctx.fillStyle='rgba(196,181,253,.85)';ctx.font='10px Arial';
+    ctx.fillText(trunc(s.artist,28),32,midY+5);
+    // Titre
+    ctx.shadowColor=ac[0];ctx.shadowBlur=6;
+    ctx.fillStyle='#ffffff';ctx.font='bold 13px Arial';
+    ctx.fillText(trunc(s.title,26),32,midY+19);
     ctx.shadowBlur=0;
 
-    // Genre pill à droite
+    // Genre
     if(s.genre){
-      const gt=s.genre.slice(0,14);
-      ctx.font='9px Arial';
-      const gW=ctx.measureText(gt).width+16;
-      const gx=W-22-gW-6;const gy=y+38;
-      ctx.fillStyle='rgba(255,255,255,.06)';ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
-      rr(ctx,gx,gy,gW,18,9);ctx.fill();ctx.stroke();
-      ctx.fillStyle='rgba(200,200,255,.6)';ctx.textAlign='center';
-      ctx.fillText(gt,gx+gW/2,gy+12.5);ctx.textAlign='left';
+      const gt=s.genre.slice(0,13);
+      ctx.font='8.5px Arial';
+      const gW=ctx.measureText(gt).width+14;
+      const gx=W-22-gW-6;const gy=midY-8;
+      ctx.fillStyle='rgba(255,255,255,.06)';ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
+      rr(ctx,gx,gy,gW,16,8);ctx.fill();ctx.stroke();
+      ctx.fillStyle='rgba(200,200,255,.55)';ctx.textAlign='center';
+      ctx.fillText(gt,gx+gW/2,gy+11);ctx.textAlign='left';
     }
   });
 
-  // ── FOOTER CALL-TO-ACTION ──
-  const footerY=sy+10*(ch+gap)+8;
-
-  // Grande pill CTA
+  // ── FOOTER CTA ──
+  const footerY=H-62;
   const ctaGrad=ctx.createLinearGradient(22,footerY,W-22,footerY);
-  ctaGrad.addColorStop(0,'rgba(124,58,237,.7)');ctaGrad.addColorStop(1,'rgba(6,182,212,.5)');
+  ctaGrad.addColorStop(0,'rgba(124,58,237,.8)');ctaGrad.addColorStop(1,'rgba(6,182,212,.6)');
   ctx.fillStyle=ctaGrad;ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;
-  rr(ctx,22,footerY,W-44,52,26);ctx.fill();ctx.stroke();
-
-  ctx.fillStyle='#ffffff';ctx.font='bold 16px Arial';ctx.textAlign='center';
-  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=10;
-  ctx.fillText('🎵  Génère ta playlist sur moodwave.app',W/2,footerY+21);
-  ctx.shadowBlur=0;
-  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='11px Arial';
-  ctx.fillText('Gratuit · IA · Basé sur ton mood',W/2,footerY+40);
+  rr(ctx,22,footerY,W-44,48,24);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#ffffff';ctx.font='bold 14px Arial';ctx.textAlign='center';
+  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=8;
+  ctx.fillText('🎵  Génère ta playlist sur moodwave.app',W/2,footerY+18);ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='10px Arial';
+  ctx.fillText('Gratuit · IA · Basé sur ton mood',W/2,footerY+36);
   ctx.textAlign='left';
 }
 

@@ -862,7 +862,7 @@ function drawShareCard(songs,meta){
   const mainMood=moodParts[0]||meta;
   ctx.shadowColor='rgba(124,106,255,.8)';ctx.shadowBlur=25;
   ctx.fillStyle='#ffffff';ctx.font='bold 32px Arial';ctx.textAlign='left';
-  ctx.fillText(trunc(mainMood,22),34,128);ctx.shadowBlur=0;
+  ctx.fillText(trunc(mainMood,28),34,128);ctx.shadowBlur=0;
   if(moodParts.length>1){
     ctx.fillStyle='rgba(196,181,253,.6)';ctx.font='12px Arial';
     ctx.fillText(moodParts.slice(1).join(' · ').slice(0,48),34,148);
@@ -1165,11 +1165,11 @@ async function loadWeekly(){
     document.getElementById('weekly-loading').style.display='none';
     if(data.songs){
       const list=document.getElementById('weekly-songs-list');
-      list.innerHTML=songCardsHTML(data.songs,'weekly','Tendances de la semaine','weekly-success');
-      attachCardEvents('weekly-songs-list',data.songs,'weekly','Tendances de la semaine','weekly-success');
+      list.innerHTML=songCardsHTML(data.songs,'weekly','Top 10 tendances','weekly-success');
+      attachCardEvents('weekly-songs-list',data.songs,'weekly','Top 10 tendances','weekly-success');
       const bar=document.getElementById('weekly-action-bar');
       bar.style.display='block';
-      bar.innerHTML=actionBarHTML(data.songs,'Tendances de la semaine','weekly','weekly-success');
+      bar.innerHTML=actionBarHTML(data.songs,'Top 10 tendances','weekly','weekly-success');
     }
     document.getElementById('weekly-actions').style.display='flex';
   }catch(e){

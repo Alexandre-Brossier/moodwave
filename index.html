@@ -31,9 +31,9 @@
     }
     /* Orbes conservées mais plus intenses */
     .orb{animation:orbFloat 10s ease-in-out infinite}
-    .orb1{animation-duration:13s;opacity:.45!important}
-    .orb2{animation-duration:17s;animation-delay:-5s;opacity:.4!important}
-    .orb3{animation-duration:15s;animation-delay:-2s;opacity:.35!important}
+    .orb1{animation-duration:13s;opacity:.65!important;filter:blur(60px)!important}
+    .orb2{animation-duration:17s;animation-delay:-5s;opacity:.6!important;filter:blur(55px)!important}
+    .orb3{animation-duration:15s;animation-delay:-2s;opacity:.55!important;filter:blur(50px)!important}
     @keyframes orbFloat{
       0%,100%{transform:translate(0,0) scale(1)}
       33%{transform:translate(40px,-30px) scale(1.08)}
@@ -50,9 +50,11 @@
     }
 
     .orb{position:fixed;border-radius:50%;filter:blur(70px);pointer-events:none;z-index:0}
-    .orb1{width:500px;height:500px;background:radial-gradient(circle,#4f46e5,transparent);top:-150px;left:-150px}
-    .orb2{width:400px;height:400px;background:radial-gradient(circle,#7c3aed,transparent);top:40%;right:-100px}
-    .orb3{width:350px;height:350px;background:radial-gradient(circle,#0891b2,transparent);bottom:-80px;left:35%}
+    .orb4{width:400px;height:400px;background:radial-gradient(circle,#be185d,transparent);top:20%;left:25%;opacity:.3!important;animation-duration:20s!important;animation-delay:-8s!important}
+    .orb5{width:350px;height:350px;background:radial-gradient(circle,#059669,transparent);bottom:20%;right:20%;opacity:.25!important;animation-duration:22s!important;animation-delay:-11s!important}
+    .orb1{width:600px;height:600px;background:radial-gradient(circle,#4f46e5,transparent);top:-180px;left:-180px}
+    .orb2{width:500px;height:500px;background:radial-gradient(circle,#7c3aed,transparent);top:35%;right:-120px}
+    .orb3{width:450px;height:450px;background:radial-gradient(circle,#0891b2,transparent);bottom:-100px;left:30%}
     .screen{display:none;position:relative;z-index:1;min-height:100vh;padding:2rem 1.25rem 6rem;max-width:560px;margin:0 auto}
     .screen.active{display:flex;flex-direction:column}
 
@@ -97,14 +99,14 @@
 
     /* PILLS */
     .pills{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem}
-    .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.875rem;padding:.6rem .5rem;border-radius:14px;cursor:pointer;transition:all .2s;user-select:none;text-align:center;width:100%}
+    .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.6rem .4rem;border-radius:14px;cursor:pointer;transition:all .2s;user-select:none;text-align:center;width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;line-height:1.3}
     .pill:hover{border-color:var(--accent2);color:#fff;background:rgba(255,255,255,.12)}
     .pill.selected{background:rgba(124,106,255,.28);border-color:#a78bfa;color:#fff;font-weight:500}
     .pill.all-genres.selected{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4);color:#fde68a}
 
     /* ENERGY CARDS */
     .energy-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;margin-bottom:1.25rem}
-    .energy-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1rem .75rem;text-align:center;cursor:pointer;transition:all .2s;user-select:none}
+    .energy-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1rem .75rem;text-align:center;cursor:pointer;transition:all .2s;user-select:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
     .energy-card:hover{border-color:var(--accent2);background:rgba(255,255,255,.1)}
     .energy-card.selected{background:rgba(124,106,255,.22);border-color:#a78bfa}
     .energy-card .e-icon{font-size:1.75rem;margin-bottom:.4rem}
@@ -304,7 +306,7 @@
 <body>
 <canvas id="bg-canvas"></canvas>
 <div class="hero-particles" id="global-particles"></div>
-<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div><div class="orb orb4"></div><div class="orb orb5"></div>
 
 <!-- SHARE MODAL -->
 <div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeModal()">
@@ -984,7 +986,7 @@ function initBackground(){
     ctx.strokeStyle=color;
     ctx.lineWidth=lineW;
     ctx.shadowColor=color;
-    ctx.shadowBlur=18;
+    ctx.shadowBlur=28;
     for(let x=0;x<=W;x+=2){
       const y=yBase+Math.sin((x*freq)+t*speed)*amp+Math.sin((x*freq*.7)+t*speed*1.3)*amp*.4;
       x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
@@ -997,7 +999,7 @@ function initBackground(){
     const cx=W*.5,cy=H*.42;
     for(let i=0;i<5;i++){
       const r=80+i*70+Math.sin(t*.4+i)*15;
-      const alpha=.04-i*.006;
+      const alpha=.09-i*.012;
       ctx.beginPath();
       ctx.arc(cx,cy,r,0,Math.PI*2);
       ctx.strokeStyle=`rgba(124,106,255,${alpha})`;
@@ -1014,13 +1016,14 @@ function initBackground(){
       const len=H*.7;
       const grad=ctx.createLinearGradient(cx,cy,
         cx+Math.cos(angle)*len,cy+Math.sin(angle)*len);
-      grad.addColorStop(0,'rgba(124,106,255,.06)');
+      grad.addColorStop(0,'rgba(124,106,255,.14)');
+      grad.addColorStop(0.5,'rgba(167,139,250,.06)');
       grad.addColorStop(1,'transparent');
       ctx.beginPath();
       ctx.moveTo(cx,cy);
       ctx.lineTo(cx+Math.cos(angle)*len,cy+Math.sin(angle)*len);
       ctx.strokeStyle=grad;
-      ctx.lineWidth=60;
+      ctx.lineWidth=90;
       ctx.stroke();
     }
   }
@@ -1034,12 +1037,13 @@ function initBackground(){
     // Anneaux concentriques au centre
     drawRings();
 
-    // Ondes sonores
-    drawWave(H*.3,28,.008,.8,'rgba(124,106,255,.35)',1.5);
-    drawWave(H*.35,20,.01,1.1,'rgba(167,139,250,.25)',1);
-    drawWave(H*.65,35,.007,.6,'rgba(8,145,178,.3)',1.5);
-    drawWave(H*.7,18,.012,.9,'rgba(103,232,249,.2)',1);
-    drawWave(H*.5,12,.015,1.4,'rgba(196,181,253,.15)',1);
+    // Ondes sonores — plus visibles
+    drawWave(H*.25,45,.007,.7,'rgba(124,106,255,.55)',2.5);
+    drawWave(H*.3,30,.009,1.0,'rgba(167,139,250,.4)',1.8);
+    drawWave(H*.6,55,.006,.55,'rgba(8,145,178,.5)',2.5);
+    drawWave(H*.66,25,.011,.85,'rgba(103,232,249,.35)',1.5);
+    drawWave(H*.48,18,.014,1.3,'rgba(196,181,253,.3)',1.2);
+    drawWave(H*.75,35,.008,.65,'rgba(190,24,93,.3)',1.8);
 
     t+=.015;
     requestAnimationFrame(animate);

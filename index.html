@@ -14,7 +14,7 @@
   <link rel="apple-touch-icon" href="/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.css">
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
   <script defer src="/_vercel/insights/script.js"></script>
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -533,6 +533,7 @@ let currentMeta='';
 let savedSongs=[];
 let savedMeta='';
 let weeklyData=null;
+let weeklySongs=[];
 let votes={};
 let msgInterval=null;
 let activeDropdown=null;
@@ -845,6 +846,11 @@ function copyShareUrl(songs,meta,successId){
 
 /* ══ ACTION BAR ══ */
 function actionBarHTML(songs,meta,prefix,successId){
+  // Exposer les songs dans le scope global pour que le dropdown puisse y accéder
+  if(prefix==='current')currentSongs=songs;
+  else if(prefix==='saved')savedSongs=songs;
+  else if(prefix==='weekly')weeklySongs=songs;
+  window.currentSongs=currentSongs;window.savedSongs=savedSongs;window.weeklySongs=weeklySongs;
   const p=prefix;
   const songsJson=JSON.stringify(songs).replace(/'/g,"\\'");
   return '<div class="action-bar">'+
@@ -1032,6 +1038,7 @@ async function loadWeekly(){
     if(!res.ok)throw new Error('Erreur '+res.status);
     const data=await res.json();
     weeklyData=data;
+    weeklySongs=data.songs||[];
     const dateEl=document.getElementById('weekly-date');
     if(dateEl&&data.weekLabel)dateEl.textContent=data.weekLabel;
     document.getElementById('weekly-loading').style.display='none';

@@ -218,6 +218,22 @@
     }
     .btn-generate-main:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(124,106,255,.65)}
     .btn-generate-main:active{transform:scale(.97)}
+    .btn-surprise-hero{
+      width:100%;
+      background:transparent;
+      border:1px solid rgba(255,255,255,.2);
+      color:var(--muted)!important;
+      -webkit-text-fill-color:var(--muted);
+      font-family:'DM Sans',sans-serif;
+      font-size:.95rem;
+      font-weight:500;
+      padding:.8rem;
+      border-radius:100px;
+      cursor:pointer;
+      transition:all .2s;
+      text-align:center;
+    }
+    .btn-surprise-hero:hover{border-color:var(--accent2);color:#fff!important;-webkit-text-fill-color:#fff;background:rgba(124,106,255,.1)}
     .btn-surprise-main{
       width:100%;
       background:transparent;
@@ -310,6 +326,7 @@
   </div>
   <div class="hero-actions">
     <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist</button>
+    <button class="btn-surprise-hero" onclick="generate(true)">🎲 Génère-moi une playlist aléatoire surprenante</button>
     <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')" style="display:none">
       📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span>
     </button>
@@ -419,7 +436,6 @@
       <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
     </div>
     <button class="btn-generate-main" onclick="generate(false)">Générer ma playlist ✨</button>
-    <button class="btn-surprise-main" onclick="generate(true)">🎲 Surprends-moi complètement</button>
   </div>
   <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>

@@ -20,53 +20,36 @@
     :root{--bg:#07080f;--surface:rgba(255,255,255,0.06);--surface2:rgba(255,255,255,0.10);--border:rgba(255,255,255,0.15);--text:#f0f0ff;--muted:rgba(240,240,255,0.65);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc}
     html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
 
-    /* FOND ANIMÉ */
-    body::before{
-      content:'';
+    /* FOND CANVAS ANIMÉ */
+    #bg-canvas{
       position:fixed;
       inset:0;
-      background:
-        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(79,70,229,.18) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(124,58,237,.15) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 60% at 50% 50%, rgba(8,145,178,.08) 0%, transparent 70%);
-      pointer-events:none;
+      width:100%;
+      height:100%;
       z-index:0;
-    }
-    /* Grille déco subtile */
-    body::after{
-      content:'';
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-      background-size:48px 48px;
       pointer-events:none;
-      z-index:0;
-      mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
-      -webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
     }
-    /* Orbes animées */
-    .orb{animation:orbFloat 12s ease-in-out infinite}
-    .orb1{animation-duration:14s}
-    .orb2{animation-duration:18s;animation-delay:-6s}
-    .orb3{animation-duration:16s;animation-delay:-3s}
+    /* Orbes conservées mais plus intenses */
+    .orb{animation:orbFloat 10s ease-in-out infinite}
+    .orb1{animation-duration:13s;opacity:.45!important}
+    .orb2{animation-duration:17s;animation-delay:-5s;opacity:.4!important}
+    .orb3{animation-duration:15s;animation-delay:-2s;opacity:.35!important}
     @keyframes orbFloat{
       0%,100%{transform:translate(0,0) scale(1)}
-      33%{transform:translate(30px,-20px) scale(1.05)}
-      66%{transform:translate(-20px,15px) scale(.95)}
+      33%{transform:translate(40px,-30px) scale(1.08)}
+      66%{transform:translate(-25px,20px) scale(.93)}
     }
-    /* Particules décoratives */
-    .hero-particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-    .particle{position:absolute;width:2px;height:2px;background:rgba(196,181,253,.4);border-radius:50%;animation:particleFloat linear infinite}
+    /* Particules */
+    .hero-particles{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+    .particle{position:absolute;border-radius:50%;animation:particleFloat linear infinite}
     @keyframes particleFloat{
-      0%{transform:translateY(100vh) translateX(0);opacity:0}
+      0%{transform:translateY(100vh);opacity:0}
       10%{opacity:1}
-      90%{opacity:.3}
-      100%{transform:translateY(-20px) translateX(20px);opacity:0}
+      90%{opacity:.5}
+      100%{transform:translateY(-40px) translateX(15px);opacity:0}
     }
 
-    .orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;opacity:.32;z-index:0}
+    .orb{position:fixed;border-radius:50%;filter:blur(70px);pointer-events:none;z-index:0}
     .orb1{width:500px;height:500px;background:radial-gradient(circle,#4f46e5,transparent);top:-150px;left:-150px}
     .orb2{width:400px;height:400px;background:radial-gradient(circle,#7c3aed,transparent);top:40%;right:-100px}
     .orb3{width:350px;height:350px;background:radial-gradient(circle,#0891b2,transparent);bottom:-80px;left:35%}
@@ -319,6 +302,8 @@
   </style>
 </head>
 <body>
+<canvas id="bg-canvas"></canvas>
+<div class="hero-particles" id="global-particles"></div>
 <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
 
 <!-- SHARE MODAL -->
@@ -366,7 +351,6 @@
 
 <!-- HERO -->
 <div id="hero" class="screen active">
-  <div class="hero-particles" id="hero-particles"></div>
   <div class="logo"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;margin-right:6px"><rect width="28" height="28" rx="7" fill="url(#lg)"/><defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop offset="0%" stop-color="#4f46e5"/><stop offset="100%" stop-color="#7c3aed"/></linearGradient></defs><rect x="5" y="12" width="3" height="9" rx="1.5" fill="rgba(196,181,253,0.9)"/><rect x="9.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/><rect x="14" y="5" width="3" height="18" rx="1.5" fill="rgba(124,106,255,1)"/><rect x="18.5" y="8" width="3" height="13" rx="1.5" fill="rgba(167,139,250,1)"/></svg>Moodwave</div>
   <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
   <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
@@ -962,21 +946,105 @@ function attachCardEvents(containerId,songsRef,listId,meta,successId){
 
 
 
-/* PARTICULES HERO */
-function initParticles(){
-  const container=document.getElementById('hero-particles');
-  if(!container)return;
-  const count=18;
-  for(let i=0;i<count;i++){
-    const p=document.createElement('div');
-    p.className='particle';
-    p.style.left=Math.random()*100+'%';
-    p.style.animationDuration=(8+Math.random()*12)+'s';
-    p.style.animationDelay=(-Math.random()*15)+'s';
-    p.style.width=p.style.height=(1+Math.random()*2)+'px';
-    p.style.opacity=.2+Math.random()*.4;
-    container.appendChild(p);
+/* FOND ANIMÉ CANVAS + PARTICULES */
+function initBackground(){
+  // ── Particules flottantes ──
+  const container=document.getElementById('global-particles');
+  if(container){
+    for(let i=0;i<30;i++){
+      const p=document.createElement('div');
+      p.className='particle';
+      const size=1+Math.random()*3;
+      p.style.cssText=
+        'left:'+Math.random()*100+'%;'+
+        'width:'+size+'px;height:'+size+'px;'+
+        'background:'+(Math.random()>.5?'rgba(196,181,253,':'rgba(103,232,249,')+(.3+Math.random()*.5)+')'  +';'+
+        'animation-duration:'+(7+Math.random()*14)+'s;'+
+        'animation-delay:'+(-(Math.random()*18))+'s;'+
+        'box-shadow:0 0 '+(size*3)+'px currentColor;';
+      container.appendChild(p);
+    }
   }
+
+  // ── Canvas — ondes sonores animées ──
+  const canvas=document.getElementById('bg-canvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,t=0;
+
+  function resize(){
+    W=canvas.width=window.innerWidth;
+    H=canvas.height=window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  function drawWave(yBase,amp,freq,speed,color,lineW){
+    ctx.beginPath();
+    ctx.strokeStyle=color;
+    ctx.lineWidth=lineW;
+    ctx.shadowColor=color;
+    ctx.shadowBlur=18;
+    for(let x=0;x<=W;x+=2){
+      const y=yBase+Math.sin((x*freq)+t*speed)*amp+Math.sin((x*freq*.7)+t*speed*1.3)*amp*.4;
+      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur=0;
+  }
+
+  function drawRings(){
+    const cx=W*.5,cy=H*.42;
+    for(let i=0;i<5;i++){
+      const r=80+i*70+Math.sin(t*.4+i)*15;
+      const alpha=.04-i*.006;
+      ctx.beginPath();
+      ctx.arc(cx,cy,r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(124,106,255,${alpha})`;
+      ctx.lineWidth=1.5;
+      ctx.stroke();
+    }
+  }
+
+  function drawBeams(){
+    const cx=W*.5,cy=H*.15;
+    const beams=6;
+    for(let i=0;i<beams;i++){
+      const angle=(i/beams)*Math.PI+t*.05;
+      const len=H*.7;
+      const grad=ctx.createLinearGradient(cx,cy,
+        cx+Math.cos(angle)*len,cy+Math.sin(angle)*len);
+      grad.addColorStop(0,'rgba(124,106,255,.06)');
+      grad.addColorStop(1,'transparent');
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(cx+Math.cos(angle)*len,cy+Math.sin(angle)*len);
+      ctx.strokeStyle=grad;
+      ctx.lineWidth=60;
+      ctx.stroke();
+    }
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,W,H);
+
+    // Rayons de lumière en haut
+    drawBeams();
+
+    // Anneaux concentriques au centre
+    drawRings();
+
+    // Ondes sonores
+    drawWave(H*.3,28,.008,.8,'rgba(124,106,255,.35)',1.5);
+    drawWave(H*.35,20,.01,1.1,'rgba(167,139,250,.25)',1);
+    drawWave(H*.65,35,.007,.6,'rgba(8,145,178,.3)',1.5);
+    drawWave(H*.7,18,.012,.9,'rgba(103,232,249,.2)',1);
+    drawWave(H*.5,12,.015,1.4,'rgba(196,181,253,.15)',1);
+
+    t+=.015;
+    requestAnimationFrame(animate);
+  }
+  animate();
 }
 
 /* REGEN */
@@ -1093,7 +1161,7 @@ function registerSW(){if('serviceWorker' in navigator)navigator.serviceWorker.re
 
 /* INIT */
 votes=loadVotes();
-initParticles();
+initBackground();
 updateHistoryBadge();
 registerSW();
 const urlp=new URLSearchParams(window.location.search).get('p');

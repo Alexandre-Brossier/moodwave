@@ -62,8 +62,9 @@
     .step-hint{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.7}
 
     /* PILLS */
-    .pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
-    .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.875rem;padding:.55rem 1rem;border-radius:14px;cursor:pointer;transition:all .2s;user-select:none}
+    .pills{display:flex;flex-wrap:wrap;gap:.5rem .4rem;margin-bottom:1.25rem;justify-content:space-between}
+    .pills::after{content:'';flex:1 1 auto;max-width:calc(33% - .4rem)}
+    .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.875rem;padding:.55rem 1rem;border-radius:14px;cursor:pointer;transition:all .2s;user-select:none;flex:1 1 auto;text-align:center;min-width:calc(33% - .4rem);max-width:calc(50% - .4rem)}
     .pill:hover{border-color:var(--accent2);color:#fff;background:rgba(255,255,255,.12)}
     .pill.selected{background:rgba(124,106,255,.28);border-color:#a78bfa;color:#fff;font-weight:500}
     .pill.all-genres.selected{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4);color:#fde68a}
@@ -207,7 +208,8 @@
     .mood-textarea:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,.09)}
     .mood-textarea::placeholder{color:rgba(200,200,255,.3)}
     /* ÉPOQUE */
-    .era-pills{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:1.5rem}
+    .era-pills{display:flex;flex-wrap:wrap;gap:.5rem .4rem;margin-bottom:1.5rem;justify-content:space-between}
+    .era-pills::after{content:'';flex:1 1 auto;max-width:calc(33% - .4rem)}
 
     footer{text-align:center;padding:2rem 1rem 1.5rem;color:rgba(200,200,255,.35);font-size:.75rem;line-height:1.9;margin-top:auto}
   </style>
@@ -310,13 +312,12 @@
     </div>
     <div style="font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:.6rem;margin-top:.25rem">Époque musicale <span style="color:var(--muted);font-size:.65rem;letter-spacing:0;text-transform:none;font-weight:400">(optionnel)</span></div>
     <div class="era-pills">
-      <div class="pill" data-group="era" data-val="Années 70" onclick="selectPill(this)">📼 70s</div>
-      <div class="pill" data-group="era" data-val="Années 80" onclick="selectPill(this)">🎸 80s</div>
-      <div class="pill" data-group="era" data-val="Années 90" onclick="selectPill(this)">💿 90s</div>
-      <div class="pill" data-group="era" data-val="Années 2000" onclick="selectPill(this)">📱 2000s</div>
-      <div class="pill" data-group="era" data-val="Années 2010" onclick="selectPill(this)">🎧 2010s</div>
-      <div class="pill" data-group="era" data-val="Actuel" onclick="selectPill(this)">✨ Actuel</div>
-      <div class="pill" data-group="era" data-val="Mixte" onclick="selectPill(this)">🔀 Mixte</div>
+      <div class="pill" data-group="era" data-val="Années 70" onclick="toggleEraPill(this)">📼 70s</div>
+      <div class="pill" data-group="era" data-val="Années 80" onclick="toggleEraPill(this)">🎸 80s</div>
+      <div class="pill" data-group="era" data-val="Années 90" onclick="toggleEraPill(this)">💿 90s</div>
+      <div class="pill" data-group="era" data-val="Années 2000" onclick="toggleEraPill(this)">📱 2000s</div>
+      <div class="pill" data-group="era" data-val="Années 2010" onclick="toggleEraPill(this)">🎧 2010s</div>
+      <div class="pill" data-group="era" data-val="Actuel" onclick="toggleEraPill(this)">✨ Actuel</div>
     </div>
     <div class="step-nav"><button class="btn-next" onclick="goStep(2)">Suivant →</button></div>
   </div>
@@ -445,7 +446,8 @@
 </div>
 
 <script>
-const sel={mood:null,energy:null,context:null,era:null};
+const sel={mood:null,energy:null,context:null};
+let selectedEras=[];
 let selectedGenres=[];
 let msgInterval=null,currentSongs=[],currentMeta='',savedSongs=[],savedMeta='';
 let currentStep=1;
@@ -494,6 +496,7 @@ function updateStepperUI(){
   document.getElementById('step-counter').textContent=currentStep+' / '+TOTAL_STEPS;
 }
 function resetStepper(){
+  selectedEras=[];
   currentStep=1;
   document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('step-1').classList.add('active');
@@ -544,6 +547,16 @@ function toggleAllGenres(el){
   selectedGenres=[];
   if(el.classList.contains('selected')){el.classList.remove('selected');}
   else{el.classList.add('selected');selectedGenres=['De tout'];}
+}
+function toggleEraPill(el){
+  const val=el.dataset.val;
+  if(el.classList.contains('selected')){
+    el.classList.remove('selected');
+    selectedEras=selectedEras.filter(e=>e!==val);
+  } else {
+    el.classList.add('selected');
+    if(!selectedEras.includes(val))selectedEras.push(val);
+  }
 }
 
 /* MESSAGES */
@@ -836,7 +849,7 @@ async function regenSong(idx,songs,meta,listId,successId){
   const song=songs[idx];
   try{
     const res=await fetch('/api/regen',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({song:{artist:song.artist,title:song.title},otherSongs,meta,genres:selectedGenres,era:sel.era})});
+      body:JSON.stringify({song:{artist:song.artist,title:song.title},otherSongs,meta,genres:selectedGenres,era:selectedEras})});
     if(!res.ok)throw new Error('Erreur '+res.status);
     const newSong=await res.json();
     songs[idx]=newSong;
@@ -872,13 +885,13 @@ async function generate(isSurprise){
   const withSurprise=isSurprise||document.getElementById('surprise-toggle').classList.contains('on');
   showScreen('loading-screen');startLoading();
   const genreLabel=selectedGenres.length>0&&!selectedGenres.includes('De tout')?selectedGenres.join('-')+' / ':'';
-  const eraLabel=sel.era&&sel.era!=='Mixte'?' ('+sel.era+')':'';
+  const eraLabel=selectedEras.length>0?' ('+selectedEras.join(', ')+')':'';
   const meta=isSurprise?'Mode Surprise':genreLabel+(sel.mood||'')+eraLabel+' / '+(sel.energy||'')+' / '+(sel.context||'')+(withSurprise?' · Surprise':'');
   const {liked,disliked}=getLikedDisliked();
   const freeText=document.getElementById('mood-free-text')?.value?.trim()||'';
   const body=isSurprise
     ?{type:'surprise',likedSongs:liked,dislikedSongs:disliked}
-    :{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres,era:sel.era,freeText,likedSongs:liked,dislikedSongs:disliked};
+    :{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres,era:selectedEras,freeText,likedSongs:liked,dislikedSongs:disliked};
   try{
     const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'Erreur ('+res.status+')');}

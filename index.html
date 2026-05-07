@@ -518,19 +518,19 @@ function renderRecap(){
 /* PILLS */
 function selectPill(el){
   const g=el.dataset.group;
+  const val=el.dataset.val;
+  // Pour l'époque : toggle (reclique = déselectionne)
+  if(g==='era' && sel[g]===val){
+    el.classList.remove('selected');
+    sel[g]=null;
+    return;
+  }
+  // Sélection normale
   document.querySelectorAll('.pill[data-group="'+g+'"]').forEach(p=>p.classList.remove('selected'));
   el.classList.add('selected');
-  sel[g]=el.dataset.val;
+  sel[g]=val;
   if(g==='mood'){const b=document.getElementById('mood-next');if(b)b.disabled=false;}
   if(g==='context'){const b=document.getElementById('context-next');if(b)b.disabled=false;}
-  if(g==='era'){
-    // Sélection normale + possibilité de déselectionner en recliquant
-    if(sel[g]===el.dataset.val){
-      el.classList.remove('selected');
-      sel[g]=null;
-      return; // sortir avant le re-select générique
-    }
-  }
 }
 function toggleMultiPill(el){
   const allBtn=document.querySelector('.all-genres');

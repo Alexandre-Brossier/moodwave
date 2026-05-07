@@ -275,7 +275,7 @@
 <!-- SHARE CARD -->
 <div class="card-overlay" id="card-overlay" onclick="if(event.target===this)closeShareCard()">
   <div class="card-box">
-    <canvas id="share-canvas" width="400" height="760"></canvas>
+    <canvas id="share-canvas" width="540" height="960"></canvas>
     <div class="card-actions">
       <button onclick="closeShareCard()">✕ Fermer</button>
       <button class="btn-dl" onclick="downloadShareCard()">⬇️ Télécharger</button>
@@ -797,130 +797,193 @@ function closeShareCard(){document.getElementById('card-overlay').classList.remo
 function drawShareCard(songs,meta){
   const canvas=document.getElementById('share-canvas');
   const ctx=canvas.getContext('2d');
-  const W=400,H=760;canvas.width=W;canvas.height=H;
+  // Format story 9:16
+  const W=540,H=960;canvas.width=W;canvas.height=H;
 
-  // ── Fond dégradé riche ──
-  const bg=ctx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,'#0a0520');bg.addColorStop(.45,'#12063a');bg.addColorStop(1,'#060d24');
-  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // ── FOND : noir profond avec texture ──
+  ctx.fillStyle='#050310';ctx.fillRect(0,0,W,H);
 
-  // ── Orbes colorées ──
-  const orbs=[
-    {x:0,y:0,r:220,c:'rgba(124,106,255,.55)'},
-    {x:W,y:H*.35,r:180,c:'rgba(8,145,178,.4)'},
-    {x:W*.5,y:H*.65,r:160,c:'rgba(190,24,93,.3)'},
-    {x:0,y:H,r:200,c:'rgba(79,70,229,.4)'},
-  ];
-  orbs.forEach(o=>{
-    const g=ctx.createRadialGradient(o.x,o.y,0,o.x,o.y,o.r);
-    g.addColorStop(0,o.c);g.addColorStop(1,'transparent');
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  });
+  // Dégradé diagonal dramatique
+  const bgd=ctx.createLinearGradient(0,0,W,H);
+  bgd.addColorStop(0,'rgba(79,46,220,.6)');
+  bgd.addColorStop(.4,'rgba(10,5,40,.8)');
+  bgd.addColorStop(.7,'rgba(5,20,50,.9)');
+  bgd.addColorStop(1,'rgba(180,20,100,.4)');
+  ctx.fillStyle=bgd;ctx.fillRect(0,0,W,H);
 
-  // ── Grille subtile ──
-  ctx.strokeStyle='rgba(255,255,255,.03)';ctx.lineWidth=1;
-  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
-  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+  // Orbe violet explosif en haut à gauche
+  const o1=ctx.createRadialGradient(0,0,0,0,0,380);
+  o1.addColorStop(0,'rgba(124,58,237,.9)');
+  o1.addColorStop(.5,'rgba(79,46,220,.4)');
+  o1.addColorStop(1,'transparent');
+  ctx.fillStyle=o1;ctx.fillRect(0,0,W,H);
 
-  // ── Ondes déco en bas ──
-  for(let i=0;i<4;i++){
-    ctx.beginPath();
-    ctx.strokeStyle='rgba(124,106,255,'+(0.12-i*.025)+')';
-    ctx.lineWidth=1.5;
-    for(let x=0;x<=W;x+=3){
-      const y=H*.78+Math.sin((x*.015)+(i*.8))*18+i*12;
-      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    }
-    ctx.stroke();
+  // Orbe cyan en bas à droite
+  const o2=ctx.createRadialGradient(W,H,0,W,H,320);
+  o2.addColorStop(0,'rgba(6,182,212,.7)');
+  o2.addColorStop(.5,'rgba(8,145,178,.3)');
+  o2.addColorStop(1,'transparent');
+  ctx.fillStyle=o2;ctx.fillRect(0,0,W,H);
+
+  // Orbe rose au centre-bas
+  const o3=ctx.createRadialGradient(W*.6,H*.7,0,W*.6,H*.7,250);
+  o3.addColorStop(0,'rgba(236,72,153,.35)');
+  o3.addColorStop(1,'transparent');
+  ctx.fillStyle=o3;ctx.fillRect(0,0,W,H);
+
+  // ── LIGNES DE SCAN (effet écran/glitch) ──
+  for(let y=0;y<H;y+=4){
+    ctx.fillStyle='rgba(0,0,0,.08)';
+    ctx.fillRect(0,y,W,1);
   }
 
-  // ── Header logo ──
-  // Fond pill logo
-  ctx.fillStyle='rgba(124,106,255,.25)';
-  ctx.strokeStyle='rgba(167,139,250,.4)';ctx.lineWidth=1;
-  rr(ctx,28,22,154,36,18);ctx.fill();ctx.stroke();
-  // Barres waveform mini
-  const barsH=[10,16,22,16,10];
-  barsH.forEach((h,i)=>{
-    const bx=44+i*8;const by=40-h/2;
-    const bg2=ctx.createLinearGradient(0,by,0,by+h);
-    bg2.addColorStop(0,'rgba(196,181,253,.9)');bg2.addColorStop(1,'rgba(124,106,255,.9)');
-    ctx.fillStyle=bg2;
-    rr(ctx,bx,by,5,h,2.5);ctx.fill();
+  // ── GRAND TITRE MOODWAVE en arrière-plan (watermark géant) ──
+  ctx.save();
+  ctx.globalAlpha=.04;
+  ctx.font='bold 130px Arial Black, Arial';
+  ctx.fillStyle='#ffffff';
+  ctx.textAlign='center';
+  ctx.fillText('MOOD',W/2,H*.35);
+  ctx.fillText('WAVE',W/2,H*.5);
+  ctx.restore();
+
+  // ── BANDES DÉCORATIVES DIAGONALES ──
+  ctx.save();
+  ctx.globalAlpha=.06;
+  for(let i=0;i<8;i++){
+    ctx.fillStyle=i%2===0?'#7c6aff':'#06b6d4';
+    ctx.beginPath();
+    ctx.moveTo(-200+i*120,0);ctx.lineTo(-200+i*120+80,0);
+    ctx.lineTo(-200+i*120+80+H*.3,H);ctx.lineTo(-200+i*120+H*.3,H);
+    ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+
+  // ── HEADER ──
+  // Pill logo Moodwave
+  const pillGrad=ctx.createLinearGradient(30,28,220,28);
+  pillGrad.addColorStop(0,'rgba(124,58,237,.7)');
+  pillGrad.addColorStop(1,'rgba(6,182,212,.4)');
+  ctx.fillStyle=pillGrad;
+  ctx.strokeStyle='rgba(196,181,253,.5)';ctx.lineWidth=1.5;
+  rr(ctx,30,22,200,42,21);ctx.fill();ctx.stroke();
+
+  // Mini waveform dans la pill
+  const wh=[12,20,28,20,12];
+  wh.forEach((h,i)=>{
+    const bx=46+i*10;const by=43-h/2;
+    ctx.fillStyle='rgba(255,255,255,.9)';
+    rr(ctx,bx,by,6,h,3);ctx.fill();
   });
-  ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='bold 14px Arial';ctx.textAlign='left';
-  ctx.fillText('MOODWAVE',92,45);
+  ctx.fillStyle='#ffffff';ctx.font='bold 16px Arial';ctx.textAlign='left';
+  ctx.fillText('MOODWAVE',108,50);
 
-  // ── Meta tag (mood) ──
-  const metaText=meta.slice(0,42);
-  ctx.font='12px Arial';
-  const metaW=ctx.measureText(metaText).width+24;
-  ctx.fillStyle='rgba(255,255,255,.08)';ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;
-  rr(ctx,28,68,metaW,28,14);ctx.fill();ctx.stroke();
-  ctx.fillStyle='rgba(200,185,255,.8)';ctx.font='11px Arial';ctx.fillText(metaText,40,86);
+  // Badge "✦ IA Generated"
+  ctx.fillStyle='rgba(255,255,255,.08)';ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;
+  rr(ctx,W-130,28,100,30,15);ctx.fill();ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='10px Arial';ctx.textAlign='center';
+  ctx.fillText('✦ IA Generated',W-80,47);
 
-  // ── Titre section ──
-  ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='500 11px Arial';
-  ctx.fillText('PLAYLIST DU MOMENT',28,116);
-  // Ligne déco
-  const lg=ctx.createLinearGradient(28,0,W-28,0);
-  lg.addColorStop(0,'rgba(124,106,255,.6)');lg.addColorStop(.5,'rgba(196,181,253,.4)');lg.addColorStop(1,'transparent');
-  ctx.strokeStyle=lg;ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(28,122);ctx.lineTo(W-28,122);ctx.stroke();
+  // ── ZONE CENTRALE : titre mood ──
+  // Grand texte mood
+  const moodParts=meta.split(' / ');
+  const mainMood=moodParts[0]||meta;
 
-  // ── Song cards ──
-  const sy=130,ch=56,gap=3;
+  ctx.textAlign='left';
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.font='bold 11px Arial';
+  ctx.letterSpacing='3px';
+  ctx.fillText('MON MOOD DU MOMENT',34,96);
+
+  // Ligne séparatrice lumineuse
+  const sepGrad=ctx.createLinearGradient(34,0,W-34,0);
+  sepGrad.addColorStop(0,'rgba(124,106,255,.8)');
+  sepGrad.addColorStop(.5,'rgba(196,181,253,.5)');
+  sepGrad.addColorStop(1,'rgba(6,182,212,.3)');
+  ctx.strokeStyle=sepGrad;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(34,103);ctx.lineTo(W-34,103);ctx.stroke();
+
+  // Grand mood text avec glow
+  ctx.shadowColor='rgba(124,106,255,.8)';ctx.shadowBlur=30;
+  ctx.fillStyle='#ffffff';ctx.font='bold 38px Arial';ctx.textAlign='left';
+  ctx.fillText(trunc(mainMood,20),34,148);
+  ctx.shadowBlur=0;
+
+  // Sous-infos (énergie / contexte)
+  if(moodParts.length>1){
+    ctx.fillStyle='rgba(196,181,253,.6)';ctx.font='14px Arial';
+    ctx.fillText(moodParts.slice(1).join(' · ').slice(0,40),34,172);
+  }
+
+  // ── PLAYLIST TITLE ──
+  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='bold 10px Arial';
+  ctx.fillText('MA PLAYLIST',34,202);
+  // Petite ligne
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(34,208);ctx.lineTo(W-34,208);ctx.stroke();
+
+  // ── SONG CARDS : style moderne ──
+  const sy=216,ch=65,gap=5;
   songs.slice(0,10).forEach((s,i)=>{
     const y=sy+i*(ch+gap);
-    const even=i%2===0;
 
-    // Card bg avec alternance légère
-    ctx.fillStyle=even?'rgba(255,255,255,.055)':'rgba(255,255,255,.035)';
-    ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
-    rr(ctx,24,y,W-48,ch,10);ctx.fill();ctx.stroke();
+    // Fond card avec glassmorphism
+    ctx.fillStyle=i%2===0?'rgba(255,255,255,.06)':'rgba(255,255,255,.03)';
+    ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
+    rr(ctx,22,y,W-44,ch,12);ctx.fill();ctx.stroke();
 
-    // Barre colorée gauche
-    const barColors=['#7c6aff','#a78bfa','#06b6d4','#8b5cf6','#0891b2','#7c6aff','#a78bfa','#06b6d4','#8b5cf6','#0891b2'];
-    ctx.fillStyle=barColors[i];
-    rr(ctx,24,y,3,ch,1.5);ctx.fill();
+    // Accent bar gauche avec dégradé
+    const accentColors=[
+      ['#7c3aed','#06b6d4'],['#2563eb','#7c3aed'],['#db2777','#7c3aed'],
+      ['#0891b2','#06b6d4'],['#7c3aed','#db2777'],['#2563eb','#0891b2'],
+      ['#7c3aed','#06b6d4'],['#db2777','#2563eb'],['#0891b2','#7c3aed'],['#06b6d4','#2563eb']
+    ];
+    const ac=accentColors[i];
+    const acg=ctx.createLinearGradient(0,y,0,y+ch);
+    acg.addColorStop(0,ac[0]);acg.addColorStop(1,ac[1]);
+    ctx.fillStyle=acg;rr(ctx,22,y,4,ch,2);ctx.fill();
 
-    // Numéro
-    ctx.fillStyle='rgba(196,181,253,.5)';ctx.font='bold 9px Arial';ctx.textAlign='left';
-    ctx.fillText(String(i+1).padStart(2,'0'),32,y+18);
+    // Numéro stylisé
+    ctx.fillStyle='rgba(196,181,253,.35)';ctx.font='bold 10px Arial';ctx.textAlign='left';
+    ctx.fillText(String(i+1).padStart(2,'0'),34,y+20);
 
     // Artiste
-    ctx.fillStyle='rgba(196,181,253,.85)';ctx.font='500 10.5px Arial';
-    ctx.fillText(trunc(s.artist,24),32,y+32);
+    ctx.fillStyle='rgba(196,181,253,.85)';ctx.font='500 11px Arial';
+    ctx.fillText(trunc(s.artist,26),34,y+35);
 
-    // Titre
-    ctx.fillStyle='#ffffff';ctx.font='bold 12.5px Arial';
-    ctx.fillText(trunc(s.title,26),32,y+48);
+    // Titre en gras blanc
+    ctx.shadowColor=ac[0];ctx.shadowBlur=8;
+    ctx.fillStyle='#ffffff';ctx.font='bold 14px Arial';
+    ctx.fillText(trunc(s.title,24),34,y+52);
+    ctx.shadowBlur=0;
 
-    // Genre tag à droite
-    const g2=s.genre?s.genre.slice(0,13):'';
-    if(g2){
-      ctx.font='9.5px Arial';
-      const gW=ctx.measureText(g2).width+14;
-      ctx.fillStyle='rgba(165,243,252,.12)';ctx.strokeStyle='rgba(165,243,252,.25)';ctx.lineWidth=.8;
-      rr(ctx,W-24-gW,y+37,gW,16,8);ctx.fill();ctx.stroke();
-      ctx.fillStyle='rgba(165,243,252,.75)';ctx.textAlign='center';
-      ctx.fillText(g2,W-24-gW/2,y+48);ctx.textAlign='left';
+    // Genre pill à droite
+    if(s.genre){
+      const gt=s.genre.slice(0,14);
+      ctx.font='9px Arial';
+      const gW=ctx.measureText(gt).width+16;
+      const gx=W-22-gW-6;const gy=y+38;
+      ctx.fillStyle='rgba(255,255,255,.06)';ctx.strokeStyle='rgba(255,255,255,.12)';ctx.lineWidth=1;
+      rr(ctx,gx,gy,gW,18,9);ctx.fill();ctx.stroke();
+      ctx.fillStyle='rgba(200,200,255,.6)';ctx.textAlign='center';
+      ctx.fillText(gt,gx+gW/2,gy+12.5);ctx.textAlign='left';
     }
   });
 
-  // ── Footer ──
-  ctx.fillStyle='rgba(255,255,255,.12)';ctx.fillRect(24,H-50,W-48,1);
-  // Ligne dégradée déco
-  const fl=ctx.createLinearGradient(24,0,W-24,0);
-  fl.addColorStop(0,'transparent');fl.addColorStop(.3,'rgba(124,106,255,.5)');
-  fl.addColorStop(.7,'rgba(196,181,253,.5)');fl.addColorStop(1,'transparent');
-  ctx.strokeStyle=fl;ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(24,H-50);ctx.lineTo(W-24,H-50);ctx.stroke();
+  // ── FOOTER CALL-TO-ACTION ──
+  const footerY=sy+10*(ch+gap)+8;
 
-  ctx.fillStyle='rgba(255,255,255,.4)';ctx.font='11px Arial';ctx.textAlign='left';
-  ctx.fillText('moodwave.app',28,H-26);
-  ctx.fillStyle='rgba(196,181,253,.5)';ctx.font='10px Arial';ctx.textAlign='right';
-  ctx.fillText('Génère ta playlist gratuitement →',W-28,H-26);
+  // Grande pill CTA
+  const ctaGrad=ctx.createLinearGradient(22,footerY,W-22,footerY);
+  ctaGrad.addColorStop(0,'rgba(124,58,237,.7)');ctaGrad.addColorStop(1,'rgba(6,182,212,.5)');
+  ctx.fillStyle=ctaGrad;ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;
+  rr(ctx,22,footerY,W-44,52,26);ctx.fill();ctx.stroke();
+
+  ctx.fillStyle='#ffffff';ctx.font='bold 16px Arial';ctx.textAlign='center';
+  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=10;
+  ctx.fillText('🎵  Génère ta playlist sur moodwave.app',W/2,footerY+21);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='11px Arial';
+  ctx.fillText('Gratuit · IA · Basé sur ton mood',W/2,footerY+40);
   ctx.textAlign='left';
 }
 

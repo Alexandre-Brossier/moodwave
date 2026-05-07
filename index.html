@@ -99,7 +99,7 @@
 
     /* PILLS */
     .pills{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem}
-    .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.6rem .4rem;border-radius:14px;cursor:pointer;transition:all .2s;user-select:none;text-align:center;width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;line-height:1.3}
+    .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.78rem;padding:.5rem .25rem;border-radius:14px;cursor:pointer;transition:all .2s;user-select:none;text-align:center;width:100%;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.2rem;line-height:1.2;word-break:break-word;hyphens:auto}
     .pill:hover{border-color:var(--accent2);color:#fff;background:rgba(255,255,255,.12)}
     .pill.selected{background:rgba(124,106,255,.28);border-color:#a78bfa;color:#fff;font-weight:500}
     .pill.all-genres.selected{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4);color:#fde68a}
@@ -404,28 +404,28 @@
     <div class="step-question">Quel genre tu écoutes ?</div>
     <div class="step-hint">Choix multiple — sélectionne tout ce qui te correspond.</div>
     <div class="pills">
-      <div class="pill" data-group="genre" data-val="Électronique" onclick="toggleMultiPill(this)">🎛️ Électronique</div>
-      <div class="pill" data-group="genre" data-val="Rock" onclick="toggleMultiPill(this)">🎸 Rock</div>
-      <div class="pill" data-group="genre" data-val="Rap / Hip-Hop" onclick="toggleMultiPill(this)">🎤 Rap</div>
-      <div class="pill" data-group="genre" data-val="Reggae" onclick="toggleMultiPill(this)">🌴 Reggae</div>
-      <div class="pill" data-group="genre" data-val="Classique" onclick="toggleMultiPill(this)">🎻 Classique</div>
-      <div class="pill" data-group="genre" data-val="R&B / Soul" onclick="toggleMultiPill(this)">🎷 R&amp;B / Soul</div>
-      <div class="pill" data-group="genre" data-val="Metal" onclick="toggleMultiPill(this)">🤘 Métal</div>
-      <div class="pill" data-group="genre" data-val="Pop" onclick="toggleMultiPill(this)">🎶 Pop</div>
-      <div class="pill" data-group="genre" data-val="Jazz" onclick="toggleMultiPill(this)">🎺 Jazz</div>
-      <div class="pill" data-group="genre" data-val="Indie" onclick="toggleMultiPill(this)">🌿 Indie</div>
-      <div class="pill" data-group="genre" data-val="World Music" onclick="toggleMultiPill(this)">🌍 World</div>
-      <div class="pill" data-group="genre" data-val="Animé" onclick="toggleMultiPill(this)">🎌 Animé</div>
-      <div class="pill all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)">✨ De tout</div>
+      <div class="pill" data-group="genre" data-val="Électronique" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🎛️</span><span>Électronique</span></div>
+      <div class="pill" data-group="genre" data-val="Rock" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🎸</span><span>Rock</span></div>
+      <div class="pill" data-group="genre" data-val="Rap/Hip-Hop" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🎤</span><span>Rap</span></div>
+      <div class="pill" data-group="genre" data-val="Reggae" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🌴</span><span>Reggae</span></div>
+      <div class="pill" data-group="genre" data-val="Classique" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🎻</span><span>Classique</span></div>
+      <div class="pill" data-group="genre" data-val="R&B/Soul" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🎷</span><span>R&amp;B/Soul</span></div>
+      <div class="pill" data-group="genre" data-val="Metal" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🤘</span><span>Métal</span></div>
+      <div class="pill" data-group="genre" data-val="Pop" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🎶</span><span>Pop</span></div>
+      <div class="pill" data-group="genre" data-val="Jazz" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🎺</span><span>Jazz</span></div>
+      <div class="pill" data-group="genre" data-val="Indie" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🌿</span><span>Indie</span></div>
+      <div class="pill" data-group="genre" data-val="World" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🌍</span><span>World</span></div>
+      <div class="pill" data-group="genre" data-val="Animé" onclick="toggleMultiPill(this)"><span style="font-size:1.1rem;line-height:1">🎌</span><span>Animé</span></div>
+      <div class="pill all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)"><span style="font-size:1.1rem;line-height:1">✨</span><span>De tout</span></div>
     </div>
     <div style="font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:.6rem;margin-top:.25rem">Époque musicale <span style="color:var(--muted);font-size:.65rem;letter-spacing:0;text-transform:none;font-weight:400">(optionnel)</span></div>
     <div class="era-pills">
-      <div class="pill" data-group="era" data-val="Années 70" onclick="toggleEraPill(this)">📼 70s</div>
-      <div class="pill" data-group="era" data-val="Années 80" onclick="toggleEraPill(this)">🎸 80s</div>
-      <div class="pill" data-group="era" data-val="Années 90" onclick="toggleEraPill(this)">💿 90s</div>
-      <div class="pill" data-group="era" data-val="Années 2000" onclick="toggleEraPill(this)">📱 2000s</div>
-      <div class="pill" data-group="era" data-val="Années 2010" onclick="toggleEraPill(this)">🎧 2010s</div>
-      <div class="pill" data-group="era" data-val="Actuel" onclick="toggleEraPill(this)">✨ Actuel</div>
+      <div class="pill" data-group="era" data-val="Années 70" onclick="toggleEraPill(this)"><span style="font-size:1.1rem;line-height:1">📼</span><span>70s</span></div>
+      <div class="pill" data-group="era" data-val="Années 80" onclick="toggleEraPill(this)"><span style="font-size:1.1rem;line-height:1">🎸</span><span>80s</span></div>
+      <div class="pill" data-group="era" data-val="Années 90" onclick="toggleEraPill(this)"><span style="font-size:1.1rem;line-height:1">💿</span><span>90s</span></div>
+      <div class="pill" data-group="era" data-val="Années 2000" onclick="toggleEraPill(this)"><span style="font-size:1.1rem;line-height:1">📱</span><span>2000s</span></div>
+      <div class="pill" data-group="era" data-val="Années 2010" onclick="toggleEraPill(this)"><span style="font-size:1.1rem;line-height:1">🎧</span><span>2010s</span></div>
+      <div class="pill" data-group="era" data-val="Actuel" onclick="toggleEraPill(this)"><span style="font-size:1.1rem;line-height:1">✨</span><span>Actuel</span></div>
     </div>
     <div class="step-nav"><button class="btn-next" onclick="goStep(2)">Suivant →</button></div>
   </div>
@@ -435,14 +435,14 @@
     <div class="step-question">Comment tu te sens ?</div>
     <div class="step-hint">Choisis le mood qui correspond le mieux à maintenant.</div>
     <div class="pills">
-      <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)">😌 Calme</div>
-      <div class="pill" data-group="mood" data-val="Stressé" onclick="selectPill(this)">😤 Stressé</div>
-      <div class="pill" data-group="mood" data-val="Heureux" onclick="selectPill(this)">😊 Heureux</div>
-      <div class="pill" data-group="mood" data-val="Triste" onclick="selectPill(this)">😢 Triste</div>
-      <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)">🔥 Motivé</div>
-      <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)">🌙 Nostalgique</div>
-      <div class="pill" data-group="mood" data-val="Focus TDAH" onclick="selectPill(this)">🧠 Focus TDAH</div>
-      <div class="pill" data-group="mood" data-val="Anxieux" onclick="selectPill(this)">😰 Anxieux</div>
+      <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">😌</span><span>Calme</span></div>
+      <div class="pill" data-group="mood" data-val="Stressé" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">😤</span><span>Stressé</span></div>
+      <div class="pill" data-group="mood" data-val="Heureux" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">😊</span><span>Heureux</span></div>
+      <div class="pill" data-group="mood" data-val="Triste" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">😢</span><span>Triste</span></div>
+      <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🔥</span><span>Motivé</span></div>
+      <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🌙</span><span>Nostalgique</span></div>
+      <div class="pill" data-group="mood" data-val="Focus TDAH" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🧠</span><span>Focus TDAH</span></div>
+      <div class="pill" data-group="mood" data-val="Anxieux" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">😰</span><span>Anxieux</span></div>
     </div>
     <div class="mood-text-wrap">
       <textarea class="mood-textarea" id="mood-free-text" placeholder="Optionnel — décris ton mood en quelques mots... ex: &quot;je rentre d'une longue journée, j'ai besoin de me vider la tête&quot;" maxlength="200" rows="2"></textarea>
@@ -467,15 +467,15 @@
     <div class="step-question">Dans quel contexte écoutes-tu ta musique ?</div>
     <div class="step-hint">Ça aide l'IA à adapter le tempo, l'énergie et l'ambiance.</div>
     <div class="pills">
-      <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)">💻 Travail</div>
-      <div class="pill" data-group="context" data-val="Études" onclick="selectPill(this)">📚 Études</div>
-      <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)">🏃 Sport</div>
-      <div class="pill" data-group="context" data-val="Détente" onclick="selectPill(this)">🛋️ Détente</div>
-      <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)">🚇 Trajet</div>
-      <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)">🎉 Fête</div>
-      <div class="pill" data-group="context" data-val="Gaming" onclick="selectPill(this)">🎮 Gaming</div>
-      <div class="pill" data-group="context" data-val="Road trip" onclick="selectPill(this)">🚗 Road trip</div>
-      <div class="pill" data-group="context" data-val="Méditation" onclick="selectPill(this)">🧘 Méditation</div>
+      <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">💻</span><span>Travail</span></div>
+      <div class="pill" data-group="context" data-val="Études" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">📚</span><span>Études</span></div>
+      <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🏃</span><span>Sport</span></div>
+      <div class="pill" data-group="context" data-val="Détente" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🛋️</span><span>Détente</span></div>
+      <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🚇</span><span>Trajet</span></div>
+      <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🎉</span><span>Fête</span></div>
+      <div class="pill" data-group="context" data-val="Gaming" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🎮</span><span>Gaming</span></div>
+      <div class="pill" data-group="context" data-val="Road trip" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🚗</span><span>Road trip</span></div>
+      <div class="pill" data-group="context" data-val="Méditation" onclick="selectPill(this)"><span style="font-size:1.1rem;line-height:1">🧘</span><span>Méditation</span></div>
     </div>
     <div class="step-nav"><button class="btn-next" id="context-next" onclick="goStep(5)" disabled>Suivant →</button></div>
   </div>

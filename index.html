@@ -23,8 +23,8 @@
 
 
     /* AUTH */
-    #auth-screen{align-items:center;justify-content:center;text-align:center;gap:1.25rem;padding-top:3rem}
-    .auth-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:360px}
+    #auth-screen{align-items:center;justify-content:center;text-align:center;gap:1.25rem;padding-top:3rem;position:relative;z-index:10}
+    .auth-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:360px;position:relative;z-index:10}
     .auth-title{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:.4rem}
     .auth-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
     .auth-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;padding:.8rem 1rem;margin-bottom:.75rem;transition:border-color .2s}
@@ -38,7 +38,7 @@
     .auth-link:hover{color:#fff}
     .auth-error{background:rgba(255,80,80,.1);border:1px solid rgba(255,100,100,.3);color:#fca5a5;border-radius:10px;padding:.65rem .875rem;font-size:.82rem;margin-bottom:.75rem;display:none}
     .auth-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem}
-    .auth-tab{flex:1;padding:.65rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;transition:all .2s}
+    .auth-tab{flex:1;padding:.65rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;transition:all .2s;position:relative;z-index:11;-webkit-tap-highlight-color:transparent}
     .auth-tab.active{background:rgba(124,106,255,.25);border-color:#a78bfa;color:#fff;font-weight:600}
     /* USER BADGE */
     .user-badge{display:none;align-items:center;gap:.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:.4rem .875rem .4rem .5rem;cursor:pointer;transition:all .2s}
@@ -594,8 +594,8 @@
 /* ══ SUPABASE AUTH ══ */
 // Charge le SDK Supabase de manière asynchrone
 let supabase = null;
-const SUPABASE_URL = 'https://nwxmnknsoadcjrocluwe.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_6wU11x2f2dmRmlFK5WM-aA_IWXENyJz;
+const SUPABASE_URL = 'https://VOTRE_URL.supabase.co';
+const SUPABASE_ANON_KEY = 'VOTRE_CLE_ANON';
 
 async function initSupabase(){
   if(supabase)return supabase;
@@ -611,10 +611,23 @@ let authMode='signup'; // 'signup' | 'login'
 
 function switchAuthTab(mode){
   authMode=mode;
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(mode==='signup'&&i===0)||(mode==='login'&&i===1)));
-  document.getElementById('auth-title').textContent=mode==='signup'?'Créer un compte':'Se connecter';
-  document.getElementById('auth-submit-btn').textContent=mode==='signup'?'Créer mon compte':'Se connecter';
-  document.getElementById('auth-error').style.display='none';
+  // Réécriture explicite sans toggle pour éviter les bugs
+  const tabs=document.querySelectorAll('.auth-tab');
+  if(tabs.length>=2){
+    if(mode==='signup'){
+      tabs[0].classList.add('active');
+      tabs[1].classList.remove('active');
+    } else {
+      tabs[0].classList.remove('active');
+      tabs[1].classList.add('active');
+    }
+  }
+  const title=document.getElementById('auth-title');
+  const btn=document.getElementById('auth-submit-btn');
+  const err=document.getElementById('auth-error');
+  if(title)title.textContent=mode==='signup'?'Créer un compte':'Se connecter';
+  if(btn)btn.textContent=mode==='signup'?'Créer mon compte':'Se connecter';
+  if(err){err.style.display='none';err.style.background='';err.style.color='';}
 }
 
 async function submitAuth(){

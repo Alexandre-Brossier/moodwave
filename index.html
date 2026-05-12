@@ -62,6 +62,11 @@
     .user-menu-item.danger:hover{background:rgba(255,80,80,.1)}
     .hero-topbar{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:360px;position:relative}
 
+
+    .home-btn{position:fixed;bottom:1.25rem;right:1.25rem;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff;font-size:1.2rem;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(124,106,255,.5);z-index:150;transition:transform .2s,box-shadow .2s}
+    .home-btn:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(124,106,255,.7)}
+    .home-btn.visible{display:flex}
+
     /* FOND */
     #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
     .orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:orbFloat 14s ease-in-out infinite}
@@ -878,6 +883,12 @@ function showScreen(id){
   if(id==='hero')updateHistoryBadge();
   if(id==='form-screen')resetStepper();
   if(id==='weekly-screen'&&!weeklyData)loadWeekly();
+  // Bouton home visible sur tous les écrans sauf hero et auth
+  const homeBtn=document.getElementById('home-btn');
+  if(homeBtn){
+    const showHome=['results-screen','saved-screen','weekly-screen','history-screen','loading-screen'];
+    homeBtn.classList.toggle('visible', showHome.includes(id));
+  }
 }
 
 /* ══ STEPPER ══ */
@@ -1090,12 +1101,14 @@ function downloadCSV(songs,meta){
 function downloadPDF(songs,meta){
   const w=window.open('','_blank');
   const rows=songs.map((s,i)=>'<tr><td>'+String(i+1).padStart(2,'0')+'</td><td><b>'+esc(s.artist)+'</b></td><td>'+esc(s.title)+'</td><td>'+esc(s.genre)+'</td><td>'+esc(s.reason)+'</td></tr>').join('');
-  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave</title></head><body style="font-family:Arial;padding:40px;max-width:800px;margin:0 auto"><h1 style="color:#7c6aff">Moodwave</h1><p style="color:#888">'+esc(meta)+'</p><table style="width:100%;border-collapse:collapse;margin-top:20px"><thead><tr style="background:#7c6aff;color:#fff"><th style="padding:8px;text-align:left">N</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody style="font-size:14px">'+rows+'</tbody></table><br><button onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">Enregistrer en PDF</button></body></html>';
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave</title></head><body style="font-family:Arial;padding:40px;max-width:800px;margin:0 auto"><h1 style="color:#7c6aff">Moodwave</h1><p style="color:#888">'+esc(meta)+'</p><table style="width:100%;border-collapse:collapse;margin-top:20px"><thead><tr style="background:#7c6aff;color:#fff"><th style="padding:8px;text-align:left">N</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody style="font-size:14px">'+rows+'</tbody></table><br><button onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">Enregistrer en PDF</button>  <button class="home-btn" id="home-btn" onclick="showScreen('hero')" title="Accueil">🏠</button>
+</body></html>';
   w.document.write(html);w.document.close();
 }
 function downloadWord(songs,meta){
   const rows=songs.map((s,i)=>'<tr><td>'+String(i+1).padStart(2,'0')+'</td><td><b>'+s.artist+'</b></td><td>'+s.title+'</td><td>'+s.genre+'</td><td>'+s.reason+'</td></tr>').join('');
-  const html='<html><body><h1>Moodwave — '+meta+'</h1><table border="1"><thead><tr><th>N</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>'+rows+'</tbody></table></body></html>';
+  const html='<html><body><h1>Moodwave — '+meta+'</h1><table border="1"><thead><tr><th>N</th><th>Artiste</th><th>Titre</th><th>Genre</th><th>Pourquoi</th></tr></thead><tbody>'+rows+'</tbody></table>  <button class="home-btn" id="home-btn" onclick="showScreen('hero')" title="Accueil">🏠</button>
+</body></html>';
   const blob=new Blob([html],{type:'application/msword'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave.doc';a.click();
 }
@@ -1607,5 +1620,6 @@ checkExistingSession();
 const urlp=new URLSearchParams(window.location.search).get('p');
 if(urlp){const raw=localStorage.getItem('mw_p_'+urlp);if(raw)try{const d=JSON.parse(raw);currentSongs=d.songs;currentMeta=d.meta;saveToHistory(d.songs,d.meta);renderResults(d.songs,d.meta);}catch(e){}}
 </script>
+  <button class="home-btn" id="home-btn" onclick="showScreen('hero')" title="Accueil">🏠</button>
 </body>
 </html>

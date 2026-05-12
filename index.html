@@ -32,28 +32,7 @@
     .back-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
     .back-btn:hover{background:rgba(255,255,255,.18)}
     footer{text-align:center;padding:2rem 1rem 1rem;color:rgba(200,200,255,.3);font-size:.75rem;margin-top:auto}
-    .home-btn{
-      position:fixed;
-      bottom:5rem;
-      right:1rem;
-      width:44px;height:44px;
-      border-radius:50%;
-      background:linear-gradient(135deg,#7c6aff,#a78bfa);
-      border:none;
-      color:#fff;
-      font-size:1.1rem;
-      cursor:pointer;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 4px 20px rgba(124,106,255,.6);
-      z-index:300;
-      transition:transform .2s,opacity .2s;
-      opacity:.92;
-    }
-    .home-btn:hover{transform:scale(1.1);opacity:1}
-    @media(max-width:600px){
-      .home-btn{bottom:5.5rem;right:.75rem;width:42px;height:42px;font-size:1rem}
+    :1rem}
     }
 
     .home-btn.visible{display:flex}
@@ -258,8 +237,6 @@
 <div class="particles" id="particles"></div>
 <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div><div class="orb orb4"></div>
 
-<button class="home-btn" id="home-btn" onclick="showScreen('hero')" title="Accueil">🏠</button>
-
 <div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-title">Partager 🚀 <button class="modal-close-btn" onclick="closeModal()">✕</button></div>
@@ -463,7 +440,7 @@
   <div class="feedback-banner" id="feedback-banner"></div>
   <div id="results-action-bar"></div>
   <div id="songs-list"></div>
-  <div class="results-actions"><button class="btn-alt" onclick="showScreen('form-screen')">🔄 Nouveau mood</button><button class="btn-alt" onclick="generate(true)">🎲 Surprise</button></div>
+  <div class="results-actions"><button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button><button class="btn-alt" onclick="showScreen('form-screen')">🔄 Nouveau mood</button><button class="btn-alt" onclick="generate(true)">🎲 Surprise</button></div>
   <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>
 
@@ -471,8 +448,9 @@
   <div class="screen-header"><button class="back-btn" onclick="showScreen('hero')">←</button><div class="screen-title">Mes playlists 📋</div></div>
   <div id="history-list"></div>
   <div class="history-actions-row" id="history-actions" style="display:none">
-    <button class="btn-alt" onclick="showScreen('form-screen')">+ Nouvelle playlist</button>
-    <button class="btn-danger" onclick="clearHistory()">🗑️ Tout effacer</button>
+    <button class="btn-alt" onclick="showScreen('hero')">🏠</button>
+    <button class="btn-alt" onclick="showScreen('form-screen')">+ Nouvelle</button>
+    <button class="btn-danger" onclick="clearHistory()">🗑️ Effacer</button>
   </div>
   <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>
@@ -482,7 +460,7 @@
   <div class="success-msg" id="saved-success"></div>
   <div id="saved-action-bar"></div>
   <div id="saved-songs-list"></div>
-  <div class="results-actions"><button class="btn-alt" onclick="showScreen('history-screen')">← Historique</button><button class="btn-alt" onclick="showScreen('form-screen')">+ Nouveau mood</button></div>
+  <div class="results-actions"><button class="btn-alt" onclick="showScreen('hero')">🏠</button><button class="btn-alt" onclick="showScreen('history-screen')">← Historique</button><button class="btn-alt" onclick="showScreen('form-screen')">+ Nouveau</button></div>
   <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>
 
@@ -492,7 +470,7 @@
   <div id="weekly-loading" class="weekly-loading">Chargement des tendances…</div>
   <div id="weekly-action-bar" style="display:none"></div>
   <div id="weekly-songs-list"></div>
-  <div class="results-actions" id="weekly-actions" style="display:none"><button class="btn-alt" onclick="showScreen('hero')">← Accueil</button><button class="btn-alt" onclick="showScreen('form-screen')">🎵 Ma playlist</button></div>
+  <div class="results-actions" id="weekly-actions" style="display:none"><button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button><button class="btn-alt" onclick="showScreen('form-screen')">🎵 Ma playlist</button></div>
   <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
 </div>
 

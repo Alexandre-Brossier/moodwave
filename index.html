@@ -1480,23 +1480,33 @@ async function renderHistory(){
     actions.style.display='none';return;
   }
   actions.style.display='flex';
-  list.innerHTML=entries.map(e=>{
+  // Stocker les entries globalement AVANT de générer le HTML
+  window._historyEntries = entries;
+  list.innerHTML=entries.map((e,i)=>{
     const preview=e.songs.slice(0,3).map(s=>s.artist+' – '+s.title).join(' · ');
     const tags=e.meta.split(' / ').map(t=>'<span class="h-tag">'+esc(t.trim())+'</span>').join('');
-    const idAttr=typeof e.id==='string'?'"'+e.id+'"':e.id;
-    return '<div class="history-item" onclick="openSaved('+idAttr+')">'+
+    // Utiliser l'index numérique pour éviter les problèmes de guillemets avec les UUID
+    return '<div class="history-item" data-idx="'+i+'" onclick="openSavedByIndex(this)">'+
       '<div class="history-header"><div class="history-tags">'+tags+'</div><span class="h-date">'+esc(e.date)+'</span></div>'+
       '<div class="h-preview">'+esc(preview)+'…</div>'+
       '<div class="h-count">'+e.songs.length+' titres</div></div>';
   }).join('');
-
-  // Stocker les entries pour openSaved
-  window._historyEntries = entries;
 }
+function openSavedByIndex(el){
+  const idx=parseInt(el.dataset.idx);
+  const entries=window._historyEntries||[];
+  const entry=entries[idx];
+  if(!entry)return;
+  openSavedEntry(entry);
+}
+
 function openSaved(id){
   const allEntries=[...(window._historyEntries||[]),...getHistory()];
   const entry=allEntries.find(e=>String(e.id)===String(id));if(!entry)return;
-  savedSongs=entry.songs;savedMeta=entry.meta;
+  openSavedEntry(entry);
+}
+
+function openSavedEntry(entry){  savedSongs=entry.songs;savedMeta=entry.meta;
   document.getElementById('saved-meta').textContent=entry.meta+' · '+entry.date;
   document.getElementById('saved-success').style.display='none';
   document.getElementById('saved-action-bar').innerHTML=actionBarHTML(entry.songs,entry.meta,'saved','saved-success');

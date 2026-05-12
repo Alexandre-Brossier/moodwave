@@ -32,8 +32,8 @@
     .oauth-icon{width:20px;height:20px;flex-shrink:0}
 
     /* AUTH */
-    #auth-screen{align-items:center;justify-content:center;text-align:center;gap:1.25rem;padding-top:3rem;position:relative;z-index:10}
-    .auth-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:360px;position:relative;z-index:10}
+    #auth-screen{align-items:center;justify-content:center;text-align:center;gap:1.25rem;padding-top:3rem;position:relative;z-index:20}
+    .auth-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:360px;position:relative;z-index:21}
     .auth-title{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:.4rem}
     .auth-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
     .auth-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;padding:.8rem 1rem;margin-bottom:.75rem;transition:border-color .2s}
@@ -47,7 +47,10 @@
     .auth-link:hover{color:#fff}
     .auth-error{background:rgba(255,80,80,.1);border:1px solid rgba(255,100,100,.3);color:#fca5a5;border-radius:10px;padding:.65rem .875rem;font-size:.82rem;margin-bottom:.75rem;display:none}
     .auth-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem}
-    .auth-tab{flex:1;padding:.65rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;transition:all .2s;position:relative;z-index:11;-webkit-tap-highlight-color:transparent}
+    .auth-tab{flex:1;padding:.65rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;transition:all .2s;position:relative;z-index:22;-webkit-tap-highlight-color:transparent}
+
+    .auth-box button,.auth-box input{pointer-events:auto !important;position:relative;z-index:22}
+    .oauth-btn{pointer-events:auto !important}
     .auth-tab.active{background:rgba(124,106,255,.25);border-color:#a78bfa;color:#fff;font-weight:600}
     /* USER BADGE */
     .user-badge{display:none;align-items:center;gap:.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:.4rem .875rem .4rem .5rem;cursor:pointer;transition:all .2s}
@@ -68,14 +71,14 @@
     .home-btn.visible{display:flex}
 
     /* FOND */
-    #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-    .orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:orbFloat 14s ease-in-out infinite}
+    #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;user-select:none}
+    .orb{position:fixed;border-radius:50%;pointer-events:none !important;z-index:0;animation:orbFloat 14s ease-in-out infinite;user-select:none}
     .orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(79,70,229,.5),transparent);top:-180px;left:-180px;filter:blur(60px)}
     .orb2{width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,.45),transparent);top:35%;right:-120px;filter:blur(55px);animation-duration:17s;animation-delay:-5s}
     .orb3{width:450px;height:450px;background:radial-gradient(circle,rgba(8,145,178,.4),transparent);bottom:-100px;left:30%;filter:blur(50px);animation-duration:15s;animation-delay:-2s}
     .orb4{width:400px;height:400px;background:radial-gradient(circle,rgba(190,24,93,.3),transparent);top:20%;left:25%;filter:blur(70px);animation-duration:20s;animation-delay:-8s}
     @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.08)}66%{transform:translate(-25px,20px) scale(.93)}}
-    .particles{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+    .particles{position:fixed;inset:0;pointer-events:none !important;overflow:hidden;z-index:1;user-select:none}
     .particle{position:absolute;border-radius:50%;animation:particleUp linear infinite}
     @keyframes particleUp{0%{transform:translateY(100vh);opacity:0}10%{opacity:.8}90%{opacity:.3}100%{transform:translateY(-40px);opacity:0}}
 

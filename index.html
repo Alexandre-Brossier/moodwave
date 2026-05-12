@@ -226,6 +226,43 @@
     .history-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
     .history-empty .icon{font-size:2.5rem;margin-bottom:1rem}
     .history-actions-row{display:flex;gap:.625rem;margin-top:1rem}
+
+    /* LIKED SONGS */
+    #liked-screen{gap:0;padding-bottom:7rem}
+    .liked-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
+    .liked-empty .icon{font-size:2.5rem;margin-bottom:1rem}
+    .liked-song-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:14px;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.875rem;transition:border-color .2s}
+    .liked-song-card:hover{border-color:rgba(167,139,250,.4)}
+    .liked-song-num{font-size:.7rem;color:var(--muted);font-weight:600;width:20px;flex-shrink:0;text-align:center}
+    .liked-song-info{flex:1;min-width:0}
+    .liked-song-artist{font-size:.75rem;color:var(--accent2);font-weight:500}
+    .liked-song-title{font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .liked-song-genre{font-size:.65rem;color:var(--cyan);margin-top:.15rem}
+    .liked-play-btn{width:28px;height:28px;border-radius:50%;background:rgba(124,106,255,.2);border:1px solid rgba(124,106,255,.3);color:var(--accent2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+    .liked-play-btn:hover,.liked-play-btn.playing{background:rgba(124,106,255,.4);color:#fff}
+
+    /* MOOD RANKING */
+    .mood-rank-item{display:flex;align-items:center;gap:.875rem;padding:.75rem 1rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;margin-bottom:.5rem}
+    .mood-rank-pos{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent2);width:28px;flex-shrink:0;text-align:center}
+    .mood-rank-pos.gold{color:#fbbf24}
+    .mood-rank-pos.silver{color:#94a3b8}
+    .mood-rank-pos.bronze{color:#b45309}
+    .mood-rank-info{flex:1}
+    .mood-rank-name{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;color:#fff}
+    .mood-rank-count{font-size:.75rem;color:var(--muted);margin-top:.1rem}
+    .mood-rank-bar-wrap{width:80px;flex-shrink:0}
+    .mood-rank-bar{height:6px;border-radius:100px;background:rgba(255,255,255,.1);overflow:hidden}
+    .mood-rank-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease}
+
+    /* SHARE BADGE */
+    .share-badge-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:700;display:none;align-items:center;justify-content:center;padding:1rem}
+    .share-badge-overlay.open{display:flex}
+    .share-badge-box{background:linear-gradient(135deg,#0d0520,#1a1040);border:1px solid rgba(124,106,255,.4);border-radius:20px;padding:2rem 1.5rem;max-width:360px;width:100%;text-align:center}
+    .share-badge-title{font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:.5rem}
+    .share-badge-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+    .share-badge-emoji{font-size:3rem;margin-bottom:.75rem}
+    .share-badge-actions{display:flex;gap:.625rem;margin-top:1.25rem}
+
     .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}
     .weekly-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
@@ -236,6 +273,47 @@
 <canvas id="bg-canvas"></canvas>
 <div class="particles" id="particles"></div>
 <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div><div class="orb orb4"></div>
+
+
+<div id="liked-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <div><div class="screen-title">❤️ Titres aimés</div><div class="results-meta" id="liked-count"></div></div>
+  </div>
+  <div id="liked-list"></div>
+  <div class="results-actions">
+    <button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button>
+    <button class="btn-alt" onclick="generateFromLiked()">🎵 Playlist depuis mes ❤️</button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+
+<div id="ranking-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <div><div class="screen-title">📊 Classement des moods</div><div class="results-meta">Les moods les plus générés sur Moodwave</div></div>
+  </div>
+  <div id="ranking-list"></div>
+  <div id="ranking-personal"></div>
+  <div class="results-actions">
+    <button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+
+<div class="share-badge-overlay" id="share-badge-overlay" onclick="if(event.target===this)closeShareBadge()">
+  <div class="share-badge-box">
+    <div class="share-badge-emoji" id="badge-emoji">🎵</div>
+    <div class="share-badge-title" id="badge-title">Tu vas adorer ça !</div>
+    <div class="share-badge-sub" id="badge-sub">Quelqu'un a partagé une playlist Moodwave avec toi.</div>
+    <div class="share-badge-actions">
+      <button class="btn-alt" style="flex:1" onclick="closeShareBadge()">Plus tard</button>
+      <button class="btn-primary" style="flex:2;padding:.8rem" onclick="closeShareBadge();showScreen('form-screen')">🎵 Créer ma playlist</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -328,6 +406,8 @@
     <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist ✨</button>
     <button class="btn-secondary" onclick="generate(true)">🎲 Playlist aléatoire surprenante</button>
     <button class="btn-weekly" onclick="showScreen('weekly-screen')">🔥 Tendances de la semaine</button>
+    <button class="btn-secondary" onclick="showScreen('liked-screen');renderLikedSongs()" style="border-color:rgba(239,68,68,.35);color:#f87171">❤️ Mes titres aimés</button>
+    <button class="btn-secondary" onclick="showScreen('ranking-screen');renderRanking()" style="border-color:rgba(251,191,36,.35);color:#fbbf24">📊 Classement des moods</button>
     <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')">📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span></button>
   </div>
   <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
@@ -708,6 +788,196 @@ async function deletePlaylistFromCloud(id) {
   } catch(e) {
     console.error('Erreur suppression cloud:', e);
   }
+}
+
+
+
+/* ══ HISTORIQUE TITRES AIMÉS ══ */
+function getAllLikedSongs(){
+  const v=loadVotes();
+  const history=getHistory();
+  const liked=[];
+  const seen=new Set();
+  history.forEach(entry=>{
+    (entry.songs||[]).forEach(s=>{
+      const key=voteKey(s);
+      if(v[key]==='like'&&!seen.has(key)){
+        seen.add(key);
+        liked.push({...s,key});
+      }
+    });
+  });
+  // Aussi depuis window._historyEntries (cloud)
+  (window._historyEntries||[]).forEach(entry=>{
+    (entry.songs||[]).forEach(s=>{
+      const key=voteKey(s);
+      if(v[key]==='like'&&!seen.has(key)){
+        seen.add(key);
+        liked.push({...s,key});
+      }
+    });
+  });
+  return liked;
+}
+
+function renderLikedSongs(){
+  const liked=getAllLikedSongs();
+  const list=document.getElementById('liked-list');
+  const countEl=document.getElementById('liked-count');
+  if(countEl)countEl.textContent=liked.length+' titre'+(liked.length>1?'s':'')+' aimé'+(liked.length>1?'s':'');
+  if(!liked.length){
+    list.innerHTML='<div class="liked-empty"><div class="icon">💔</div><p>Aucun titre aimé pour l'instant.<br>Utilise 👍 sur tes playlists !</p></div>';
+    return;
+  }
+  list.innerHTML=liked.map((s,i)=>{
+    return '<div class="liked-song-card">'+
+      '<span class="liked-song-num">'+String(i+1).padStart(2,'0')+'</span>'+
+      '<button class="liked-play-btn" data-artist="'+esc(s.artist)+'" data-title="'+esc(s.title)+'" onclick="playPreview(this.dataset.artist,this.dataset.title,this)">▶</button>'+
+      '<div class="liked-song-info">'+
+        '<div class="liked-song-artist">'+esc(s.artist)+'</div>'+
+        '<div class="liked-song-title">'+esc(s.title)+'</div>'+
+        '<div class="liked-song-genre">'+esc(s.genre||'')+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function generateFromLiked(){
+  const liked=getAllLikedSongs();
+  if(!liked.length){showScreen('form-screen');return;}
+  showScreen('loading-screen');startLoading();
+  const likedLabels=liked.map(s=>s.artist+' — '+s.title);
+  const meta='Playlist depuis mes ❤️';
+  try{
+    const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'mood',mood:'Varié',energy:'Moyen',context:'Détente',genres:[],likedSongs:likedLabels,dislikedSongs:[]})});
+    if(!res.ok)throw new Error('Erreur');
+    const songs=await res.json();
+    stopLoading();currentSongs=songs;currentMeta=meta;
+    saveToHistory(songs,meta);
+    const moodForStat=sel.mood||'';
+    if(moodForStat)trackMoodStat(moodForStat);
+    renderResults(songs,meta);
+  }catch(e){stopLoading();showScreen('liked-screen');}
+}
+
+/* ══ CLASSEMENT DES MOODS ══ */
+// Stats locales (agrégées depuis l'historique)
+function getMoodStats(){
+  const history=[...getHistory(),...(window._historyEntries||[])];
+  const stats={};
+  history.forEach(e=>{
+    if(!e.meta||e.meta==='Mode Surprise')return;
+    // Extraire le mood du meta "Genres / Mood / Energie / Contexte"
+    const parts=e.meta.split(' / ');
+    // Le mood est généralement la 2e partie (après les genres)
+    for(const part of parts){
+      const moods=['Calme','Stressé','Heureux','Triste','Motivé','Excité','Nostalgique','Focus TDAH','Anxieux'];
+      const found=moods.find(m=>part.includes(m));
+      if(found){stats[found]=(stats[found]||0)+1;break;}
+    }
+  });
+  return stats;
+}
+
+async function getGlobalMoodStats(){
+  // Essayer de charger depuis Supabase
+  const sb=await initSupabase();
+  if(!sb||!currentUser||currentUser.isGuest)return null;
+  try{
+    const {data}=await sb.from('mood_stats').select('mood,count').order('count',{ascending:false}).limit(10);
+    return data;
+  }catch(e){return null;}
+}
+
+async function trackMoodStat(mood){
+  const sb=await initSupabase();
+  if(!sb||!mood||mood==='Mode Surprise')return;
+  try{
+    // Upsert — incrémente le compteur
+    await sb.rpc('increment_mood_stat',{mood_name:mood});
+  }catch(e){
+    // Silencieux si la table n'existe pas encore
+  }
+}
+
+async function renderRanking(){
+  const list=document.getElementById('ranking-list');
+  const personal=document.getElementById('ranking-personal');
+  list.innerHTML='<div class="weekly-loading">Chargement…</div>';
+
+  // Stats globales depuis Supabase
+  const global=await getGlobalMoodStats();
+
+  // Stats locales comme fallback
+  const localStats=getMoodStats();
+  const localArr=Object.entries(localStats).sort((a,b)=>b[1]-a[1]);
+
+  const moodEmojis={
+    'Calme':'🌙','Stressé':'⚠️','Heureux':'😊','Triste':'🌧️',
+    'Motivé':'🚀','Excité':'⚡','Nostalgique':'🕰️','Focus TDAH':'🎯','Anxieux':'💓'
+  };
+
+  if(global&&global.length>0){
+    const max=global[0].count||1;
+    list.innerHTML='<p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem">Données de la communauté Moodwave</p>'+
+      global.map((item,i)=>{
+        const pct=Math.round((item.count/max)*100);
+        const pos=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        return '<div class="mood-rank-item">'+
+          '<div class="mood-rank-pos '+pos+'">'+(i+1)+'</div>'+
+          '<div class="mood-rank-info">'+
+            '<div class="mood-rank-name">'+(moodEmojis[item.mood]||'🎵')+' '+item.mood+'</div>'+
+            '<div class="mood-rank-count">'+item.count+' playlist'+(item.count>1?'s':'')+'</div>'+
+          '</div>'+
+          '<div class="mood-rank-bar-wrap"><div class="mood-rank-bar"><div class="mood-rank-fill" style="width:'+pct+'%"></div></div></div>'+
+        '</div>';
+      }).join('');
+  } else if(localArr.length>0){
+    const max=localArr[0][1]||1;
+    list.innerHTML='<p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem">Tes statistiques personnelles</p>'+
+      localArr.map(([mood,count],i)=>{
+        const pct=Math.round((count/max)*100);
+        const pos=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        return '<div class="mood-rank-item">'+
+          '<div class="mood-rank-pos '+pos+'">'+(i+1)+'</div>'+
+          '<div class="mood-rank-info">'+
+            '<div class="mood-rank-name">'+(moodEmojis[mood]||'🎵')+' '+mood+'</div>'+
+            '<div class="mood-rank-count">'+count+' playlist'+(count>1?'s':'')+'</div>'+
+          '</div>'+
+          '<div class="mood-rank-bar-wrap"><div class="mood-rank-bar"><div class="mood-rank-fill" style="width:'+pct+'%"></div></div></div>'+
+        '</div>';
+      }).join('');
+  } else {
+    list.innerHTML='<div class="liked-empty"><div class="icon">📊</div><p>Pas encore de données.<br>Génère des playlists pour voir ton classement !</p></div>';
+  }
+
+  // Stats perso en bas
+  if(localArr.length>0&&global){
+    personal.innerHTML='<p style="font-size:.75rem;color:var(--muted);margin-top:1.5rem;margin-bottom:.75rem">TES STATS PERSO</p>'+
+      localArr.slice(0,3).map(([mood,count])=>
+        '<div class="mood-rank-item" style="opacity:.7">'+
+          '<div class="mood-rank-name" style="font-size:.85rem">'+(moodEmojis[mood]||'🎵')+' '+mood+'</div>'+
+          '<div class="mood-rank-count" style="font-size:.75rem;color:var(--muted)">'+count+'x</div>'+
+        '</div>'
+      ).join('');
+  }
+}
+
+/* ══ BADGE DE PARTAGE ══ */
+function showShareBadge(meta){
+  const emojis={'Calme':'🌙','Motivé':'🚀','Heureux':'☀️','Triste':'🌧️','Excité':'⚡'};
+  const mood=meta?meta.split(' / ')[0]:'';
+  const emoji=emojis[mood]||'🎵';
+  document.getElementById('badge-emoji').textContent=emoji;
+  document.getElementById('badge-title').textContent='Tu vas adorer cette playlist !';
+  document.getElementById('badge-sub').textContent=
+    'Quelqu'un a partagé une playlist Moodwave avec toi — mood : "'+mood+'". '+
+    'Crée la tienne gratuitement en 30 secondes.';
+  document.getElementById('share-badge-overlay').classList.add('open');
+}
+function closeShareBadge(){
+  document.getElementById('share-badge-overlay').classList.remove('open');
 }
 
 
@@ -1288,7 +1558,10 @@ async function generate(isSurprise){
     const songs=await res.json();
     if(!Array.isArray(songs)||!songs.length)throw new Error('Playlist vide');
     stopLoading();currentSongs=songs;currentMeta=meta;votes={};
-    saveToHistory(songs,meta);renderResults(songs,meta);
+    saveToHistory(songs,meta);
+    const moodForStat=sel.mood||'';
+    if(moodForStat)trackMoodStat(moodForStat);
+    renderResults(songs,meta);
   }catch(e){stopLoading();showScreen('form-screen');showError('Erreur : '+e.message);}
 }
 
@@ -1475,7 +1748,7 @@ initBackground();
 registerSW();
 checkExistingSession();
 const urlp=new URLSearchParams(window.location.search).get('p');
-if(urlp){const raw=localStorage.getItem('mw_p_'+urlp);if(raw)try{const d=JSON.parse(raw);currentSongs=d.songs;currentMeta=d.meta;saveToHistory(d.songs,d.meta);renderResults(d.songs,d.meta);}catch(e){}}
+if(urlp){const raw=localStorage.getItem('mw_p_'+urlp);if(raw)try{const d=JSON.parse(raw);currentSongs=d.songs;currentMeta=d.meta;saveToHistory(d.songs,d.meta);renderResults(d.songs,d.meta);setTimeout(()=>showShareBadge(d.meta),1500);}catch(e){}}
 </script>
 </body>
 </html>

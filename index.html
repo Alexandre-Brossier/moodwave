@@ -826,7 +826,7 @@ function renderLikedSongs(){
   const countEl=document.getElementById('liked-count');
   if(countEl)countEl.textContent=liked.length+' titre'+(liked.length>1?'s':'')+' aimé'+(liked.length>1?'s':'');
   if(!liked.length){
-    list.innerHTML='<div class="liked-empty"><div class="icon">💔</div><p>Aucun titre aimé pour l'instant.<br>Utilise 👍 sur tes playlists !</p></div>';
+    list.innerHTML=`<div class="liked-empty"><div class="icon">💔</div><p>Aucun titre aimé pour l'instant.<br>Utilise 👍 sur tes playlists !</p></div>`;
     return;
   }
   list.innerHTML=liked.map((s,i)=>{
@@ -972,8 +972,7 @@ function showShareBadge(meta){
   document.getElementById('badge-emoji').textContent=emoji;
   document.getElementById('badge-title').textContent='Tu vas adorer cette playlist !';
   document.getElementById('badge-sub').textContent=
-    'Quelqu'un a partagé une playlist Moodwave avec toi — mood : "'+mood+'". '+
-    'Crée la tienne gratuitement en 30 secondes.';
+    "Quelqu'un a partagé une playlist Moodwave avec toi — mood : \""+mood+"\". Crée la tienne gratuitement en 30 secondes.";
   document.getElementById('share-badge-overlay').classList.add('open');
 }
 function closeShareBadge(){

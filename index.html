@@ -1005,7 +1005,6 @@ function closeShareBadge(){
 
 
 /* ══ LIKES CLOUD ══ */
-async 
 async function saveVotesToCloud(){
   if(!currentUser||currentUser.isGuest)return;
   const sb=await initSupabase();if(!sb)return;

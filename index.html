@@ -960,14 +960,12 @@ function downloadCSV(songs,meta){
 function downloadPDF(songs,meta){
   const w=window.open('','_blank');
   const rows=songs.map((s,i)=>'<tr><td>'+String(i+1).padStart(2,'0')+'<\/td><td><b>'+esc(s.artist)+'</b><\/td><td>'+esc(s.title)+'<\/td><td>'+esc(s.genre)+'<\/td><td>'+esc(s.reason)+'<\/td><\/tr>').join('');
-  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave</title><\/head><body style="font-family:Arial;padding:40px;max-width:800px;margin:0 auto"><h1 style="color:#7c6aff">Moodwave<\/h1><p style="color:#888">'+esc(meta)+'<\/p><table style="width:100%;border-collapse:collapse;margin-top:20px"><thead><tr style="background:#7c6aff;color:#fff"><th style="padding:8px;text-align:left">N<\/th><th>Artiste<\/th><th>Titre<\/th><th>Genre<\/th><th>Pourquoi<\/th><\/tr><\/thead><tbody style="font-size:14px">'+rows+'<\/tbody><\/table><br><button onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">Enregistrer en PDF</button>  <button class="home-btn" id="home-btn" onclick="showScreen('hero')" title="Accueil">🏠</button>
-<\/body><\/html>';
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave</title><\/head><body style="font-family:Arial;padding:40px;max-width:800px;margin:0 auto"><h1 style="color:#7c6aff">Moodwave<\/h1><p style="color:#888">'+esc(meta)+'<\/p><table style="width:100%;border-collapse:collapse;margin-top:20px"><thead><tr style="background:#7c6aff;color:#fff"><th style="padding:8px;text-align:left">N<\/th><th>Artiste<\/th><th>Titre<\/th><th>Genre<\/th><th>Pourquoi<\/th><\/tr><\/thead><tbody style="font-size:14px">'+rows+'<\/tbody><\/table><br><button onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">Enregistrer en PDF</button><\/body><\/html>';
   w.document.write(html);w.document.close();
 }
 function downloadWord(songs,meta){
   const rows=songs.map((s,i)=>'<tr><td>'+String(i+1).padStart(2,'0')+'<\/td><td><b>'+s.artist+'</b><\/td><td>'+s.title+'<\/td><td>'+s.genre+'<\/td><td>'+s.reason+'<\/td><\/tr>').join('');
-  const html='<html><body><h1>Moodwave — '+meta+'<\/h1><table border="1"><thead><tr><th>N<\/th><th>Artiste<\/th><th>Titre<\/th><th>Genre<\/th><th>Pourquoi<\/th><\/tr><\/thead><tbody>'+rows+'<\/tbody><\/table>  <button class="home-btn" id="home-btn" onclick="showScreen('hero')" title="Accueil">🏠</button>
-<\/body><\/html>';
+  const html='<html><body><h1>Moodwave — '+meta+'<\/h1><table border="1"><thead><tr><th>N<\/th><th>Artiste<\/th><th>Titre<\/th><th>Genre<\/th><th>Pourquoi<\/th><\/tr><\/thead><tbody>'+rows+'<\/tbody><\/table><\/body><\/html>';
   const blob=new Blob([html],{type:'application/msword'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave.doc';a.click();
 }

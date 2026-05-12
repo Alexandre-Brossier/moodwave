@@ -81,13 +81,15 @@
     .hero-feature-title{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;color:#fff}
     .hero-feature-desc{font-size:.7rem;color:var(--muted);line-height:1.45}
     .hero-actions{display:flex;flex-direction:column;align-items:center;gap:.75rem;width:100%;max-width:340px}
+    .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;width:100%}
+    .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;width:100%}
     .btn-primary{background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;padding:.9rem 2rem;border-radius:100px;cursor:pointer;box-shadow:0 0 36px rgba(124,106,255,.45);transition:transform .2s;width:100%}
     .btn-primary:hover{transform:translateY(-2px)}
     .btn-secondary{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%}
     .btn-secondary:hover{border-color:var(--accent2);color:#fff}
     .btn-weekly{background:transparent;border:1px solid rgba(74,222,128,.35);color:#4ade80;font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%}
     .btn-weekly:hover{background:rgba(74,222,128,.1)}
-    .btn-history{background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%;display:none}
+    .btn-history{background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%;display:none;grid-column:1/-1}
     .btn-history:hover{border-color:var(--accent2);color:#fff}
     .count-badge{background:rgba(124,106,255,.35);color:var(--accent2);font-size:.7rem;font-weight:600;padding:.1rem .5rem;border-radius:100px;margin-left:.4rem}
     .btn-alt{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.17);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem 1rem;border-radius:100px;cursor:pointer;transition:all .2s}
@@ -404,10 +406,12 @@
   </div>
   <div class="hero-actions">
     <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist ✨</button>
-    <button class="btn-secondary" onclick="generate(true)">🎲 Playlist aléatoire surprenante</button>
-    <button class="btn-weekly" onclick="showScreen('weekly-screen')">🔥 Tendances de la semaine</button>
-    <button class="btn-secondary" onclick="showScreen('liked-screen');renderLikedSongs()" style="border-color:rgba(239,68,68,.35);color:#f87171">❤️ Mes titres aimés</button>
-    <button class="btn-secondary" onclick="showScreen('ranking-screen');renderRanking()" style="border-color:rgba(251,191,36,.35);color:#fbbf24">📊 Classement des moods</button>
+    <div class="hero-grid">
+      <button class="btn-secondary" onclick="generate(true)">🎲 Surprise</button>
+      <button class="btn-weekly" onclick="showScreen('weekly-screen')">🔥 Tendances</button>
+      <button class="btn-secondary" onclick="showScreen('liked-screen');renderLikedSongs()" style="border-color:rgba(239,68,68,.35);color:#f87171">❤️ Mes aimés</button>
+      <button class="btn-secondary" onclick="showScreen('ranking-screen');renderRanking()" style="border-color:rgba(251,191,36,.35);color:#fbbf24">📊 Classement</button>
+    </div>
     <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')">📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span></button>
   </div>
   <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
@@ -643,12 +647,15 @@ function continueAsGuest(email){
 }
 
 function onUserLoggedIn(user){
+  // Charger les votes depuis le cloud après connexion
+  setTimeout(loadVotesFromCloud, 500);
   currentUser=user;
   const initials=(user.email||'?').slice(0,1).toUpperCase();
   const name=(user.email||'Invité').split('@')[0];
   document.getElementById('user-avatar').textContent=initials;
   document.getElementById('user-name-display').textContent=name;
   document.getElementById('user-badge').style.display='flex';
+  loadLikesFromCloud();
   localStorage.setItem('mw_user',JSON.stringify({email:user.email,isGuest:user.isGuest||false}));
   showScreen('hero');
 }
@@ -820,10 +827,20 @@ function getAllLikedSongs(){
   return liked;
 }
 
-function renderLikedSongs(){
-  const liked=getAllLikedSongs();
+async function renderLikedSongs(){
   const list=document.getElementById('liked-list');
   const countEl=document.getElementById('liked-count');
+  list.innerHTML='<div class="weekly-loading">Chargement…</div>';
+
+  // Charger depuis le cloud si connecté
+  let liked=[];
+  const cloudLikes=await getLikedSongsFromCloud();
+  if(cloudLikes&&cloudLikes.length>0){
+    liked=cloudLikes.map(row=>({artist:row.artist,title:row.title,genre:row.genre,key:row.song_key}));
+  } else {
+    liked=getAllLikedSongs();
+  }
+
   if(countEl)countEl.textContent=liked.length+' titre'+(liked.length>1?'s':'')+' aimé'+(liked.length>1?'s':'');
   if(!liked.length){
     list.innerHTML=`<div class="liked-empty"><div class="icon">💔</div><p>Aucun titre aimé pour l'instant.<br>Utilise 👍 sur tes playlists !</p></div>`;
@@ -907,11 +924,15 @@ async function renderRanking(){
   list.innerHTML='<div class="weekly-loading">Chargement…</div>';
 
   // Stats globales depuis Supabase
+  // Charger stats globales Supabase
   const global=await getGlobalMoodStats();
 
-  // Stats locales comme fallback
+  // Stats locales comme fallback et pour section perso
   const localStats=getMoodStats();
   const localArr=Object.entries(localStats).sort((a,b)=>b[1]-a[1]);
+
+  // Si pas de données globales, afficher message d'encouragement
+
 
   const moodEmojis={
     'Calme':'🌙','Stressé':'⚠️','Heureux':'😊','Triste':'🌧️',
@@ -949,7 +970,9 @@ async function renderRanking(){
         '</div>';
       }).join('');
   } else {
-    list.innerHTML='<div class="liked-empty"><div class="icon">📊</div><p>Pas encore de données.<br>Génère des playlists pour voir ton classement !</p></div>';
+    list.innerHTML=`<div class="liked-empty"><div class="icon">📊</div>
+      <p>Le classement communauté sera disponible dès que la table Supabase est configurée.<br><br>
+      <span style="font-size:.75rem;color:var(--muted)">Exécute le SQL de configuration dans Supabase pour activer cette fonctionnalité.</span></p></div>`;
   }
 
   // Stats perso en bas
@@ -977,6 +1000,90 @@ function showShareBadge(meta){
 }
 function closeShareBadge(){
   document.getElementById('share-badge-overlay').classList.remove('open');
+}
+
+
+
+/* ══ LIKES CLOUD ══ */
+async 
+async function saveVotesToCloud(){
+  if(!currentUser||currentUser.isGuest)return;
+  const sb=await initSupabase();if(!sb)return;
+  try{
+    await sb.from('user_likes').upsert({
+      user_id:currentUser.id,
+      votes:votes,
+      updated_at:new Date().toISOString()
+    },{onConflict:'user_id'});
+  }catch(e){}
+}
+
+async function loadVotesFromCloud(){
+  if(!currentUser||currentUser.isGuest)return;
+  const sb=await initSupabase();if(!sb)return;
+  try{
+    const {data}=await sb.from('user_likes').select('votes').eq('user_id',currentUser.id).single();
+    if(data&&data.votes){
+      votes={...loadVotes(),...data.votes};
+      saveVotes();
+    }
+  }catch(e){}
+}
+
+async function syncLikeToCloud(key, voteType){
+  const sb=await initSupabase();
+  if(!sb||!currentUser||currentUser.isGuest)return;
+  try{
+    if(!voteType){
+      await sb.from('liked_songs').delete().eq('user_id',currentUser.id).eq('song_key',key);
+    } else if(voteType==='like'){
+      // Trouver les infos du titre depuis l'historique
+      const song=findSongByKey(key);
+      await sb.from('liked_songs').upsert({
+        user_id:currentUser.id,
+        song_key:key,
+        artist:song?.artist||'',
+        title:song?.title||'',
+        genre:song?.genre||'',
+        created_at:new Date().toISOString()
+      },{onConflict:'user_id,song_key'});
+    } else {
+      await sb.from('liked_songs').delete().eq('user_id',currentUser.id).eq('song_key',key);
+    }
+  }catch(e){console.log('Sync like silencieux:',e.message);}
+}
+
+function findSongByKey(key){
+  const history=[...getHistory(),...(window._historyEntries||[])];
+  for(const entry of history){
+    for(const s of (entry.songs||[])){
+      if(voteKey(s)===key)return s;
+    }
+  }
+  return null;
+}
+
+async function loadLikesFromCloud(){
+  const sb=await initSupabase();
+  if(!sb||!currentUser||currentUser.isGuest)return;
+  try{
+    const {data}=await sb.from('liked_songs').select('song_key').eq('user_id',currentUser.id);
+    if(data&&data.length>0){
+      data.forEach(row=>{if(!votes[row.song_key])votes[row.song_key]='like';});
+      saveVotes();
+    }
+  }catch(e){}
+}
+
+async function getLikedSongsFromCloud(){
+  const sb=await initSupabase();
+  if(!sb||!currentUser||currentUser.isGuest)return null;
+  try{
+    const {data}=await sb.from('liked_songs')
+      .select('*').eq('user_id',currentUser.id)
+      .order('created_at',{ascending:false});
+    return data;
+  }catch(e){return null;}
 }
 
 
@@ -1188,6 +1295,8 @@ function vote(key,type){
   if(like)like.className='like-btn'+(votes[key]==='like'?' liked':'');
   if(dislike)dislike.className='like-btn'+(votes[key]==='dislike'?' disliked':'');
   updateFeedbackBanner();
+  // Sync cloud
+  syncLikeToCloud(key, votes[key]||null);
 }
 function updateFeedbackBanner(){
   const banner=document.getElementById('feedback-banner');if(!banner)return;

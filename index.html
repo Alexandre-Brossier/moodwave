@@ -799,6 +799,54 @@ async function handleOAuthCallback(){
 }
 
 
+
+/* ══ CLOUD HISTORY (Supabase) ══ */
+
+async function savePlaylistToCloud(songs, meta) {
+  if (!currentUser || currentUser.isGuest) return;
+  const sb = await initSupabase();
+  if (!sb) return;
+  try {
+    await sb.from('playlists').insert({
+      user_id: currentUser.id,
+      meta: meta,
+      songs: songs
+    });
+  } catch(e) {
+    console.error('Erreur sauvegarde cloud:', e);
+  }
+}
+
+async function loadPlaylistsFromCloud() {
+  if (!currentUser || currentUser.isGuest) return null;
+  const sb = await initSupabase();
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb
+      .from('playlists')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    return data;
+  } catch(e) {
+    console.error('Erreur chargement cloud:', e);
+    return null;
+  }
+}
+
+async function deletePlaylistFromCloud(id) {
+  if (!currentUser || currentUser.isGuest) return;
+  const sb = await initSupabase();
+  if (!sb) return;
+  try {
+    await sb.from('playlists').delete().eq('id', id);
+  } catch(e) {
+    console.error('Erreur suppression cloud:', e);
+  }
+}
+
+
 /* ══ ÉTAT GLOBAL ══ */
 const sel={mood:null,energy:null,context:null};
 let selectedGenres=[];
@@ -1389,9 +1437,13 @@ function getHistory(){try{return JSON.parse(localStorage.getItem('moodwave_histo
 function saveToHistory(songs,meta,update){
   const h=getHistory();
   if(update){const idx=h.findIndex(e=>e.meta===meta);if(idx>=0){h[idx].songs=songs;localStorage.setItem('moodwave_history',JSON.stringify(h));return;}}
-  h.unshift({id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs});
+  const entry={id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs};
+  h.unshift(entry);
   if(h.length>20)h.pop();
-  localStorage.setItem('moodwave_history',JSON.stringify(h));updateHistoryBadge();
+  localStorage.setItem('moodwave_history',JSON.stringify(h));
+  updateHistoryBadge();
+  // Sauvegarder dans le cloud si connecté
+  savePlaylistToCloud(songs, meta);
 }
 function updateHistoryBadge(){
   const n=getHistory().length;
@@ -1399,21 +1451,51 @@ function updateHistoryBadge(){
   const btn=document.getElementById('btn-history-hero');
   if(btn)btn.style.display=n>0?'block':'none';
 }
-function renderHistory(){
-  const h=getHistory();const list=document.getElementById('history-list');const actions=document.getElementById('history-actions');
-  if(!h.length){list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist.<br>Génère ta première playlist !</p></div>';actions.style.display='none';return;}
+async function renderHistory(){
+  const list=document.getElementById('history-list');
+  const actions=document.getElementById('history-actions');
+  list.innerHTML='<div class="weekly-loading">Chargement…</div>';
+
+  let entries = [];
+
+  // Charger depuis le cloud si connecté avec un vrai compte
+  if(currentUser && !currentUser.isGuest){
+    const cloudData = await loadPlaylistsFromCloud();
+    if(cloudData && cloudData.length > 0){
+      entries = cloudData.map(e=>({
+        id: e.id,
+        cloudId: e.id,
+        date: new Date(e.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),
+        meta: e.meta,
+        songs: e.songs
+      }));
+    }
+  }
+
+  // Fallback localStorage
+  if(entries.length === 0) entries = getHistory();
+
+  if(!entries.length){
+    list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist.<br>Génère ta première playlist !</p></div>';
+    actions.style.display='none';return;
+  }
   actions.style.display='flex';
-  list.innerHTML=h.map(e=>{
+  list.innerHTML=entries.map(e=>{
     const preview=e.songs.slice(0,3).map(s=>s.artist+' – '+s.title).join(' · ');
     const tags=e.meta.split(' / ').map(t=>'<span class="h-tag">'+esc(t.trim())+'</span>').join('');
-    return '<div class="history-item" onclick="openSaved('+e.id+')">'+
+    const idAttr=typeof e.id==='string'?'"'+e.id+'"':e.id;
+    return '<div class="history-item" onclick="openSaved('+idAttr+')">'+
       '<div class="history-header"><div class="history-tags">'+tags+'</div><span class="h-date">'+esc(e.date)+'</span></div>'+
       '<div class="h-preview">'+esc(preview)+'…</div>'+
       '<div class="h-count">'+e.songs.length+' titres</div></div>';
   }).join('');
+
+  // Stocker les entries pour openSaved
+  window._historyEntries = entries;
 }
 function openSaved(id){
-  const entry=getHistory().find(e=>e.id===id);if(!entry)return;
+  const allEntries=[...(window._historyEntries||[]),...getHistory()];
+  const entry=allEntries.find(e=>String(e.id)===String(id));if(!entry)return;
   savedSongs=entry.songs;savedMeta=entry.meta;
   document.getElementById('saved-meta').textContent=entry.meta+' · '+entry.date;
   document.getElementById('saved-success').style.display='none';

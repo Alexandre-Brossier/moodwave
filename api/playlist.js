@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'Clé API manquante' });
 
-  const { type, mood, energy, context, surprise, genres, era, freeText, likedSongs, dislikedSongs } = req.body;
+  const { type, mood, energy, context, surprise, genres, era, freeText, genreFreeText, likedSongs, dislikedSongs } = req.body;
 
   // Instruction genres
   let genreInstruction = '';
@@ -27,14 +27,19 @@ export default async function handler(req, res) {
     }
   }
 
-  // Instruction époque (tableau de valeurs)
+  // Instruction sous-genre libre — PRIORITAIRE sur les genres génériques
+  const genreFreeInstruction = genreFreeText
+    ? `- Sous-genre SPÉCIFIQUE demandé : "${genreFreeText}". C'est une précision importante — concentre la majorité des titres sur ce sous-genre exact. L'utilisateur sait précisément ce qu'il veut.`
+    : '';
+
+  // Instruction époque
   let eraInstruction = '';
   const erasArr = Array.isArray(era) ? era : (era ? [era] : []);
   if (erasArr.length > 0) {
     eraInstruction = `- Époque : privilégie les titres des ${erasArr.join(' et ')}. Quelques titres d'autres époques sont acceptés si vraiment pertinents.`;
   }
 
-  // Instruction texte libre
+  // Instruction texte libre mood
   const freeTextInstruction = freeText
     ? `- Description du mood par l'utilisateur : "${freeText}" — tiens-en compte pour affiner les suggestions.`
     : '';
@@ -44,7 +49,7 @@ Tu dois répondre UNIQUEMENT avec un tableau JSON valide de 10 objets, sans mark
 Chaque objet doit avoir exactement ces champs :
 - "artist" : nom de l'artiste (string)
 - "title" : titre du morceau (string)
-- "genre" : sous-genre précis, ex: "Ambient Techno", "Neo-Soul", "Post-Rock" (string, max 25 caractères)
+- "genre" : sous-genre précis, ex: "Hardstyle", "Neo-Soul", "Post-Rock" (string, max 25 caractères)
 - "reason" : phrase courte en français expliquant pourquoi ce titre correspond (string, max 100 caractères)
 Assure-toi que les artistes et titres existent vraiment sur Spotify.`;
 
@@ -61,6 +66,7 @@ ${dislikedSongs && dislikedSongs.length > 0 ? `- Évite absolument ce style : ${
 - Niveau d'énergie : "${energy}"
 - Contexte : "${context}"
 ${genreInstruction}
+${genreFreeInstruction}
 ${eraInstruction}
 ${freeTextInstruction}
 ${surprise ? '- Bonus : inclure 2-3 titres surprenants ou de découverte en plus des classiques.' : ''}
@@ -89,18 +95,20 @@ Varie les artistes, évite de mettre deux titres du même artiste.`;
     });
 
     if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      throw new Error(errData.error?.message || `Erreur Anthropic (${response.status})`);
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `Erreur Anthropic (${response.status})`);
     }
 
     const data = await response.json();
     const rawText = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
     const match = rawText.match(/\[[\s\S]*\]/);
-    if (!match) throw new Error('Format de réponse inattendu');
+    if (!match) throw new Error('Format inattendu');
+
     const songs = JSON.parse(match[0]);
     if (!Array.isArray(songs) || !songs.length) throw new Error('Playlist vide');
 
     return res.status(200).json(songs);
+
   } catch (err) {
     console.error('Erreur playlist:', err.message);
     return res.status(500).json({ error: err.message });

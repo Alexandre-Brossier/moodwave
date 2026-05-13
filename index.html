@@ -375,6 +375,13 @@
     <button class="back-btn" onclick="showScreen('hero')">←</button>
     <div><div class="screen-title">Donner mon avis 💬</div></div>
   </div>
+  <div id="feedback-guest-block" style="display:none;width:100%;max-width:420px;background:rgba(124,106,255,.08);border:1px solid rgba(124,106,255,.3);border-radius:16px;padding:1.5rem;text-align:center">
+    <i class="ph-lock ph-fill" style="font-size:2.5rem;color:var(--accent2);margin-bottom:.75rem;display:block"></i>
+    <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.5rem">Compte requis</div>
+    <div style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:1.25rem">Pour laisser un avis, tu dois être connecté avec un compte Google, Discord ou email. Cela garantit l'authenticité des retours.</div>
+    <button class="btn-primary" style="padding:.8rem 2rem" onclick="showScreen('auth-screen')">Créer un compte</button>
+  </div>
+  <div id="feedback-form-wrap" style="width:100%">
 
   <div class="feedback-box" style="width:100%">
     <div class="feedback-section-title">Ta note globale</div>
@@ -404,6 +411,7 @@
     <div class="error-msg" id="feedback-error"></div>
 
     <button class="btn-primary" onclick="submitFeedback()" id="feedback-submit-btn">Envoyer mon avis ✨</button>
+  </div>
   </div>
   <footer>Merci de nous aider à améliorer Moodwave ❤️</footer>
 </div>
@@ -1238,6 +1246,56 @@ function selectCat(el){
   currentCat = el.dataset.val;
 }
 
+
+async function checkAlreadyVoted(){
+  // Bloquer les invités
+  const guestBlock = document.getElementById('feedback-guest-block');
+  const formWrap = document.getElementById('feedback-form-wrap');
+  if(!currentUser || currentUser.isGuest){
+    if(guestBlock) guestBlock.style.display = 'block';
+    if(formWrap) formWrap.style.display = 'none';
+    return;
+  }
+  // Utilisateur connecté — afficher le formulaire
+  if(guestBlock) guestBlock.style.display = 'none';
+  if(formWrap) formWrap.style.display = 'block';
+  const sb = await initSupabase();
+  if(!sb) return;
+  try{
+    const {data} = await sb
+      .from('feedbacks')
+      .select('id, rating, category, comment')
+      .eq('user_id', currentUser.id)
+      .limit(1);
+    if(data && data.length > 0){
+      const existing = data[0];
+      const btn = document.getElementById('feedback-submit-btn');
+      const sucEl = document.getElementById('feedback-success');
+      // Pré-remplir avec l'avis existant
+      setRating(existing.rating);
+      const catBtn = document.querySelector(`.feedback-cat[data-val="${existing.category}"]`);
+      if(catBtn) selectCat(catBtn);
+      const textarea = document.getElementById('feedback-comment');
+      if(textarea) textarea.value = existing.comment || '';
+      // Désactiver le formulaire
+      if(btn){
+        btn.textContent = '✅ Avis déjà soumis';
+        btn.disabled = true;
+        btn.style.opacity = '.5';
+        btn.style.cursor = 'not-allowed';
+      }
+      if(sucEl){
+        sucEl.textContent = `Tu as déjà soumis un avis — merci pour ta contribution ! 🙏`;
+        sucEl.style.display = 'block';
+      }
+    } else {
+      // Réactiver si besoin (retour sur l'écran)
+      const btn = document.getElementById('feedback-submit-btn');
+      if(btn){ btn.textContent = 'Envoyer mon avis ✨'; btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+    }
+  }catch(e){}
+}
+
 async function submitFeedback(){
   const comment = document.getElementById('feedback-comment')?.value?.trim() || '';
   const errEl = document.getElementById('feedback-error');
@@ -1246,6 +1304,9 @@ async function submitFeedback(){
   errEl.style.display = 'none';
   sucEl.style.display = 'none';
 
+  if(!currentUser || currentUser.isGuest){
+    showScreen('auth-screen'); return;
+  }
   if(!currentRating){ errEl.textContent = `Merci de donner une note avant d'envoyer.`; errEl.style.display = 'block'; return; }
   if(!comment){ errEl.textContent = 'Ajoute un commentaire pour nous aider à comprendre ton retour.'; errEl.style.display = 'block'; return; }
 
@@ -1260,6 +1321,21 @@ async function submitFeedback(){
   }
 
   try{
+    // Vérifier si l'utilisateur a déjà soumis un avis
+    if(currentUser && !currentUser.isGuest){
+      const {data: existing} = await sb
+        .from('feedbacks')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .limit(1);
+      if(existing && existing.length > 0){
+        errEl.textContent = `Tu as déjà soumis un avis. Merci pour ta contribution ! 🙏`;
+        errEl.style.display = 'block';
+        btn.textContent = 'Envoyer mon avis ✨'; btn.disabled = false;
+        return;
+      }
+    }
+
     await sb.from('feedbacks').insert({
       user_id: currentUser?.isGuest ? null : currentUser?.id || null,
       rating: currentRating,
@@ -1356,6 +1432,7 @@ function showScreen(id){
   if(id==='history-screen')renderHistory();
   if(id==='hero'){updateHistoryBadge();loadPublicRating();}
   if(id==='auth-screen')loadPublicRating();
+  if(id==='feedback-screen')checkAlreadyVoted();
   if(id==='form-screen')resetStepper();
   if(id==='weekly-screen'&&!weeklyData)loadWeekly();
   // Bouton home visible sur tous les écrans sauf hero et auth

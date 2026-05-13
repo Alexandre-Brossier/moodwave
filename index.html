@@ -278,6 +278,14 @@
     .dropdown-item{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .dropdown-menu{min-width:200px}
 
+
+    /* GENRE LIBRE */
+    .genre-free-wrap{margin-bottom:1.25rem}
+    .genre-free-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:12px;color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.92rem;padding:.7rem 1rem;transition:border-color .2s;margin-bottom:.6rem}
+    .genre-free-input:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,.09)}
+    .genre-free-input::placeholder{color:rgba(200,200,255,.3)}
+    .genre-free-hint{display:flex;align-items:flex-start;gap:.5rem;background:rgba(124,106,255,.08);border:1px solid rgba(124,106,255,.2);border-radius:10px;padding:.625rem .875rem;font-size:.75rem;color:rgba(200,185,255,.75);line-height:1.55}
+
     .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}
     .weekly-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
@@ -467,6 +475,19 @@
       <div class="pill" data-group="era" data-val="Années 2000" onclick="toggleEraPill(this)"><i class="ph-device-mobile ph-fill"></i><span>2000s</span></div>
       <div class="pill" data-group="era" data-val="Années 2010" onclick="toggleEraPill(this)"><i class="ph-headphones ph-fill"></i><span>2010s</span></div>
       <div class="pill" data-group="era" data-val="Actuel" onclick="toggleEraPill(this)"><i class="ph-trend-up ph-fill"></i><span>Actuel</span></div>
+    </div>
+    <div class="genre-free-wrap">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <i class="ph-pencil-simple ph-fill" style="color:var(--accent2);font-size:1rem"></i>
+        <span style="font-size:.75rem;font-weight:600;color:var(--accent2);letter-spacing:.08em;text-transform:uppercase">Sous-genre spécifique</span>
+        <span style="font-size:.68rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optionnel)</span>
+      </div>
+      <input class="genre-free-input" id="genre-free-text" type="text" maxlength="60"
+        placeholder="ex : hardstyle, lo-fi hip hop, bossa nova, metalcore…">
+      <div class="genre-free-hint">
+        <i class="ph-lightbulb ph-fill" style="color:var(--accent2);font-size:.85rem;flex-shrink:0"></i>
+        Sélectionne d'abord un genre ci-dessus, puis précise ici le sous-genre exact que tu veux. L'IA s'adapte à n'importe quel style, même très pointu.
+      </div>
     </div>
     <div class="step-nav"><button class="btn-next" onclick="goStep(2)">Suivant →</button></div>
   </div>
@@ -1181,8 +1202,9 @@ function renderRecap(){
   const genres=selectedGenres.length>0?selectedGenres.join(', '):'Tous genres';
   const eras=selectedEras.length>0?selectedEras.join(', '):'—';
   const ft=document.getElementById('mood-free-text')?.value?.trim()||'';
+  const gft=document.getElementById('genre-free-text')?.value?.trim()||'';
   document.getElementById('recap-box').innerHTML=
-    '<div class="recap-row"><span class="recap-key">Genres</span><span class="recap-val">'+genres+'</span></div>'+
+    '<div class="recap-row"><span class="recap-key">Genres</span><span class="recap-val">'+genres+(gft?' · '+esc(gft):'')+'</span></div>'+
     '<div class="recap-row"><span class="recap-key">Époque</span><span class="recap-val">'+eras+'</span></div>'+
     '<div class="recap-row"><span class="recap-key">Mood</span><span class="recap-val">'+(sel.mood||'?')+'</span></div>'+
     (ft?'<div class="recap-row"><span class="recap-key">Description</span><span class="recap-val" style="font-style:italic;color:var(--muted)">'+esc(ft.slice(0,60))+(ft.length>60?'…':'')+'</span></div>':'')+
@@ -1676,6 +1698,7 @@ async function generate(isSurprise){
   const meta=isSurprise?'Mode Surprise':genreLabel+(sel.mood||'')+eraLabel+' / '+(sel.energy||'')+' / '+(sel.context||'')+(withSurprise?' · Surprise':'');
   const {liked,disliked}=getLikedDisliked();
   const freeText=document.getElementById('mood-free-text')?.value?.trim()||'';
+  const genreFreeText=document.getElementById('genre-free-text')?.value?.trim()||'';
   const body=isSurprise
     ?{type:'surprise',likedSongs:liked,dislikedSongs:disliked}
     :{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres,era:selectedEras,freeText,likedSongs:liked,dislikedSongs:disliked};

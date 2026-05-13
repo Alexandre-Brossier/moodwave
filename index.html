@@ -183,9 +183,9 @@
     .dropdown-btn:hover{border-color:var(--accent2);color:#fff}
     .dropdown-btn .arr{font-size:.65rem;transition:transform .2s}
     .dropdown-btn.open .arr{transform:rotate(180deg)}
-    .dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:12px;overflow:hidden;z-index:100;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+    .dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:12px;overflow:hidden;z-index:100;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);min-width:180px}
     .dropdown-menu.open{display:block}
-    .dropdown-item{display:flex;align-items:center;gap:.5rem;padding:.7rem .875rem;font-size:.82rem;color:#e0e0ff;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif}
+    .dropdown-item{display:flex;align-items:center;gap:.5rem;padding:.7rem .875rem;font-size:.82rem;color:#e0e0ff;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;white-space:nowrap}
     .dropdown-item:hover{background:rgba(255,255,255,.08);color:#fff}
     .dropdown-item .di{font-size:.95rem;width:18px;text-align:center}
     .dropdown-item.sep{border-top:1px solid rgba(255,255,255,.08)}
@@ -264,6 +264,20 @@
     .share-badge-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
     .share-badge-emoji{font-size:3rem;margin-bottom:.75rem}
     .share-badge-actions{display:flex;gap:.625rem;margin-top:1.25rem}
+
+
+    /* STREAMING LINKS SUR CARDS */
+    .stream-links{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}
+    .stream-link{display:inline-flex;align-items:center;gap:.3rem;padding:.25rem .6rem;border-radius:100px;font-size:.68rem;font-weight:500;cursor:pointer;border:1px solid;transition:all .2s;text-decoration:none;white-space:nowrap}
+    .stream-link:hover{transform:translateY(-1px);opacity:.85}
+    .stream-link.spotify{background:rgba(30,215,96,.1);border-color:rgba(30,215,96,.35);color:#1ed760}
+    .stream-link.deezer{background:rgba(163,102,228,.1);border-color:rgba(163,102,228,.35);color:#a366e4}
+    .stream-link.youtube{background:rgba(255,0,0,.1);border-color:rgba(255,0,0,.35);color:#ff4444}
+    .stream-link.apple{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2);color:#fff}
+    .stream-link.soundcloud{background:rgba(255,85,0,.1);border-color:rgba(255,85,0,.35);color:#ff5500}
+    /* DROPDOWN items — texte non coupé */
+    .dropdown-item{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .dropdown-menu{min-width:200px}
 
     .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}
@@ -1586,6 +1600,13 @@ function songCardsHTML(songs,listId,meta,successId){
         '<span class="genre-tag">'+esc(s.genre)+'</span>'+
         (s.trend?'<span class="trend-tag">🔥 '+esc(s.trend)+'</span>':'')+
         '<div class="reason">'+esc(s.reason)+'</div>'+
+        '<div class="stream-links">'+
+          '<a class="stream-link spotify" href="https://open.spotify.com/search/'+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener">🎵 Spotify</a>'+
+          '<a class="stream-link deezer" href="https://www.deezer.com/search/'+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener">🎶 Deezer</a>'+
+          '<a class="stream-link youtube" href="https://www.youtube.com/results?search_query='+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener">▶ YouTube</a>'+
+          '<a class="stream-link apple" href="https://music.apple.com/search?term='+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener">🍎 Apple</a>'+
+          '<a class="stream-link soundcloud" href="https://soundcloud.com/search?q='+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener">☁️ SoundCloud</a>'+
+        '</div>'+
       '</div>'+
       '<div class="like-btns">'+
         '<button class="regen-btn" data-action="regen">↻</button>'+

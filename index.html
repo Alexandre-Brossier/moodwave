@@ -82,7 +82,11 @@
     .hero-feature-desc{font-size:.7rem;color:var(--muted);line-height:1.45}
     .hero-actions{display:flex;flex-direction:column;align-items:center;gap:.75rem;width:100%;max-width:340px}
     .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;width:100%}
+    .hero-grid button{display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.88rem}
+    .hero-grid button i{font-size:1.1rem}
     .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;width:100%}
+    .hero-grid button{display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.88rem}
+    .hero-grid button i{font-size:1.1rem}
     .btn-primary{background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;padding:.9rem 2rem;border-radius:100px;cursor:pointer;box-shadow:0 0 36px rgba(124,106,255,.45);transition:transform .2s;width:100%}
     .btn-primary:hover{transform:translateY(-2px)}
     .btn-secondary{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%}
@@ -416,10 +420,10 @@
   <div class="hero-actions">
     <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist ✨</button>
     <div class="hero-grid">
-      <button class="btn-secondary" onclick="generate(true)">🎲 Surprise</button>
-      <button class="btn-weekly" onclick="showScreen('weekly-screen')">🔥 Tendances</button>
-      <button class="btn-secondary" onclick="showScreen('liked-screen');renderLikedSongs()" style="border-color:rgba(239,68,68,.35);color:#f87171">❤️ Mes aimés</button>
-      <button class="btn-secondary" onclick="showScreen('ranking-screen');renderRanking()" style="border-color:rgba(251,191,36,.35);color:#fbbf24">📊 Classement</button>
+      <button class="btn-secondary" onclick="generate(true)"><i class="ph-shuffle ph-fill" style="color:var(--accent2)"></i> Surprise</button>
+      <button class="btn-weekly" onclick="showScreen('weekly-screen')"><i class="ph-fire ph-fill" style="color:#4ade80"></i> Tendances</button>
+      <button class="btn-secondary" onclick="showScreen('liked-screen');renderLikedSongs()" style="border-color:rgba(239,68,68,.35);color:#f87171"><i class="ph-heart ph-fill" style="color:#f87171"></i> Aimés</button>
+      <button class="btn-secondary" onclick="showScreen('ranking-screen');renderRanking()" style="border-color:rgba(251,191,36,.35);color:#fbbf24"><i class="ph-chart-bar ph-fill" style="color:#fbbf24"></i> Classement</button>
     </div>
     <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')">📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span></button>
   </div>

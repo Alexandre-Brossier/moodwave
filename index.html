@@ -446,6 +446,12 @@
 
 <div id="auth-screen" class="screen active">
   <div class="logo"><i class="ph-waveform ph-fill" style="font-size:1.2rem"></i>Moodwave</div>
+  <div class="hero-rating" id="auth-rating" style="display:none">
+    <span class="hero-rating-stars" id="auth-rating-stars">★★★★★</span>
+    <span class="hero-rating-score" id="auth-rating-score">—</span>
+    <div class="hero-rating-divider"></div>
+    <span class="hero-rating-count" id="auth-rating-count">— avis</span>
+  </div>
   <div class="auth-box">
     <div class="auth-title" id="auth-title">Créer un compte</div>
     <div class="auth-sub">Sauvegarde tes playlists sur tous tes appareils</div>
@@ -1298,11 +1304,23 @@ async function loadPublicRating(){
     const scoreEl = document.getElementById('hero-rating-score');
     const countEl = document.getElementById('hero-rating-count');
 
+    // Widget hero
     if(widget && starsEl && scoreEl && countEl){
       starsEl.textContent = stars;
       scoreEl.textContent = rounded.toFixed(1);
-      countEl.textContent = data.length + (data.length > 1 ? ' avis' : ' avis');
+      countEl.textContent = data.length + ' avis';
       widget.style.display = 'flex';
+    }
+    // Widget auth
+    const authWidget = document.getElementById('auth-rating');
+    const authStars = document.getElementById('auth-rating-stars');
+    const authScore = document.getElementById('auth-rating-score');
+    const authCount = document.getElementById('auth-rating-count');
+    if(authWidget && authStars && authScore && authCount){
+      authStars.textContent = stars;
+      authScore.textContent = rounded.toFixed(1);
+      authCount.textContent = data.length + ' avis';
+      authWidget.style.display = 'flex';
     }
   }catch(e){}
 }
@@ -1337,6 +1355,7 @@ function showScreen(id){
   closeAllDropdowns();
   if(id==='history-screen')renderHistory();
   if(id==='hero'){updateHistoryBadge();loadPublicRating();}
+  if(id==='auth-screen')loadPublicRating();
   if(id==='form-screen')resetStepper();
   if(id==='weekly-screen'&&!weeklyData)loadWeekly();
   // Bouton home visible sur tous les écrans sauf hero et auth

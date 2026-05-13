@@ -286,6 +286,37 @@
     .genre-free-input::placeholder{color:rgba(200,200,255,.3)}
     .genre-free-hint{display:flex;align-items:flex-start;gap:.5rem;background:rgba(124,106,255,.08);border:1px solid rgba(124,106,255,.2);border-radius:10px;padding:.625rem .875rem;font-size:.75rem;color:rgba(200,185,255,.75);line-height:1.55}
 
+
+    /* FEEDBACK & NOTATION */
+    #feedback-screen{align-items:center;justify-content:flex-start;gap:0;padding-top:1.5rem}
+    .feedback-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:1.5rem;width:100%;max-width:420px;margin-bottom:1rem}
+    .feedback-section-title{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:1rem}
+
+    /* Étoiles */
+    .star-row{display:flex;gap:.5rem;margin-bottom:1.25rem;justify-content:center}
+    .star-btn{font-size:2rem;cursor:pointer;transition:transform .15s;background:none;border:none;padding:.1rem;line-height:1;filter:grayscale(1);opacity:.4}
+    .star-btn.active{filter:none;opacity:1;transform:scale(1.15)}
+    .star-btn:hover{transform:scale(1.2)}
+
+    /* Catégorie */
+    .feedback-cats{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+    .feedback-cat{padding:.45rem 1rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;transition:all .2s}
+    .feedback-cat.selected{background:rgba(124,106,255,.25);border-color:#a78bfa;color:#fff}
+
+    /* Textarea */
+    .feedback-textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:12px;color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.88rem;padding:.75rem 1rem;resize:none;min-height:100px;transition:border-color .2s;line-height:1.55;margin-bottom:1rem}
+    .feedback-textarea:focus{outline:none;border-color:var(--accent)}
+    .feedback-textarea::placeholder{color:rgba(200,200,255,.3)}
+
+    /* Rating widget sur hero */
+    .hero-rating{display:flex;align-items:center;gap:.625rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:.5rem 1rem;cursor:pointer;transition:all .2s}
+    .hero-rating:hover{border-color:rgba(124,106,255,.4);background:rgba(124,106,255,.08)}
+    .hero-rating-stars{color:#fbbf24;font-size:.95rem;letter-spacing:.05rem}
+    .hero-rating-score{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;color:#fff}
+    .hero-rating-count{font-size:.75rem;color:var(--muted)}
+    .hero-rating-divider{width:1px;height:16px;background:rgba(255,255,255,.15)}
+    .hero-rating-cta{font-size:.75rem;color:var(--accent2);font-weight:500}
+
     .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}
     .weekly-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
@@ -336,6 +367,45 @@
       <button class="btn-primary" style="flex:2;padding:.8rem" onclick="closeShareBadge();showScreen('form-screen')">🎵 Créer ma playlist</button>
     </div>
   </div>
+</div>
+
+
+<div id="feedback-screen" class="screen">
+  <div class="screen-header" style="width:100%;max-width:420px">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <div><div class="screen-title">Donner mon avis 💬</div></div>
+  </div>
+
+  <div class="feedback-box" style="width:100%">
+    <div class="feedback-section-title">Ta note globale</div>
+    <div class="star-row" id="star-row">
+      <button class="star-btn" data-val="1" onclick="setRating(1)">⭐</button>
+      <button class="star-btn" data-val="2" onclick="setRating(2)">⭐</button>
+      <button class="star-btn" data-val="3" onclick="setRating(3)">⭐</button>
+      <button class="star-btn" data-val="4" onclick="setRating(4)">⭐</button>
+      <button class="star-btn" data-val="5" onclick="setRating(5)">⭐</button>
+    </div>
+    <div id="rating-label" style="text-align:center;font-size:.85rem;color:var(--muted);margin-bottom:1.25rem;min-height:1.2rem"></div>
+
+    <div class="feedback-section-title">Type de retour</div>
+    <div class="feedback-cats">
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="strengths">💪 Point fort</button>
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="weakness">⚠️ Point faible</button>
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="suggestion">💡 Suggestion</button>
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="bug">🐛 Bug</button>
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="other">💬 Autre</button>
+    </div>
+
+    <div class="feedback-section-title">Ton commentaire</div>
+    <textarea class="feedback-textarea" id="feedback-comment" maxlength="500"
+      placeholder="Dis-nous ce que tu penses… ce qui fonctionne bien, ce qui manque, ce que tu voudrais voir évoluer."></textarea>
+
+    <div class="success-msg" id="feedback-success"></div>
+    <div class="error-msg" id="feedback-error"></div>
+
+    <button class="btn-primary" onclick="submitFeedback()" id="feedback-submit-btn">Envoyer mon avis ✨</button>
+  </div>
+  <footer>Merci de nous aider à améliorer Moodwave ❤️</footer>
 </div>
 
 <div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeModal()">
@@ -413,9 +483,18 @@
       </div>
       <div class="user-menu" id="user-menu">
         <button class="user-menu-item" onclick="showScreen('history-screen');toggleUserMenu()"><i class="ph-clock-counter-clockwise"></i> Mes playlists</button>
+        <button class="user-menu-item" onclick="showScreen('feedback-screen');toggleUserMenu()"><i class="ph-chat-dots"></i> Donner mon avis</button>
         <button class="user-menu-item danger" onclick="signOut()"><i class="ph-sign-out"></i> Se déconnecter</button>
       </div>
     </div>
+  </div>
+  <div class="hero-rating" id="hero-rating" onclick="showScreen('feedback-screen')" style="display:none">
+    <span class="hero-rating-stars" id="hero-rating-stars">★★★★★</span>
+    <span class="hero-rating-score" id="hero-rating-score">—</span>
+    <div class="hero-rating-divider"></div>
+    <span class="hero-rating-count" id="hero-rating-count">— avis</span>
+    <div class="hero-rating-divider"></div>
+    <span class="hero-rating-cta">Donner mon avis</span>
   </div>
   <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
   <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
@@ -600,13 +679,18 @@ let supabase = null;
 const SUPABASE_URL = 'https://nwxmnknsoadcjrocluwe.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_6wU11x2f2dmRmlFK5WM-aA_IWXENyJz';
 
+let _supabasePromise=null;
 async function initSupabase(){
   if(supabase)return supabase;
-  try{
-    const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-    supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-    return supabase;
-  }catch(e){console.error('Supabase non disponible:',e);return null;}
+  if(_supabasePromise)return _supabasePromise;
+  _supabasePromise=(async()=>{
+    try{
+      const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+      return supabase;
+    }catch(e){console.error('Supabase non disponible:',e);return null;}
+  })();
+  return _supabasePromise;
 }
 
 let currentUser=null;
@@ -681,8 +765,8 @@ function continueAsGuest(email){
 }
 
 function onUserLoggedIn(user){
-  // Charger les votes depuis le cloud après connexion
   setTimeout(loadVotesFromCloud, 500);
+  setTimeout(loadPublicRating, 800);
   currentUser=user;
   const initials=(user.email||'?').slice(0,1).toUpperCase();
   const name=(user.email||'Invité').split('@')[0];
@@ -1120,6 +1204,110 @@ async function getLikedSongsFromCloud(){
 }
 
 
+
+/* ══ FEEDBACK & NOTATION ══ */
+let currentRating = 0;
+let currentCat = '';
+
+const ratingLabels = {
+  1: 'Très décevant 😞',
+  2: 'Peut mieux faire 😐',
+  3: 'Correct 🙂',
+  4: 'Très bien ! 😊',
+  5: `Excellent, j'adore ! 🤩`
+};
+
+function setRating(val){
+  currentRating = val;
+  document.querySelectorAll('.star-btn').forEach(b=>{
+    b.classList.toggle('active', parseInt(b.dataset.val) <= val);
+  });
+  const lbl = document.getElementById('rating-label');
+  if(lbl) lbl.textContent = ratingLabels[val] || '';
+}
+
+function selectCat(el){
+  document.querySelectorAll('.feedback-cat').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  currentCat = el.dataset.val;
+}
+
+async function submitFeedback(){
+  const comment = document.getElementById('feedback-comment')?.value?.trim() || '';
+  const errEl = document.getElementById('feedback-error');
+  const sucEl = document.getElementById('feedback-success');
+  const btn = document.getElementById('feedback-submit-btn');
+  errEl.style.display = 'none';
+  sucEl.style.display = 'none';
+
+  if(!currentRating){ errEl.textContent = `Merci de donner une note avant d'envoyer.`; errEl.style.display = 'block'; return; }
+  if(!comment){ errEl.textContent = 'Ajoute un commentaire pour nous aider à comprendre ton retour.'; errEl.style.display = 'block'; return; }
+
+  btn.textContent = 'Envoi…'; btn.disabled = true;
+
+  const sb = await initSupabase();
+  if(!sb){
+    sucEl.textContent = '✅ Merci pour ton avis ! (mode hors ligne)';
+    sucEl.style.display = 'block';
+    btn.textContent = 'Envoyer mon avis ✨'; btn.disabled = false;
+    return;
+  }
+
+  try{
+    await sb.from('feedbacks').insert({
+      user_id: currentUser?.isGuest ? null : currentUser?.id || null,
+      rating: currentRating,
+      category: currentCat || 'other',
+      comment,
+      created_at: new Date().toISOString()
+    });
+    sucEl.textContent = '✅ Merci beaucoup ! Ton avis nous aide vraiment à améliorer Moodwave.';
+    sucEl.style.display = 'block';
+    // Reset
+    currentRating = 0; currentCat = '';
+    document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.feedback-cat').forEach(b=>b.classList.remove('selected'));
+    document.getElementById('feedback-comment').value = '';
+    document.getElementById('rating-label').textContent = '';
+    // Recharger la note publique
+    loadPublicRating();
+  }catch(e){
+    errEl.textContent = `Erreur lors de l'envoi. Réessaie.`;
+    errEl.style.display = 'block';
+  }
+  btn.textContent = 'Envoyer mon avis ✨'; btn.disabled = false;
+}
+
+async function loadPublicRating(){
+  const sb = await initSupabase();
+  if(!sb) return;
+  try{
+    const { data } = await sb
+      .from('feedbacks')
+      .select('rating')
+      .not('rating','is',null);
+
+    if(!data || data.length < 3) return; // Afficher seulement si assez d'avis
+
+    const avg = data.reduce((s,r)=>s+r.rating,0) / data.length;
+    const rounded = Math.round(avg * 10) / 10;
+    const stars = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+
+    const widget = document.getElementById('hero-rating');
+    const starsEl = document.getElementById('hero-rating-stars');
+    const scoreEl = document.getElementById('hero-rating-score');
+    const countEl = document.getElementById('hero-rating-count');
+
+    if(widget && starsEl && scoreEl && countEl){
+      starsEl.textContent = stars;
+      scoreEl.textContent = rounded.toFixed(1);
+      countEl.textContent = data.length + (data.length > 1 ? ' avis' : ' avis');
+      widget.style.display = 'flex';
+    }
+  }catch(e){}
+}
+
+
 /* ══ ÉTAT GLOBAL ══ */
 const sel={mood:null,energy:null,context:null};
 let selectedGenres=[];
@@ -1148,7 +1336,7 @@ function showScreen(id){
   window.scrollTo(0,0);
   closeAllDropdowns();
   if(id==='history-screen')renderHistory();
-  if(id==='hero')updateHistoryBadge();
+  if(id==='hero'){updateHistoryBadge();loadPublicRating();}
   if(id==='form-screen')resetStepper();
   if(id==='weekly-screen'&&!weeklyData)loadWeekly();
   // Bouton home visible sur tous les écrans sauf hero et auth
@@ -1896,6 +2084,7 @@ votes=loadVotes();
 updateHistoryBadge();
 initBackground();
 registerSW();
+loadPublicRating();
 checkExistingSession();
 const urlp=new URLSearchParams(window.location.search).get('p');
 if(urlp){const raw=localStorage.getItem('mw_p_'+urlp);if(raw)try{const d=JSON.parse(raw);currentSongs=d.songs;currentMeta=d.meta;saveToHistory(d.songs,d.meta);renderResults(d.songs,d.meta);setTimeout(()=>showShareBadge(d.meta),1500);}catch(e){}}

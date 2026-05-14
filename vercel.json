@@ -3,7 +3,6 @@
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/sw.js", "destination": "/sw.js" },
     { "source": "/manifest.json", "destination": "/manifest.json" },
-    { "source": "/app.js", "destination": "/app.js" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
@@ -12,13 +11,6 @@
       "headers": [
         { "key": "Cache-Control", "value": "no-cache" },
         { "key": "Service-Worker-Allowed", "value": "/" }
-      ]
-    },
-    {
-      "source": "/app.js",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600" },
-        { "key": "Content-Type", "value": "application/javascript" }
       ]
     }
   ]

@@ -1,0 +1,3051 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#07080f">
+  <title>Moodwave — Ta playlist selon ton mood</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <style>
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    :root{--bg:#07080f;--border:rgba(255,255,255,.14);--text:#f0f0ff;--muted:rgba(240,240,255,.6);--accent:#7c6aff;--accent2:#c4b5fd;--cyan:#a5f3fc}
+    html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden}
+    #bg-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+    .orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:orbFloat 14s ease-in-out infinite;filter:blur(70px)}
+    .orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(79,70,229,.55),transparent);top:-180px;left:-180px;animation-duration:13s}
+    .orb2{width:500px;height:500px;background:radial-gradient(circle,rgba(124,58,237,.5),transparent);top:35%;right:-120px;animation-duration:17s;animation-delay:-5s}
+    .orb3{width:450px;height:450px;background:radial-gradient(circle,rgba(8,145,178,.45),transparent);bottom:-100px;left:30%;animation-duration:15s;animation-delay:-2s}
+    .orb4{width:400px;height:400px;background:radial-gradient(circle,rgba(190,24,93,.3),transparent);top:20%;left:25%;filter:blur(80px);animation-duration:20s;animation-delay:-8s}
+    @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(40px,-30px) scale(1.08)}66%{transform:translate(-25px,20px) scale(.93)}}
+    .particles{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+    .particle{position:absolute;border-radius:50%;animation:particleUp linear infinite;pointer-events:none}
+    @keyframes particleUp{0%{transform:translateY(100vh);opacity:0}10%{opacity:.8}90%{opacity:.3}100%{transform:translateY(-40px);opacity:0}}
+    .screen{display:none;position:relative;z-index:5;min-height:100vh;padding:1.5rem 1.25rem 6rem;max-width:560px;margin:0 auto}
+    .screen.active{display:flex;flex-direction:column}
+    .back-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+    .back-btn:hover{background:rgba(255,255,255,.18)}
+    footer{text-align:center;padding:2rem 1rem 1rem;color:rgba(200,200,255,.3);font-size:.75rem;margin-top:auto}
+    :1rem}
+    }
+
+    .home-btn.visible{display:flex}
+    #auth-screen{align-items:center;justify-content:center;text-align:center;gap:1.25rem;padding-top:2.5rem}
+    .auth-box{background:rgba(13,10,30,.9);backdrop-filter:blur(20px);border:1px solid rgba(124,106,255,.3);border-radius:20px;padding:2rem 1.5rem;width:100%;max-width:360px}
+    .auth-title{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:700;color:#fff;margin-bottom:.4rem}
+    .auth-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+    .auth-tabs{display:flex;gap:.5rem;margin-bottom:1.5rem}
+    .auth-tab{flex:1;padding:.65rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.88rem;cursor:pointer;transition:all .2s}
+    .auth-tab.active{background:rgba(124,106,255,.25);border-color:#a78bfa;color:#fff;font-weight:600}
+    .auth-error{background:rgba(255,80,80,.1);border:1px solid rgba(255,100,100,.3);color:#fca5a5;border-radius:10px;padding:.65rem .875rem;font-size:.82rem;margin-bottom:.75rem;display:none}
+    .auth-input{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:12px;color:#fff;font-family:'DM Sans',sans-serif;font-size:.95rem;padding:.8rem 1rem;margin-bottom:.75rem;transition:border-color .2s}
+    .auth-input:focus{outline:none;border-color:var(--accent)}
+    .auth-input::placeholder{color:rgba(255,255,255,.3)}
+    .auth-btn{width:100%;background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;padding:.875rem;border-radius:100px;cursor:pointer;margin-bottom:.75rem;transition:transform .2s}
+    .auth-btn:hover{transform:translateY(-2px)}
+    .auth-divider{display:flex;align-items:center;gap:.75rem;margin:.5rem 0;color:var(--muted);font-size:.8rem}
+    .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
+    .oauth-btn{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:500;padding:.8rem 1rem;border-radius:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.75rem;margin-bottom:.625rem}
+    .oauth-btn:hover{background:rgba(255,255,255,.13);transform:translateY(-1px)}
+    .oauth-btn.google{border-color:rgba(234,67,53,.4)}.oauth-btn.google:hover{background:rgba(234,67,53,.1)}
+    .oauth-btn.discord{border-color:rgba(88,101,242,.5)}.oauth-btn.discord:hover{background:rgba(88,101,242,.15)}
+    .oauth-icon{width:20px;height:20px;flex-shrink:0}
+    .auth-guest{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.88rem;padding:.8rem;border-radius:100px;cursor:pointer;transition:all .2s}
+    .auth-guest:hover{color:#fff;border-color:rgba(255,255,255,.25)}
+    .hero-topbar{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:360px;position:relative}
+    .user-badge{display:none;align-items:center;gap:.5rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:100px;padding:.35rem .875rem .35rem .4rem;cursor:pointer;transition:all .2s}
+    .user-badge:hover{border-color:var(--accent2)}
+    .user-badge.visible{display:flex}
+    .user-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#7c6aff,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0}
+    .user-name{font-size:.78rem;color:#fff;font-weight:500;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .user-menu{position:absolute;top:calc(100% + 8px);right:0;background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:.5rem;min-width:170px;z-index:400;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+    .user-menu.open{display:block}
+    .user-menu-item{display:flex;align-items:center;gap:.625rem;padding:.65rem .875rem;border-radius:10px;font-size:.82rem;color:#e0e0ff;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;transition:background .15s}
+    .user-menu-item:hover{background:rgba(255,255,255,.08);color:#fff}
+    .user-menu-item.danger{color:#fca5a5}
+    .user-menu-item.danger:hover{background:rgba(255,80,80,.1)}
+    #hero{align-items:center;justify-content:center;text-align:center;gap:1.25rem;padding-top:1.5rem}
+    .logo{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:600;letter-spacing:.25em;color:var(--accent2);text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:.5rem}
+    .hero-title{font-family:'Outfit',sans-serif;font-size:clamp(1.8rem,5.5vw,2.6rem);font-weight:700;line-height:1.35;color:#fff;max-width:400px;letter-spacing:-.02em}
+    .hero-title span{color:var(--accent2)}
+    .hero-sub{color:var(--muted);font-size:.95rem;max-width:300px;line-height:1.65}
+    .hero-features{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;width:100%;max-width:360px}
+    .hero-feature{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:.875rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.4rem}
+    .hero-feature i{font-size:1.6rem;color:var(--accent2)}
+    .hero-feature-title{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;color:#fff}
+    .hero-feature-desc{font-size:.7rem;color:var(--muted);line-height:1.45}
+    .hero-actions{display:flex;flex-direction:column;align-items:center;gap:.75rem;width:100%;max-width:340px}
+    .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;width:100%}
+    .hero-grid button{display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.88rem}
+    .hero-grid button i{font-size:1.1rem}
+    .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:.625rem;width:100%}
+    .hero-grid button{display:flex;align-items:center;justify-content:center;gap:.5rem;font-size:.88rem}
+    .hero-grid button i{font-size:1.1rem}
+    .btn-primary{background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;padding:.9rem 2rem;border-radius:100px;cursor:pointer;box-shadow:0 0 36px rgba(124,106,255,.45);transition:transform .2s;width:100%}
+    .btn-primary:hover{transform:translateY(-2px)}
+    .btn-secondary{background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%}
+    .btn-secondary:hover{border-color:var(--accent2);color:#fff}
+    .btn-weekly{background:transparent;border:1px solid rgba(74,222,128,.35);color:#4ade80;font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%}
+    .btn-weekly:hover{background:rgba(74,222,128,.1)}
+    .btn-history{background:transparent;border:1px solid rgba(255,255,255,.15);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem;border-radius:100px;cursor:pointer;transition:all .2s;width:100%;display:none;grid-column:1/-1}
+    .btn-history:hover{border-color:var(--accent2);color:#fff}
+    .count-badge{background:rgba(124,106,255,.35);color:var(--accent2);font-size:.7rem;font-weight:600;padding:.1rem .5rem;border-radius:100px;margin-left:.4rem}
+    .btn-alt{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.17);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem 1rem;border-radius:100px;cursor:pointer;transition:all .2s}
+    .btn-alt:hover{border-color:var(--accent2);color:#fff}
+    .btn-danger{background:rgba(255,80,80,.08);border:1px solid rgba(255,100,100,.25);color:#fca5a5;font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.65rem 1rem;border-radius:100px;cursor:pointer}
+    .error-msg{background:rgba(255,80,80,.1);border:1px solid rgba(255,100,100,.3);color:#fca5a5;border-radius:12px;padding:.875rem 1rem;font-size:.85rem;margin-bottom:1rem;display:none;line-height:1.5}
+    .success-msg{background:rgba(30,215,96,.08);border:1px solid rgba(30,215,96,.25);color:#4ade80;border-radius:12px;padding:.75rem 1rem;font-size:.85rem;margin-bottom:.75rem;display:none}
+    .feedback-banner{background:rgba(124,106,255,.07);border:1px solid rgba(124,106,255,.2);border-radius:14px;padding:.75rem 1rem;margin-bottom:.875rem;font-size:.8rem;color:var(--accent2);display:none}
+    #form-screen{gap:0}
+    .stepper-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1.75rem}
+    .stepper-progress-wrap{flex:1}
+    .stepper-label{font-size:.72rem;color:var(--muted);margin-bottom:.35rem;display:flex;justify-content:space-between}
+    .stepper-bar{height:3px;background:rgba(255,255,255,.1);border-radius:100px;overflow:hidden}
+    .stepper-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:100px;transition:width .4s ease}
+    .step-panel{display:none}.step-panel.active{display:block}
+    .step-question{font-family:'Outfit',sans-serif;font-size:1.25rem;font-weight:700;color:#fff;margin-bottom:.75rem;line-height:1.5}
+    .step-hint{font-size:.85rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.65}
+    .section-label{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--accent2);margin-bottom:.6rem;margin-top:.5rem}
+    .section-label span{color:var(--muted);font-size:.62rem;letter-spacing:0;text-transform:none;font-weight:400}
+    .pills{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem}
+    .era-pills{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem}
+    .pill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.8rem;padding:.55rem .3rem;border-radius:14px;cursor:pointer;transition:all .2s;text-align:center;width:100%;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;line-height:1.25}
+    .pill:hover{border-color:var(--accent2);color:#fff;background:rgba(255,255,255,.11)}
+    .pill.selected{background:rgba(124,106,255,.28);border-color:#a78bfa;color:#fff;font-weight:500}
+    .pill.all-genres.selected{background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.4);color:#fde68a}
+    .pill i{font-size:1.25rem;color:var(--accent2)}
+    .pill.selected i{color:#fff}
+    .energy-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;margin-bottom:1.25rem}
+    .energy-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1rem .75rem;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.35rem}
+    .energy-card:hover{border-color:var(--accent2);background:rgba(255,255,255,.1)}
+    .energy-card.selected{background:rgba(124,106,255,.22);border-color:#a78bfa}
+    .energy-card i{font-size:1.8rem;color:var(--accent2)}
+    .energy-card.selected i{color:#fff}
+    .e-label{font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;color:#fff}
+    .e-desc{font-size:.72rem;color:var(--muted)}
+    .recap-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:1.1rem 1.25rem;margin-bottom:1.25rem}
+    .recap-row{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .recap-row:last-child{border-bottom:none}
+    .recap-key{font-size:.78rem;color:var(--muted)}
+    .recap-val{font-size:.82rem;color:#fff;font-weight:500;text-align:right;max-width:65%}
+    .surprise-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:.875rem 1.1rem;margin-bottom:1.25rem}
+    .surprise-info h4{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#fff;margin-bottom:.15rem}
+    .surprise-info p{font-size:.78rem;color:var(--muted)}
+    .toggle{width:44px;height:24px;background:rgba(255,255,255,.15);border-radius:100px;position:relative;cursor:pointer;transition:background .3s;border:1px solid rgba(255,255,255,.2);flex-shrink:0}
+    .toggle.on{background:linear-gradient(135deg,#7c6aff,#a78bfa);border-color:#a78bfa}
+    .toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .3s}
+    .toggle.on::after{transform:translateX(20px)}
+    .step-nav{display:flex;gap:.625rem;margin-top:.75rem}
+    .btn-next{flex:1;background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;padding:.85rem;border-radius:100px;cursor:pointer;transition:transform .2s,opacity .2s}
+    .btn-next:hover{transform:translateY(-2px)}
+    .btn-next:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .btn-generate{width:100%;background:linear-gradient(135deg,#7c6aff,#a78bfa);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;padding:1rem;border-radius:100px;cursor:pointer;box-shadow:0 0 36px rgba(124,106,255,.45);transition:transform .2s;margin-bottom:.75rem}
+    .btn-generate:hover{transform:translateY(-3px)}
+    .mood-textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:14px;color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.9rem;padding:.75rem 1rem;resize:none;min-height:68px;transition:border-color .2s;line-height:1.5;margin-bottom:1.25rem}
+    .mood-textarea:focus{outline:none;border-color:var(--accent)}
+    .mood-textarea::placeholder{color:rgba(200,200,255,.3)}
+    #loading-screen{align-items:center;justify-content:center;gap:2rem;text-align:center}
+    .wave-container{display:flex;align-items:center;gap:5px;height:60px}
+    .wave-bar{width:5px;border-radius:100px;background:linear-gradient(to top,#7c6aff,#a5f3fc);animation:wave 1.2s ease-in-out infinite}
+    .wave-bar:nth-child(1){height:20px;animation-delay:0s}.wave-bar:nth-child(2){height:35px;animation-delay:.1s}.wave-bar:nth-child(3){height:50px;animation-delay:.2s}.wave-bar:nth-child(4){height:35px;animation-delay:.3s}.wave-bar:nth-child(5){height:20px;animation-delay:.4s}.wave-bar:nth-child(6){height:40px;animation-delay:.15s}.wave-bar:nth-child(7){height:55px;animation-delay:.25s}.wave-bar:nth-child(8){height:40px;animation-delay:.35s}.wave-bar:nth-child(9){height:20px;animation-delay:.45s}
+    @keyframes wave{0%,100%{transform:scaleY(.5);opacity:.5}50%{transform:scaleY(1.2);opacity:1}}
+    .loading-text{font-family:'Outfit',sans-serif;font-size:1.1rem;color:var(--muted)}
+    #results-screen,#saved-screen,#weekly-screen,#history-screen{gap:0;padding-bottom:7rem}
+    .screen-header{display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem;padding-top:.25rem}
+    .screen-title{font-family:'Outfit',sans-serif;font-size:1.15rem;font-weight:700;color:#fff}
+    .results-meta{font-size:.78rem;color:var(--muted);margin-bottom:1rem}
+    .song-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:16px;padding:.875rem 1rem;margin-bottom:.65rem;transition:border-color .2s}
+    .song-card:hover{border-color:rgba(167,139,250,.4)}
+    .song-card-top{display:flex;align-items:flex-start;gap:.625rem}
+    .song-info{flex:1;min-width:0}
+    .song-num{font-size:.68rem;color:var(--muted);font-weight:600;margin-bottom:.1rem}
+    .song-artist{font-size:.8rem;color:var(--accent2);font-weight:500;margin-bottom:.15rem}
+    .song-title{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:.3rem}
+    .genre-tag{font-size:.68rem;padding:.2rem .65rem;border-radius:100px;background:rgba(165,243,252,.1);color:var(--cyan);border:1px solid rgba(165,243,252,.2);display:inline-block}
+    .trend-tag{font-size:.68rem;padding:.2rem .6rem;border-radius:100px;background:rgba(74,222,128,.1);color:#4ade80;border:1px solid rgba(74,222,128,.2);margin-left:.35rem;display:inline-block}
+    .reason{font-size:.75rem;color:rgba(220,220,255,.55);line-height:1.5;margin-top:.35rem;font-style:italic}
+    .like-btns{display:flex;flex-direction:column;gap:.3rem;flex-shrink:0}
+    .like-btn{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;padding:0;transition:all .2s;line-height:1}
+    .like-btn.liked{background:rgba(74,222,128,.2);border-color:rgba(74,222,128,.5)}
+    .like-btn.disliked{background:rgba(248,113,113,.2);border-color:rgba(248,113,113,.5)}
+    .preview-btn{width:30px;height:30px;border-radius:50%;background:rgba(124,106,255,.15);border:1px solid rgba(124,106,255,.3);color:var(--accent2);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .preview-btn.playing{background:rgba(124,106,255,.35);border-color:var(--accent);color:#fff}
+    .regen-btn{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);color:var(--muted);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+    .regen-btn:hover{background:rgba(124,106,255,.2);color:var(--accent2)}
+    .regen-btn.spinning{animation:spin .6s linear infinite;pointer-events:none;opacity:.6}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .results-actions{display:flex;gap:.625rem;margin-top:1rem;flex-wrap:wrap}
+    .action-bar{display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap}
+    .dropdown-wrap{position:relative;flex:1}
+    .dropdown-btn{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:500;padding:.65rem .875rem;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.5rem;transition:all .2s}
+    .dropdown-btn:hover{border-color:var(--accent2);color:#fff}
+    .dropdown-btn .arr{font-size:.65rem;transition:transform .2s}
+    .dropdown-btn.open .arr{transform:rotate(180deg)}
+    .dropdown-menu{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:12px;overflow:hidden;z-index:100;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);min-width:180px}
+    .dropdown-menu.open{display:block}
+    .dropdown-item{display:flex;align-items:center;gap:.5rem;padding:.7rem .875rem;font-size:.82rem;color:#e0e0ff;cursor:pointer;transition:background .15s;border:none;background:none;width:100%;text-align:left;font-family:'DM Sans',sans-serif;white-space:nowrap}
+    .dropdown-item:hover{background:rgba(255,255,255,.08);color:#fff}
+    .dropdown-item .di{font-size:.95rem;width:18px;text-align:center}
+    .dropdown-item.sep{border-top:1px solid rgba(255,255,255,.08)}
+    .share-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.85rem;padding:.65rem .875rem;border-radius:12px;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .share-btn:hover{border-color:var(--accent2);color:#fff}
+    .mini-player{position:fixed;bottom:0;left:0;right:0;background:#0d0e1f;border-top:1px solid rgba(255,255,255,.12);padding:.75rem 1.25rem;display:none;align-items:center;gap:.875rem;z-index:200}
+    .mini-player.visible{display:flex}
+    .mp-progress{position:absolute;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s linear;width:0}
+    .mp-info{flex:1;min-width:0}
+    .mp-title{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mp-artist{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mp-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .mp-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;flex-shrink:0}
+    .mp-close:hover{color:#fff}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:250;display:none;align-items:center;justify-content:center;padding:1rem}
+    .modal-overlay.open{display:flex}
+    .modal{background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:1.5rem 1.25rem 2rem;width:100%;max-width:420px;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+    .modal-title{font-family:'Outfit',sans-serif;font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between}
+    .modal-close-btn{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer}
+    .share-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.625rem}
+    .share-item{display:flex;flex-direction:column;align-items:center;gap:.35rem;padding:.75rem .5rem;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:all .2s}
+    .share-item:hover{background:rgba(255,255,255,.1);transform:translateY(-2px)}
+    .share-item .si{font-size:1.5rem}
+    .share-item .sl{font-size:.66rem;color:var(--muted);text-align:center}
+    .card-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:260;display:none;align-items:center;justify-content:center;padding:1rem}
+    .card-overlay.open{display:flex}
+    .card-box{background:#12132a;border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:1.1rem;max-width:340px;width:100%}
+    .card-box canvas{width:100%;border-radius:12px;display:block}
+    .card-actions{display:flex;gap:.625rem;margin-top:.875rem}
+    .card-actions button{flex:1;padding:.7rem;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer}
+    .card-actions .btn-dl{background:linear-gradient(135deg,#7c6aff,#a78bfa);border-color:transparent;color:#fff;font-weight:600}
+    .history-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:16px;padding:.875rem 1rem;margin-bottom:.65rem;cursor:pointer;transition:all .2s}
+    .history-item:hover{border-color:rgba(167,139,250,.4);background:rgba(255,255,255,.08)}
+    .history-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+    .history-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+    .h-tag{font-size:.68rem;padding:.18rem .55rem;border-radius:100px;background:rgba(124,106,255,.2);color:var(--accent2);border:1px solid rgba(124,106,255,.3)}
+    .h-date{font-size:.7rem;color:var(--muted)}
+    .h-preview{font-size:.78rem;color:rgba(220,220,255,.5);line-height:1.55}
+    .h-count{font-size:.7rem;color:var(--accent2);font-weight:500;margin-top:.3rem}
+    .history-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
+    .history-empty .icon{font-size:2.5rem;margin-bottom:1rem}
+    .history-actions-row{display:flex;gap:.625rem;margin-top:1rem}
+
+    /* LIKED SONGS */
+    #liked-screen{gap:0;padding-bottom:7rem}
+    .liked-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
+    .liked-empty .icon{font-size:2.5rem;margin-bottom:1rem}
+    .liked-song-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.11);border-radius:14px;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.875rem;transition:border-color .2s}
+    .liked-song-card:hover{border-color:rgba(167,139,250,.4)}
+    .liked-song-num{font-size:.7rem;color:var(--muted);font-weight:600;width:20px;flex-shrink:0;text-align:center}
+    .liked-song-info{flex:1;min-width:0}
+    .liked-song-artist{font-size:.75rem;color:var(--accent2);font-weight:500}
+    .liked-song-title{font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .liked-song-genre{font-size:.65rem;color:var(--cyan);margin-top:.15rem}
+    .liked-play-btn{width:28px;height:28px;border-radius:50%;background:rgba(124,106,255,.2);border:1px solid rgba(124,106,255,.3);color:var(--accent2);font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+    .liked-play-btn:hover,.liked-play-btn.playing{background:rgba(124,106,255,.4);color:#fff}
+
+    /* MOOD RANKING */
+    .mood-rank-item{display:flex;align-items:center;gap:.875rem;padding:.75rem 1rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:14px;margin-bottom:.5rem}
+    .mood-rank-pos{font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent2);width:28px;flex-shrink:0;text-align:center}
+    .mood-rank-pos.gold{color:#fbbf24}
+    .mood-rank-pos.silver{color:#94a3b8}
+    .mood-rank-pos.bronze{color:#b45309}
+    .mood-rank-info{flex:1}
+    .mood-rank-name{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;color:#fff}
+    .mood-rank-count{font-size:.75rem;color:var(--muted);margin-top:.1rem}
+    .mood-rank-bar-wrap{width:80px;flex-shrink:0}
+    .mood-rank-bar{height:6px;border-radius:100px;background:rgba(255,255,255,.1);overflow:hidden}
+    .mood-rank-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .6s ease}
+
+    /* SHARE BADGE */
+    .share-badge-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:700;display:none;align-items:center;justify-content:center;padding:1rem}
+    .share-badge-overlay.open{display:flex}
+    .share-badge-box{background:linear-gradient(135deg,#0d0520,#1a1040);border:1px solid rgba(124,106,255,.4);border-radius:20px;padding:2rem 1.5rem;max-width:360px;width:100%;text-align:center}
+    .share-badge-title{font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:700;color:#fff;margin-bottom:.5rem}
+    .share-badge-sub{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+    .share-badge-emoji{font-size:3rem;margin-bottom:.75rem}
+    .share-badge-actions{display:flex;gap:.625rem;margin-top:1.25rem}
+
+
+    /* STREAMING LINKS SUR CARDS */
+    .stream-links{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+    .stream-link{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;cursor:pointer;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);transition:all .2s;text-decoration:none;flex-shrink:0}
+    .stream-link:hover{transform:translateY(-2px);background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3)}
+    /* DROPDOWN items — texte non coupé */
+    .dropdown-item{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .dropdown-menu{min-width:200px}
+
+
+    /* GENRE LIBRE */
+    .genre-free-wrap{margin-bottom:1.25rem}
+    .genre-free-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:12px;color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.92rem;padding:.7rem 1rem;transition:border-color .2s;margin-bottom:.6rem}
+    .genre-free-input:focus{outline:none;border-color:var(--accent);background:rgba(255,255,255,.09)}
+    .genre-free-input::placeholder{color:rgba(200,200,255,.3)}
+    .genre-free-hint{display:flex;align-items:flex-start;gap:.5rem;background:rgba(124,106,255,.08);border:1px solid rgba(124,106,255,.2);border-radius:10px;padding:.625rem .875rem;font-size:.75rem;color:rgba(200,185,255,.75);line-height:1.55}
+
+
+    /* FEEDBACK & NOTATION */
+    #feedback-screen{align-items:center;justify-content:flex-start;gap:0;padding-top:1.5rem}
+    .feedback-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:1.5rem;width:100%;max-width:420px;margin-bottom:1rem}
+    .feedback-section-title{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:1rem}
+
+    /* Étoiles */
+    .star-row{display:flex;gap:.5rem;margin-bottom:1.25rem;justify-content:center}
+    .star-btn{font-size:2rem;cursor:pointer;transition:transform .15s;background:none;border:none;padding:.1rem;line-height:1;filter:grayscale(1);opacity:.4}
+    .star-btn.active{filter:none;opacity:1;transform:scale(1.15)}
+    .star-btn:hover{transform:scale(1.2)}
+
+    /* Catégorie */
+    .feedback-cats{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+    .feedback-cat{padding:.45rem 1rem;border-radius:100px;border:1px solid rgba(255,255,255,.15);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;transition:all .2s}
+    .feedback-cat.selected{background:rgba(124,106,255,.25);border-color:#a78bfa;color:#fff}
+
+    /* Textarea */
+    .feedback-textarea{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:12px;color:#e0e0ff;font-family:'DM Sans',sans-serif;font-size:.88rem;padding:.75rem 1rem;resize:none;min-height:100px;transition:border-color .2s;line-height:1.55;margin-bottom:1rem}
+    .feedback-textarea:focus{outline:none;border-color:var(--accent)}
+    .feedback-textarea::placeholder{color:rgba(200,200,255,.3)}
+
+    /* Rating widget sur hero */
+    .hero-rating{display:flex;align-items:center;gap:.625rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:100px;padding:.5rem 1rem;cursor:pointer;transition:all .2s}
+    .hero-rating:hover{border-color:rgba(124,106,255,.4);background:rgba(124,106,255,.08)}
+    .hero-rating-stars{color:#fbbf24;font-size:.95rem;letter-spacing:.05rem}
+    .hero-rating-score{font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;color:#fff}
+    .hero-rating-count{font-size:.75rem;color:var(--muted)}
+    .hero-rating-divider{width:1px;height:16px;background:rgba(255,255,255,.15)}
+    .hero-rating-cta{font-size:.75rem;color:var(--accent2);font-weight:500}
+
+
+    /* JOURNAL MUSICAL */
+    #journal-screen{gap:0;padding-bottom:7rem}
+    .journal-header-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.625rem;margin-bottom:1.5rem}
+    .journal-stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1rem .75rem;text-align:center}
+    .journal-stat-val{font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:800;color:#fff}
+    .journal-stat-lbl{font-size:.7rem;color:var(--muted);margin-top:.2rem}
+
+    /* Graphe moods */
+    .journal-section{margin-bottom:1.75rem}
+    .journal-section-title{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem}
+    .mood-chart{display:flex;flex-direction:column;gap:.5rem}
+    .mood-chart-row{display:flex;align-items:center;gap:.75rem}
+    .mood-chart-label{font-size:.78rem;color:var(--muted);width:90px;flex-shrink:0;text-align:right}
+    .mood-chart-bar-wrap{flex:1;background:rgba(255,255,255,.07);border-radius:100px;height:8px;overflow:hidden}
+    .mood-chart-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+    .mood-chart-count{font-size:.72rem;color:var(--muted);width:20px;text-align:right;flex-shrink:0}
+
+    /* Timeline */
+    .journal-timeline{display:flex;flex-direction:column;gap:0}
+    .timeline-month{margin-bottom:1.25rem}
+    .timeline-month-label{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.625rem;padding-left:.5rem;border-left:2px solid rgba(124,106,255,.4)}
+    .timeline-entry{display:flex;gap:.875rem;padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .2s}
+    .timeline-entry:hover{padding-left:.5rem}
+    .timeline-entry:last-child{border-bottom:none}
+    .timeline-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:4px;box-shadow:0 0 8px rgba(124,106,255,.6)}
+    .timeline-content{flex:1;min-width:0}
+    .timeline-date{font-size:.7rem;color:var(--muted);margin-bottom:.2rem}
+    .timeline-mood{font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.2rem}
+    .timeline-meta{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .timeline-tracks{font-size:.72rem;color:var(--accent2);margin-top:.2rem}
+
+    /* Profil musical */
+    .music-profile{background:linear-gradient(135deg,rgba(124,106,255,.12),rgba(8,145,178,.08));border:1px solid rgba(124,106,255,.25);border-radius:18px;padding:1.25rem}
+    .profile-trait{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.06)}
+    .profile-trait:last-child{border-bottom:none}
+    .profile-trait-name{font-size:.8rem;color:var(--muted)}
+    .profile-trait-val{font-size:.82rem;color:#fff;font-weight:600;text-align:right}
+
+    /* Vide */
+    .journal-empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
+    .journal-empty-icon{font-size:3rem;margin-bottom:1rem}
+
+
+    /* SOUVENIR MUSICAL */
+    .souvenir-btn{width:100%;background:linear-gradient(135deg,rgba(124,106,255,.15),rgba(8,145,178,.1));border:1px solid rgba(124,106,255,.35);color:var(--accent2);font-family:"DM Sans",sans-serif;font-size:.88rem;font-weight:500;padding:.8rem 1rem;border-radius:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:1rem}
+    .souvenir-btn:hover{background:linear-gradient(135deg,rgba(124,106,255,.25),rgba(8,145,178,.18));border-color:var(--accent2)}
+
+    /* Modal souvenir */
+    .souvenir-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:none;align-items:flex-end;justify-content:center}
+    .souvenir-overlay.open{display:flex}
+    .souvenir-modal{background:#0d0e24;border:1px solid rgba(124,106,255,.3);border-radius:24px 24px 0 0;padding:1.75rem 1.5rem 2.5rem;width:100%;max-width:560px}
+    .souvenir-modal-title{font-family:"Outfit",sans-serif;font-size:1.1rem;font-weight:700;color:#fff;margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem}
+    .souvenir-modal-sub{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+    .souvenir-input{width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:12px;color:#fff;font-family:"DM Sans",sans-serif;font-size:.92rem;padding:.75rem 1rem;margin-bottom:.875rem;transition:border-color .2s}
+    .souvenir-input:focus{outline:none;border-color:var(--accent)}
+    .souvenir-input::placeholder{color:rgba(200,200,255,.3)}
+    .souvenir-emoji-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.875rem}
+    .souvenir-emoji-btn{font-size:1.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;width:44px;height:44px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+    .souvenir-emoji-btn.selected{background:rgba(124,106,255,.3);border-color:var(--accent)}
+    .souvenir-label{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent2);margin-bottom:.5rem;display:block}
+
+    /* Card souvenir dans journal */
+    .souvenir-card{background:linear-gradient(135deg,rgba(124,106,255,.1),rgba(8,145,178,.07));border:1px solid rgba(124,106,255,.25);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.65rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+    .souvenir-card:hover{border-color:rgba(124,106,255,.5);transform:translateY(-1px)}
+    .souvenir-card-emoji{font-size:1.8rem;margin-bottom:.4rem;display:block}
+    .souvenir-card-context{font-family:"Outfit",sans-serif;font-size:.95rem;font-weight:700;color:#fff;margin-bottom:.25rem}
+    .souvenir-card-date{font-size:.72rem;color:var(--muted);margin-bottom:.35rem}
+    .souvenir-card-tracks{font-size:.75rem;color:var(--accent2)}
+    .souvenir-card-badge{position:absolute;top:.75rem;right:.875rem;background:rgba(124,106,255,.25);border:1px solid rgba(124,106,255,.4);border-radius:100px;padding:.2rem .6rem;font-size:.65rem;color:var(--accent2);font-weight:600}
+
+    /* Notification souvenir */
+    .souvenir-notif{background:linear-gradient(135deg,rgba(124,106,255,.12),rgba(8,145,178,.08));border:1px solid rgba(124,106,255,.3);border-radius:16px;padding:1rem 1.1rem;margin-bottom:1rem;display:none;cursor:pointer}
+    .souvenir-notif-title{font-family:"Outfit",sans-serif;font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.25rem}
+    .souvenir-notif-sub{font-size:.78rem;color:var(--muted);line-height:1.5}
+
+
+    /* CALENDRIER */
+    .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+    .cal-nav-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .2s}
+    .cal-nav-btn:hover{background:rgba(124,106,255,.25);border-color:var(--accent)}
+    .cal-month-label{font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;color:#fff}
+    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:1.25rem}
+    .cal-day-header{text-align:center;font-size:.62rem;font-weight:600;color:var(--muted);padding:.3rem 0}
+    .cal-day{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:.75rem;color:var(--muted);cursor:default;position:relative;transition:all .2s;gap:2px}
+    .cal-day.other-month{opacity:.2}
+    .cal-day.today{background:rgba(124,106,255,.2);color:var(--accent2);font-weight:700;border:1px solid rgba(124,106,255,.35)}
+    .cal-day.has-moment{cursor:pointer;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);color:#fde68a;font-weight:600}
+    .cal-day.has-personal{cursor:pointer;background:rgba(124,106,255,.1);border:1px solid rgba(124,106,255,.25);color:var(--accent2);font-weight:600}
+    .cal-day.has-both{cursor:pointer;background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(124,106,255,.1));border:1px solid rgba(196,181,253,.3);color:#fff;font-weight:700}
+    .cal-day.has-moment:hover,.cal-day.has-personal:hover,.cal-day.has-both:hover{transform:scale(1.12);z-index:2}
+    .cal-day.selected{ring:2px;outline:2px solid var(--accent2);outline-offset:1px}
+    .cal-dots{display:flex;gap:2px;justify-content:center}
+    .cal-dot{width:4px;height:4px;border-radius:50%}
+    .cal-dot.moment{background:#fde68a}
+    .cal-dot.personal{background:var(--accent2)}
+    .cal-legend{display:flex;gap:.875rem;margin-bottom:1rem;flex-wrap:wrap}
+    .cal-legend-item{display:flex;align-items:center;gap:.35rem;font-size:.7rem;color:var(--muted)}
+    .cal-legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .day-planning{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:1rem 1.1rem;margin-bottom:1rem;display:none}
+    .day-planning-title{font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;color:#fff;margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem}
+    .day-section-label{font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:.35rem}
+    .day-entry{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);margin-bottom:.4rem;cursor:pointer;transition:all .2s}
+    .day-entry:hover{border-color:rgba(124,106,255,.3);background:rgba(124,106,255,.08)}
+    .day-entry i{font-size:1.1rem;color:var(--accent2);flex-shrink:0}
+    .day-entry-name{font-size:.82rem;font-weight:600;color:#fff;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .day-entry-meta{font-size:.7rem;color:var(--muted);flex-shrink:0}
+    .journal-tabs{display:flex;gap:.5rem;margin-bottom:1rem}
+    .journal-tab{flex:1;padding:.65rem;border-radius:100px;border:1px solid rgba(255,255,255,.13);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:.82rem;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.4rem}
+    .journal-tab.active{background:rgba(124,106,255,.22);border-color:#a78bfa;color:#fff;font-weight:600}
+
+
+    /* MOMENTS SIGNATURE */
+    #moments-screen{gap:0;padding-bottom:7rem}
+    .moments-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem}
+    .moment-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:1.25rem 1rem;text-align:center;cursor:pointer;transition:all .25s;display:flex;flex-direction:column;align-items:center;gap:.5rem;position:relative;overflow:hidden}
+    .moment-card::before{content:'';position:absolute;inset:0;background:var(--mc-color,rgba(124,106,255,.1));opacity:0;transition:opacity .25s}
+    .moment-card:hover::before{opacity:1}
+    .moment-card:hover{border-color:var(--mc-border,rgba(124,106,255,.4));transform:translateY(-2px)}
+    .moment-card-emoji{font-size:1.8rem;line-height:1;position:relative;z-index:1}
+    .moment-card-name{font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;color:#fff;position:relative;z-index:1}
+    .moment-card-desc{font-size:.72rem;color:var(--muted);line-height:1.4;position:relative;z-index:1}
+    .moment-card-time{font-size:.68rem;color:var(--accent2);font-weight:500;position:relative;z-index:1}
+    .moments-section-title{font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:.875rem;display:flex;align-items:center;gap:.5rem}
+
+    .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}
+    .weekly-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="particles" id="particles"></div>
+<div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div><div class="orb orb4"></div>
+
+
+<div id="liked-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <div><div class="screen-title">❤️ Titres aimés</div><div class="results-meta" id="liked-count"></div></div>
+  </div>
+  <div id="liked-list"></div>
+  <div class="results-actions">
+    <button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button>
+    <button class="btn-alt" onclick="generateFromLiked()">🎵 Playlist depuis mes ❤️</button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+
+<div id="ranking-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <div><div class="screen-title">📊 Classement des moods</div><div class="results-meta">Les moods les plus générés sur Moodwave</div></div>
+  </div>
+  <div id="ranking-list"></div>
+  <div id="ranking-personal"></div>
+  <div class="results-actions">
+    <button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+
+<div class="share-badge-overlay" id="share-badge-overlay" onclick="if(event.target===this)closeShareBadge()">
+  <div class="share-badge-box">
+    <div class="share-badge-emoji" id="badge-emoji">🎵</div>
+    <div class="share-badge-title" id="badge-title">Tu vas adorer ça !</div>
+    <div class="share-badge-sub" id="badge-sub">Quelqu'un a partagé une playlist Moodwave avec toi.</div>
+    <div class="share-badge-actions">
+      <button class="btn-alt" style="flex:1" onclick="closeShareBadge()">Plus tard</button>
+      <button class="btn-primary" style="flex:2;padding:.8rem" onclick="closeShareBadge();showScreen('form-screen')">🎵 Créer ma playlist</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="feedback-screen" class="screen">
+  <div class="screen-header" style="width:100%;max-width:420px">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <div><div class="screen-title">Donner mon avis 💬</div></div>
+  </div>
+  <div id="feedback-guest-block" style="display:none;width:100%;max-width:420px;background:rgba(124,106,255,.08);border:1px solid rgba(124,106,255,.3);border-radius:16px;padding:1.5rem;text-align:center">
+    <i class="ph-lock ph-fill" style="font-size:2.5rem;color:var(--accent2);margin-bottom:.75rem;display:block"></i>
+    <div style="font-family:'Outfit',sans-serif;font-size:1rem;font-weight:700;color:#fff;margin-bottom:.5rem">Compte requis</div>
+    <div style="font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:1.25rem">Pour laisser un avis, tu dois être connecté avec un compte Google, Discord ou email. Cela garantit l'authenticité des retours.</div>
+    <button class="btn-primary" style="padding:.8rem 2rem" onclick="showScreen('auth-screen')">Créer un compte</button>
+  </div>
+  <div id="feedback-form-wrap" style="width:100%">
+
+  <div class="feedback-box" style="width:100%">
+    <div class="feedback-section-title">Ta note globale</div>
+    <div class="star-row" id="star-row">
+      <button class="star-btn" data-val="1" onclick="setRating(1)">⭐</button>
+      <button class="star-btn" data-val="2" onclick="setRating(2)">⭐</button>
+      <button class="star-btn" data-val="3" onclick="setRating(3)">⭐</button>
+      <button class="star-btn" data-val="4" onclick="setRating(4)">⭐</button>
+      <button class="star-btn" data-val="5" onclick="setRating(5)">⭐</button>
+    </div>
+    <div id="rating-label" style="text-align:center;font-size:.85rem;color:var(--muted);margin-bottom:1.25rem;min-height:1.2rem"></div>
+
+    <div class="feedback-section-title">Type de retour</div>
+    <div class="feedback-cats">
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="strengths">💪 Point fort</button>
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="weakness">⚠️ Point faible</button>
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="suggestion">💡 Suggestion</button>
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="bug">🐛 Bug</button>
+      <button class="feedback-cat" onclick="selectCat(this)" data-val="other">💬 Autre</button>
+    </div>
+
+    <div class="feedback-section-title">Ton commentaire</div>
+    <textarea class="feedback-textarea" id="feedback-comment" maxlength="500"
+      placeholder="Dis-nous ce que tu penses… ce qui fonctionne bien, ce qui manque, ce que tu voudrais voir évoluer."></textarea>
+
+    <div class="success-msg" id="feedback-success"></div>
+    <div class="error-msg" id="feedback-error"></div>
+
+    <button class="btn-primary" onclick="submitFeedback()" id="feedback-submit-btn">Envoyer mon avis ✨</button>
+  </div>
+  </div>
+  <footer>Merci de nous aider à améliorer Moodwave ❤️</footer>
+</div>
+
+
+<div id="journal-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <div><div class="screen-title">📖 Mon journal musical</div></div>
+  </div>
+  <div class="journal-header-stats" id="journal-stats">
+    <div class="journal-stat"><div class="journal-stat-val" id="jstat-playlists">0</div><div class="journal-stat-lbl">Playlists</div></div>
+    <div class="journal-stat"><div class="journal-stat-val" id="jstat-moods">0</div><div class="journal-stat-lbl">Moods</div></div>
+    <div class="journal-stat"><div class="journal-stat-val" id="jstat-streak">0</div><div class="journal-stat-lbl">Jours actifs</div></div>
+  </div>
+  <div class="journal-section" id="journal-profile-section" style="display:none">
+    <div class="journal-section-title"><i class="ph-sparkle ph-fill"></i> Ton profil musical</div>
+    <div class="music-profile" id="journal-profile"></div>
+  </div>
+  <div class="journal-section" id="journal-souvenirs-section" style="display:none">
+    <div class="journal-section-title"><i class="ph-magic-wand ph-fill"></i> Tes souvenirs musicaux</div>
+    <div id="souvenirs-list"></div>
+  </div>
+  <div class="journal-section">
+    <div class="journal-section-title"><i class="ph-calendar ph-fill"></i> Calendrier musical</div>
+    <div class="cal-legend">
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#fde68a"></div>Moment Signature</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--accent2)"></div>Playlist perso</div>
+      <div class="cal-legend-item"><div class="cal-legend-dot" style="background:#fff"></div>Les deux</div>
+    </div>
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calPrevMonth()">←</button>
+      <div class="cal-month-label" id="cal-month-label">—</div>
+      <button class="cal-nav-btn" onclick="calNextMonth()">→</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="day-planning" id="day-planning">
+      <div class="day-planning-title"><i class="ph-calendar-check ph-fill" style="color:var(--accent2)"></i><span id="day-planning-date">—</span></div>
+      <div id="day-planning-content"></div>
+    </div>
+  </div>
+  <div class="journal-section">
+    <div class="journal-section-title"><i class="ph-list ph-fill"></i> Historique</div>
+    <div class="journal-tabs">
+      <button class="journal-tab active" onclick="switchJournalTab('moments',this)"><i class="ph-sparkle"></i> Moments Signature</button>
+      <button class="journal-tab" onclick="switchJournalTab('personal',this)"><i class="ph-music-note"></i> Playlists perso</button>
+    </div>
+    <button class="souvenir-btn" onclick="showScreen('moments-screen')" style="margin-bottom:.75rem"><i class="ph-sparkle ph-fill"></i> Générer un Moment Signature</button>
+    <div id="journal-moments-list"></div>
+    <div id="journal-personal-list" style="display:none"></div>
+  </div>
+  <div class="journal-section" id="journal-chart-section" style="display:none">
+    <div class="journal-section-title"><i class="ph-chart-bar ph-fill"></i> Tes moods</div>
+    <div class="mood-chart" id="mood-chart"></div>
+  </div>
+  <div class="journal-empty" id="journal-empty" style="display:none">
+    <div class="journal-empty-icon">📖</div>
+    <p>Ton journal est vide.<br>Génère ta première playlist pour commencer !</p>
+    <button class="btn-primary" style="margin-top:1.25rem;padding:.8rem 2rem" onclick="showScreen('form-screen')">Générer ma première playlist</button>
+  </div>
+  <div class="results-actions">
+    <button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button>
+    <button class="btn-alt" onclick="showScreen('form-screen')">+ Nouvelle playlist</button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+
+<!-- SOUVENIR MUSICAL MODAL -->
+<div class="souvenir-overlay" id="souvenir-overlay" onclick="if(event.target===this)closeSouvenir()">
+  <div class="souvenir-modal">
+    <div class="souvenir-modal-title"><i class="ph-magic-wand ph-fill" style="color:var(--accent2)"></i> Créer un souvenir</div>
+    <div class="souvenir-modal-sub">Associe un contexte à cette playlist pour la retrouver plus tard avec toute son émotion.</div>
+
+    <span class="souvenir-label">Choisis un émoji qui représente ce moment</span>
+    <div class="souvenir-emoji-row" id="souvenir-emoji-row">
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="🌅">🌅</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="🌙">🌙</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="🎉">🎉</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="💔">💔</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="✈️">✈️</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="🏠">🏠</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="💪">💪</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="🌧️">🌧️</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="☀️">☀️</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="🎓">🎓</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="❤️">❤️</button>
+      <button class="souvenir-emoji-btn" onclick="selectSouvenirEmoji(this)" data-val="🔥">🔥</button>
+    </div>
+
+    <span class="souvenir-label">En quelques mots, c'était quoi ce moment ?</span>
+    <input class="souvenir-input" id="souvenir-context" type="text" maxlength="80"
+      placeholder="ex : Retour de vacances en Italie, Premier appart, Soirée avec les amis…">
+
+    <span class="souvenir-label">Lieu (optionnel)</span>
+    <input class="souvenir-input" id="souvenir-location" type="text" maxlength="50"
+      placeholder="ex : Paris, Barcelone, Chez moi…">
+
+    <div style="display:flex;gap:.625rem;margin-top:.25rem">
+      <button class="btn-alt" style="flex:1" onclick="closeSouvenir()">Annuler</button>
+      <button class="btn-primary" style="flex:2;padding:.85rem" onclick="saveSouvenir()">💾 Sauvegarder ce souvenir</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="moments-screen" class="screen">
+  <div class="screen-header">
+    <button class="back-btn" onclick="showScreen('hero')">←</button>
+    <div><div class="screen-title">✨ Moments Signature</div>
+    <div class="results-meta">Une playlist taillée pour ce moment précis</div></div>
+  </div>
+
+  <div class="moments-section-title"><i class="ph-sun ph-fill"></i> Moments du quotidien</div>
+  <div class="moments-grid">
+    <div class="moment-card" style="--mc-color:rgba(251,191,36,.08);--mc-border:rgba(251,191,36,.4)" onclick="generateMoment('Premier café du matin','Calme','Faible','Détente','Démarrage doux avant que la journée commence vraiment.')">
+      <div class="moment-card-emoji"><i class="ph-coffee ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Premier café</div>
+      <div class="moment-card-desc">Démarrage doux avant la journée</div>
+      <div class="moment-card-time">6h – 9h</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(239,68,68,.08);--mc-border:rgba(239,68,68,.4)" onclick="generateMoment('Trajet matin','Motivé','Moyen','Trajet','En route, énergie qui monte progressivement.')">
+      <div class="moment-card-emoji"><i class="ph-train ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Trajet matin</div>
+      <div class="moment-card-desc">En route, énergie qui monte</div>
+      <div class="moment-card-time">7h – 9h</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(124,106,255,.1);--mc-border:rgba(124,106,255,.4)" onclick="generateMoment('Deep work concentration','Focus TDAH','Élevé','Travail','Zone de concentration maximale, pas de distraction.')">
+      <div class="moment-card-emoji"><i class="ph-brain ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Deep work</div>
+      <div class="moment-card-desc">Concentration maximale</div>
+      <div class="moment-card-time">9h – 12h</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(34,197,94,.08);--mc-border:rgba(34,197,94,.4)" onclick="generateMoment('Pause déjeuner','Heureux','Moyen','Détente','Un break mérité, décompresser et recharger.')">
+      <div class="moment-card-emoji"><i class="ph-fork-knife ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Pause déj</div>
+      <div class="moment-card-desc">Break mérité, on décompresse</div>
+      <div class="moment-card-time">12h – 14h</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(251,146,60,.08);--mc-border:rgba(251,146,60,.4)" onclick="generateMoment('Révisions avant exam','Anxieux','Moyen','Études','Concentration et gestion du stress avant un grand jour.')">
+      <div class="moment-card-emoji"><i class="ph-books ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Révisions</div>
+      <div class="moment-card-desc">Concentration avant un exam</div>
+      <div class="moment-card-time">Soir</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(6,182,212,.08);--mc-border:rgba(6,182,212,.4)" onclick="generateMoment('Séance de sport','Motivé','Élevé','Sport','Puissance maximale, on donne tout.')">
+      <div class="moment-card-emoji"><i class="ph-barbell ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Sport</div>
+      <div class="moment-card-desc">Puissance maximale</div>
+      <div class="moment-card-time">Flexible</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(168,85,247,.08);--mc-border:rgba(168,85,247,.4)" onclick="generateMoment('Vendredi soir retour maison','Heureux','Moyen','Trajet','La semaine est finie, on rentre avec le sourire.')">
+      <div class="moment-card-emoji"><i class="ph-confetti ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Vendredi soir</div>
+      <div class="moment-card-desc">La semaine est finie !</div>
+      <div class="moment-card-time">Vendredi 17h+</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(190,24,93,.08);--mc-border:rgba(190,24,93,.4)" onclick="generateMoment('Dîner en amoureux','Calme','Faible','Détente','Ambiance intime et douce pour une soirée spéciale.')">
+      <div class="moment-card-emoji"><i class="ph-candle ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Dîner amoureux</div>
+      <div class="moment-card-desc">Ambiance intime et douce</div>
+      <div class="moment-card-time">Soir</div>
+    </div>
+  </div>
+
+  <div class="moments-section-title"><i class="ph-moon-stars ph-fill"></i> Moments du soir</div>
+  <div class="moments-grid">
+    <div class="moment-card" style="--mc-color:rgba(99,102,241,.08);--mc-border:rgba(99,102,241,.4)" onclick="generateMoment('Détente après longue journée','Calme','Faible','Détente','Lâcher prise, souffler, se reposer enfin.')">
+      <div class="moment-card-emoji"><i class="ph-couch ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Détente</div>
+      <div class="moment-card-desc">Lâcher prise après la journée</div>
+      <div class="moment-card-time">19h – 21h</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(16,185,129,.08);--mc-border:rgba(16,185,129,.4)" onclick="generateMoment('Gaming late night','Excité','Élevé','Gaming','Concentration et adrénaline pour les sessions nocturnes.')">
+      <div class="moment-card-emoji"><i class="ph-game-controller ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Gaming</div>
+      <div class="moment-card-desc">Session nocturne, adrénaline</div>
+      <div class="moment-card-time">21h – 2h</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(245,158,11,.08);--mc-border:rgba(245,158,11,.4)" onclick="generateMoment('Soirée entre amis','Heureux','Élevé','Fête','Bonne humeur, énergie collective, on fait la fête.')">
+      <div class="moment-card-emoji"><i class="ph-users-three ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Soirée amis</div>
+      <div class="moment-card-desc">Bonne humeur collective</div>
+      <div class="moment-card-time">Soir</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(139,92,246,.08);--mc-border:rgba(139,92,246,.4)" onclick="generateMoment('Méditation avant sommeil','Calme','Faible','Méditation','Apaisement progressif pour préparer le sommeil.')">
+      <div class="moment-card-emoji"><i class="ph-moon-stars ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Avant sommeil</div>
+      <div class="moment-card-desc">Apaisement progressif</div>
+      <div class="moment-card-time">22h – 0h</div>
+    </div>
+  </div>
+
+  <div class="moments-section-title"><i class="ph-car ph-fill"></i> Moments en mouvement</div>
+  <div class="moments-grid">
+    <div class="moment-card" style="--mc-color:rgba(6,182,212,.08);--mc-border:rgba(6,182,212,.4)" onclick="generateMoment('Road trip en voiture','Heureux','Moyen','Road trip','Liberté sur la route, fenêtre ouverte, bonne humeur.')">
+      <div class="moment-card-emoji"><i class="ph-car ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Road trip</div>
+      <div class="moment-card-desc">Liberté sur la route</div>
+      <div class="moment-card-time">Flexible</div>
+    </div>
+    <div class="moment-card" style="--mc-color:rgba(236,72,153,.08);--mc-border:rgba(236,72,153,.4)" onclick="generateMoment('Running plein air','Motivé','Élevé','Sport','Rythme soutenu, on pousse ses limites.')">
+      <div class="moment-card-emoji"><i class="ph-person-simple-run ph-fill" style="color:var(--accent2)"></i></div>
+      <div class="moment-card-name">Running</div>
+      <div class="moment-card-desc">Rythme soutenu, on pousse</div>
+      <div class="moment-card-time">Flexible</div>
+    </div>
+  </div>
+
+  <div class="results-actions">
+    <button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button>
+    <button class="btn-alt" onclick="showScreen('form-screen')">🎵 Mood personnalisé</button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+<div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-title">Partager 🚀 <button class="modal-close-btn" onclick="closeModal()">✕</button></div>
+    <div class="share-grid">
+      <div class="share-item" onclick="shareWhatsApp()"><div class="si">💬</div><div class="sl">WhatsApp</div></div>
+      <div class="share-item" onclick="shareInstagram()"><div class="si">📸</div><div class="sl">Instagram</div></div>
+      <div class="share-item" onclick="shareFacebook()"><div class="si">📘</div><div class="sl">Facebook</div></div>
+      <div class="share-item" onclick="shareTwitter()"><div class="si">🐦</div><div class="sl">X/Twitter</div></div>
+      <div class="share-item" onclick="shareTikTok()"><div class="si">🎵</div><div class="sl">TikTok</div></div>
+      <div class="share-item" onclick="shareLinkedIn()"><div class="si">💼</div><div class="sl">LinkedIn</div></div>
+      <div class="share-item" onclick="shareSMS()"><div class="si">📱</div><div class="sl">SMS</div></div>
+      <div class="share-item" onclick="shareEmail()"><div class="si">✉️</div><div class="sl">Email</div></div>
+      <div class="share-item" onclick="shareNative()"><div class="si">🔗</div><div class="sl">Lien</div></div>
+      <div class="share-item" onclick="shareTextCopy()"><div class="si">📋</div><div class="sl">Copier</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="card-overlay" id="card-overlay" onclick="if(event.target===this)closeShareCard()">
+  <div class="card-box">
+    <canvas id="share-canvas" width="540" height="960"></canvas>
+    <div class="card-actions">
+      <button onclick="closeShareCard()">✕ Fermer</button>
+      <button class="btn-dl" onclick="downloadShareCard()">⬇️ Télécharger</button>
+    </div>
+  </div>
+</div>
+
+<div class="mini-player" id="mini-player">
+  <div class="mp-progress" id="mp-progress"></div>
+  <button class="mp-btn" id="mp-playpause" onclick="togglePlay()">▶</button>
+  <div class="mp-info"><div class="mp-title" id="mp-title">—</div><div class="mp-artist" id="mp-artist">—</div></div>
+  <button class="mp-close" onclick="stopPlayer()">✕</button>
+</div>
+<audio id="audio-player" preload="none"></audio>
+
+<div id="auth-screen" class="screen active">
+  <div class="logo"><i class="ph-waveform ph-fill" style="font-size:1.2rem"></i>Moodwave</div>
+  <div class="hero-rating" id="auth-rating" style="display:none">
+    <span class="hero-rating-stars" id="auth-rating-stars">★★★★★</span>
+    <span class="hero-rating-score" id="auth-rating-score">—</span>
+    <div class="hero-rating-divider"></div>
+    <span class="hero-rating-count" id="auth-rating-count">— avis</span>
+  </div>
+  <div class="auth-box">
+    <div class="auth-title" id="auth-title">Créer un compte</div>
+    <div class="auth-sub">Sauvegarde tes playlists sur tous tes appareils</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('signup')">Inscription</button>
+      <button class="auth-tab" onclick="switchAuthTab('login')">Connexion</button>
+    </div>
+    <div class="auth-error" id="auth-error"></div>
+    <input class="auth-input" id="auth-email" type="email" placeholder="Ton email" autocomplete="email">
+    <input class="auth-input" id="auth-password" type="password" placeholder="Mot de passe (6 caractères min.)" autocomplete="current-password">
+    <button class="auth-btn" id="auth-submit-btn" onclick="submitAuth()">Créer mon compte</button>
+    <div class="auth-divider">ou continuer avec</div>
+    <button class="oauth-btn google" onclick="signInWithGoogle()">
+      <svg class="oauth-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continuer avec Google
+    </button>
+    <button class="oauth-btn discord" onclick="signInWithDiscord()">
+      <svg class="oauth-icon" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="6" fill="#5865F2"/><path fill="white" d="M16.942 7.111A14.358 14.358 0 0 0 13.548 6a.054.054 0 0 0-.057.027 9.98 9.98 0 0 0-.44.904 13.258 13.258 0 0 0-3.978 0 9.14 9.14 0 0 0-.447-.904.056.056 0 0 0-.057-.027 14.32 14.32 0 0 0-3.394 1.111.051.051 0 0 0-.023.02C3.44 10.118 2.9 13.023 3.17 15.89a.059.059 0 0 0 .022.04 14.44 14.44 0 0 0 4.342 2.194.056.056 0 0 0 .061-.02c.334-.457.632-.94.887-1.449a.055.055 0 0 0-.03-.077 9.508 9.508 0 0 1-1.355-.645.056.056 0 0 1-.006-.092c.091-.068.182-.139.269-.211a.054.054 0 0 1 .056-.008c2.843 1.298 5.92 1.298 8.729 0a.054.054 0 0 1 .057.007c.087.072.178.144.27.212a.056.056 0 0 1-.005.092 8.9 8.9 0 0 1-1.356.644.056.056 0 0 0-.029.078c.26.508.557.99.886 1.448a.055.055 0 0 0 .061.021 14.4 14.4 0 0 0 4.349-2.194.056.056 0 0 0 .023-.039c.322-3.332-.54-6.213-2.285-8.779a.044.044 0 0 0-.022-.02ZM9.356 14.18c-.857 0-1.563-.787-1.563-1.754s.692-1.754 1.563-1.754c.878 0 1.577.794 1.563 1.754 0 .967-.692 1.754-1.563 1.754Zm5.78 0c-.858 0-1.563-.787-1.563-1.754s.692-1.754 1.562-1.754c.878 0 1.577.794 1.563 1.754 0 .967-.685 1.754-1.563 1.754Z"/></svg>
+      Continuer avec Discord
+    </button>
+    <div class="auth-divider">ou</div>
+    <button class="auth-guest" onclick="continueAsGuest()">Continuer sans compte</button>
+  </div>
+  <p style="font-size:.75rem;color:var(--muted);max-width:280px;line-height:1.6;margin-top:.5rem">Tes données restent privées et ne sont jamais partagées.</p>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+<div id="hero" class="screen">
+  <div class="hero-topbar">
+    <div class="logo"><i class="ph-waveform ph-fill" style="font-size:1.2rem"></i>Moodwave</div>
+    <div style="position:relative">
+      <div class="user-badge" id="user-badge" onclick="toggleUserMenu()">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <span class="user-name" id="user-name-display">Compte</span>
+      </div>
+      <div class="user-menu" id="user-menu">
+        <button class="user-menu-item" onclick="showScreen('history-screen');toggleUserMenu()"><i class="ph-clock-counter-clockwise"></i> Mes playlists</button>
+        <button class="user-menu-item" onclick="showScreen('journal-screen');renderJournal();toggleUserMenu()"><i class="ph-notebook"></i> Mon journal</button>
+        <button class="user-menu-item" onclick="showScreen('feedback-screen');toggleUserMenu()"><i class="ph-chat-dots"></i> Donner mon avis</button>
+        <button class="user-menu-item danger" onclick="signOut()"><i class="ph-sign-out"></i> Se déconnecter</button>
+      </div>
+    </div>
+  </div>
+  <div class="hero-rating" id="hero-rating" onclick="showScreen('feedback-screen')" style="display:none">
+    <span class="hero-rating-stars" id="hero-rating-stars">★★★★★</span>
+    <span class="hero-rating-score" id="hero-rating-score">—</span>
+    <div class="hero-rating-divider"></div>
+    <span class="hero-rating-count" id="hero-rating-count">— avis</span>
+    <div class="hero-rating-divider"></div>
+    <span class="hero-rating-cta">Donner mon avis</span>
+  </div>
+  <h1 class="hero-title">Qu'est-ce que tu veux <span>écouter aujourd'hui ?</span></h1>
+  <p class="hero-sub">Une playlist générée par l'IA, calibrée sur ton mood, ton énergie et ton moment.</p>
+  <div class="hero-features">
+    <div class="hero-feature"><i class="ph-smiley ph-fill"></i><div class="hero-feature-title">Basée sur ton mood</div><div class="hero-feature-desc">Calme, motivé, triste… l'IA s'adapte à toi</div></div>
+    <div class="hero-feature"><i class="ph-guitar ph-fill"></i><div class="hero-feature-title">Tous les genres</div><div class="hero-feature-desc">Rock, rap, jazz, animé ou surprise</div></div>
+    <div class="hero-feature"><i class="ph-play-circle ph-fill"></i><div class="hero-feature-title">Preview 30s</div><div class="hero-feature-desc">Écoute chaque titre dans l'app</div></div>
+    <div class="hero-feature"><i class="ph-share-network ph-fill"></i><div class="hero-feature-title">Export & partage</div><div class="hero-feature-desc">Spotify, Deezer, carte Instagram…</div></div>
+  </div>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="showScreen('form-screen')">Générer ma playlist ✨</button>
+    <div class="hero-grid">
+      <button class="btn-secondary" onclick="generate(true)"><i class="ph-shuffle ph-fill" style="color:var(--accent2)"></i> Surprise</button>
+      <button class="btn-weekly" onclick="showScreen('weekly-screen')"><i class="ph-fire ph-fill" style="color:#4ade80"></i> Tendances</button>
+      <button class="btn-secondary" onclick="showScreen('liked-screen');renderLikedSongs()" style="border-color:rgba(239,68,68,.35);color:#f87171"><i class="ph-heart ph-fill" style="color:#f87171"></i> Aimés</button>
+      <button class="btn-secondary" onclick="showScreen('ranking-screen');renderRanking()" style="border-color:rgba(251,191,36,.35);color:#fbbf24"><i class="ph-chart-bar ph-fill" style="color:#fbbf24"></i> Classement</button>
+      <button class="btn-secondary" onclick="showScreen('moments-screen')" style="border-color:rgba(251,191,36,.3);color:#fde68a"><i class="ph-sparkle ph-fill" style="color:#fde68a"></i> Moments</button>
+      <button class="btn-secondary" onclick="showScreen('journal-screen');renderJournal()" style="border-color:rgba(124,106,255,.4);color:var(--accent2)"><i class="ph-notebook ph-fill" style="color:var(--accent2)"></i> Journal</button>
+    
+      <button class="btn-secondary" onclick="showScreen('moments-screen')" style="border-color:rgba(251,191,36,.3);color:#fde68a"><i class="ph-sparkle ph-fill" style="color:#fde68a"></i> Moments</button>
+      <button class="btn-secondary" onclick="showScreen('journal-screen');renderJournal()" style="border-color:rgba(124,106,255,.4);color:var(--accent2)"><i class="ph-notebook ph-fill" style="color:var(--accent2)"></i> Journal</button>
+    </div>
+    <button class="btn-history" id="btn-history-hero" onclick="showScreen('history-screen')">📋 Mes playlists <span class="count-badge" id="history-count-badge">0</span></button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+<div id="form-screen" class="screen">
+  <div class="stepper-header">
+    <button class="back-btn" onclick="stepBack()">←</button>
+    <div class="stepper-progress-wrap">
+      <div class="stepper-label"><span id="step-label">Genres &amp; époque</span><span id="step-counter">1 / 5</span></div>
+      <div class="stepper-bar"><div class="stepper-fill" id="stepper-fill" style="width:20%"></div></div>
+    </div>
+  </div>
+  <div class="error-msg" id="error-msg"></div>
+  <div class="step-panel active" id="step-1">
+    <div class="step-question">Quel genre tu écoutes ?</div>
+    <div class="step-hint">Choix multiple — sélectionne tout ce qui te correspond.</div>
+    <div class="pills">
+      <div class="pill" data-group="genre" data-val="Électronique" onclick="toggleMultiPill(this)"><i class="ph-waves ph-fill"></i><span>Électronique</span></div>
+      <div class="pill" data-group="genre" data-val="Rock" onclick="toggleMultiPill(this)"><i class="ph-guitar ph-fill"></i><span>Rock</span></div>
+      <div class="pill" data-group="genre" data-val="Rap/Hip-Hop" onclick="toggleMultiPill(this)"><i class="ph-microphone-stage ph-fill"></i><span>Rap/Hip-Hop</span></div>
+      <div class="pill" data-group="genre" data-val="Reggae" onclick="toggleMultiPill(this)"><i class="ph-sun ph-fill"></i><span>Reggae</span></div>
+      <div class="pill" data-group="genre" data-val="Classique" onclick="toggleMultiPill(this)"><i class="ph-music-notes ph-fill"></i><span>Classique</span></div>
+      <div class="pill" data-group="genre" data-val="R&B/Soul" onclick="toggleMultiPill(this)"><i class="ph-vinyl-record ph-fill"></i><span>R&amp;B/Soul</span></div>
+      <div class="pill" data-group="genre" data-val="Metal" onclick="toggleMultiPill(this)"><i class="ph-lightning ph-fill"></i><span>Métal</span></div>
+      <div class="pill" data-group="genre" data-val="Pop" onclick="toggleMultiPill(this)"><i class="ph-star ph-fill"></i><span>Pop</span></div>
+      <div class="pill" data-group="genre" data-val="Jazz" onclick="toggleMultiPill(this)"><i class="ph-music-note-simple ph-fill"></i><span>Jazz</span></div>
+      <div class="pill" data-group="genre" data-val="Indie" onclick="toggleMultiPill(this)"><i class="ph-cassette-tape ph-fill"></i><span>Indie</span></div>
+      <div class="pill" data-group="genre" data-val="World Music" onclick="toggleMultiPill(this)"><i class="ph-globe ph-fill"></i><span>World</span></div>
+      <div class="pill" data-group="genre" data-val="Animé" onclick="toggleMultiPill(this)"><i class="ph-shooting-star ph-fill"></i><span>Animé</span></div>
+      <div class="pill" data-group="genre" data-val="Latino" onclick="toggleMultiPill(this)"><i class="ph-sun-horizon ph-fill"></i><span>Latino</span></div>
+      <div class="pill" data-group="genre" data-val="Afro" onclick="toggleMultiPill(this)"><i class="ph-planet ph-fill"></i><span>Afro</span></div>
+      <div class="pill all-genres" data-group="genre" data-val="De tout" onclick="toggleAllGenres(this)"><i class="ph-shuffle ph-fill"></i><span>De tout</span></div>
+    </div>
+    <div class="section-label">Époque musicale <span>(optionnel)</span></div>
+    <div class="era-pills">
+      <div class="pill" data-group="era" data-val="Années 70" onclick="toggleEraPill(this)"><i class="ph-television-simple ph-fill"></i><span>70s</span></div>
+      <div class="pill" data-group="era" data-val="Années 80" onclick="toggleEraPill(this)"><i class="ph-cassette-tape ph-fill"></i><span>80s</span></div>
+      <div class="pill" data-group="era" data-val="Années 90" onclick="toggleEraPill(this)"><i class="ph-disc ph-fill"></i><span>90s</span></div>
+      <div class="pill" data-group="era" data-val="Années 2000" onclick="toggleEraPill(this)"><i class="ph-device-mobile ph-fill"></i><span>2000s</span></div>
+      <div class="pill" data-group="era" data-val="Années 2010" onclick="toggleEraPill(this)"><i class="ph-headphones ph-fill"></i><span>2010s</span></div>
+      <div class="pill" data-group="era" data-val="Actuel" onclick="toggleEraPill(this)"><i class="ph-trend-up ph-fill"></i><span>Actuel</span></div>
+    </div>
+    <div class="genre-free-wrap">
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem">
+        <i class="ph-pencil-simple ph-fill" style="color:var(--accent2);font-size:1rem"></i>
+        <span style="font-size:.75rem;font-weight:600;color:var(--accent2);letter-spacing:.08em;text-transform:uppercase">Sous-genre spécifique</span>
+        <span style="font-size:.68rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optionnel)</span>
+      </div>
+      <input class="genre-free-input" id="genre-free-text" type="text" maxlength="60"
+        placeholder="ex : hardstyle, lo-fi hip hop, bossa nova, metalcore…">
+      <div class="genre-free-hint">
+        <i class="ph-lightbulb ph-fill" style="color:var(--accent2);font-size:.85rem;flex-shrink:0"></i>
+        Sélectionne d'abord un genre ci-dessus, puis précise ici le sous-genre exact que tu veux. L'IA s'adapte à n'importe quel style, même très pointu.
+      </div>
+    </div>
+    <div class="step-nav"><button class="btn-next" onclick="goStep(2)">Suivant →</button></div>
+  </div>
+  <div class="step-panel" id="step-2">
+    <div class="step-question">Comment tu te sens ?</div>
+    <div class="step-hint">Choisis le mood qui correspond le mieux à maintenant.</div>
+    <div class="pills">
+      <div class="pill" data-group="mood" data-val="Calme" onclick="selectPill(this)"><i class="ph-moon ph-fill"></i><span>Calme</span></div>
+      <div class="pill" data-group="mood" data-val="Stressé" onclick="selectPill(this)"><i class="ph-warning ph-fill"></i><span>Stressé</span></div>
+      <div class="pill" data-group="mood" data-val="Heureux" onclick="selectPill(this)"><i class="ph-smiley ph-fill"></i><span>Heureux</span></div>
+      <div class="pill" data-group="mood" data-val="Triste" onclick="selectPill(this)"><i class="ph-cloud-rain ph-fill"></i><span>Triste</span></div>
+      <div class="pill" data-group="mood" data-val="Motivé" onclick="selectPill(this)"><i class="ph-rocket ph-fill"></i><span>Motivé</span></div>
+      <div class="pill" data-group="mood" data-val="Excité" onclick="selectPill(this)"><i class="ph-lightning ph-fill"></i><span>Excité</span></div>
+      <div class="pill" data-group="mood" data-val="Nostalgique" onclick="selectPill(this)"><i class="ph-clock-counter-clockwise ph-fill"></i><span>Nostalgique</span></div>
+      <div class="pill" data-group="mood" data-val="Focus TDAH" onclick="selectPill(this)"><i class="ph-target ph-fill"></i><span>Focus TDAH</span></div>
+      <div class="pill" data-group="mood" data-val="Anxieux" onclick="selectPill(this)"><i class="ph-heartbeat ph-fill"></i><span>Anxieux</span></div>
+    </div>
+    <textarea class="mood-textarea" id="mood-free-text" placeholder="Optionnel — décris ton mood en quelques mots…" maxlength="200" rows="2"></textarea>
+    <div class="step-nav"><button class="btn-next" id="mood-next" onclick="goStep(3)" disabled>Suivant →</button></div>
+  </div>
+  <div class="step-panel" id="step-3">
+    <div class="step-question">Ton niveau d'énergie ?</div>
+    <div class="step-hint">Ça influence le tempo et l'intensité des morceaux.</div>
+    <div class="energy-cards">
+      <div class="energy-card" data-val="Faible" onclick="selectEnergy(this)"><i class="ph-battery-low ph-fill"></i><div class="e-label">Faible</div><div class="e-desc">Calme, posé</div></div>
+      <div class="energy-card" data-val="Moyen" onclick="selectEnergy(this)"><i class="ph-battery-medium ph-fill"></i><div class="e-label">Moyen</div><div class="e-desc">Équilibré</div></div>
+      <div class="energy-card" data-val="Élevé" onclick="selectEnergy(this)"><i class="ph-battery-full ph-fill"></i><div class="e-label">Élevé</div><div class="e-desc">Intense</div></div>
+    </div>
+    <div class="step-nav"><button class="btn-next" id="energy-next" onclick="goStep(4)" disabled>Suivant →</button></div>
+  </div>
+  <div class="step-panel" id="step-4">
+    <div class="step-question">Dans quel contexte écoutes-tu ta musique ?</div>
+    <div class="step-hint">Ça aide l'IA à adapter le tempo, l'énergie et l'ambiance.</div>
+    <div class="pills">
+      <div class="pill" data-group="context" data-val="Travail" onclick="selectPill(this)"><i class="ph-laptop ph-fill"></i><span>Travail</span></div>
+      <div class="pill" data-group="context" data-val="Études" onclick="selectPill(this)"><i class="ph-book-open ph-fill"></i><span>Études</span></div>
+      <div class="pill" data-group="context" data-val="Sport" onclick="selectPill(this)"><i class="ph-sneaker ph-fill"></i><span>Sport</span></div>
+      <div class="pill" data-group="context" data-val="Détente" onclick="selectPill(this)"><i class="ph-couch ph-fill"></i><span>Détente</span></div>
+      <div class="pill" data-group="context" data-val="Trajet" onclick="selectPill(this)"><i class="ph-train ph-fill"></i><span>Trajet</span></div>
+      <div class="pill" data-group="context" data-val="Fête" onclick="selectPill(this)"><i class="ph-confetti ph-fill"></i><span>Fête</span></div>
+      <div class="pill" data-group="context" data-val="Gaming" onclick="selectPill(this)"><i class="ph-game-controller ph-fill"></i><span>Gaming</span></div>
+      <div class="pill" data-group="context" data-val="Road trip" onclick="selectPill(this)"><i class="ph-car ph-fill"></i><span>Road trip</span></div>
+      <div class="pill" data-group="context" data-val="Méditation" onclick="selectPill(this)"><i class="ph-spiral ph-fill"></i><span>Méditation</span></div>
+    </div>
+    <div class="step-nav"><button class="btn-next" id="context-next" onclick="goStep(5)" disabled>Suivant →</button></div>
+  </div>
+  <div class="step-panel" id="step-5">
+    <div class="step-question">C'est parti ? 🎵</div>
+    <div class="step-hint">Voici ta sélection — modifie ou lance la génération.</div>
+    <div class="recap-box" id="recap-box"></div>
+    <div class="surprise-row">
+      <div class="surprise-info"><h4>🎲 Mode Surprise</h4><p>Quelques titres inattendus en bonus</p></div>
+      <div class="toggle" id="surprise-toggle" onclick="this.classList.toggle('on')"></div>
+    </div>
+    <button class="btn-generate" onclick="generate(false)">Générer ma playlist ✨</button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+<div id="loading-screen" class="screen">
+  <div class="wave-container"><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div></div>
+  <p class="loading-text" id="loading-text">Analyse de ta vibe...</p>
+</div>
+
+<div id="results-screen" class="screen">
+  <div class="screen-header"><button class="back-btn" onclick="showScreen('form-screen')">←</button><div><div class="screen-title">Ta playlist ✨</div><div class="results-meta" id="results-meta"></div></div></div>
+  <div class="success-msg" id="results-success"></div>
+  <div class="feedback-banner" id="feedback-banner"></div>
+  <div id="results-action-bar"></div>
+  <div id="songs-list"></div>
+  <button class="souvenir-btn" onclick="openSouvenir()"><i class="ph-magic-wand ph-fill"></i> Créer un souvenir de cette playlist</button>
+  <div class="results-actions"><button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button><button class="btn-alt" onclick="showScreen('form-screen')">🔄 Nouveau mood</button><button class="btn-alt" onclick="generate(true)">🎲 Surprise</button></div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+<div id="history-screen" class="screen">
+  <div class="screen-header"><button class="back-btn" onclick="showScreen('hero')">←</button><div class="screen-title">Mes playlists 📋</div></div>
+  <div id="history-list"></div>
+  <div class="history-actions-row" id="history-actions" style="display:none">
+    <button class="btn-alt" onclick="showScreen('hero')">🏠</button>
+    <button class="btn-alt" onclick="showScreen('form-screen')">+ Nouvelle</button>
+    <button class="btn-danger" onclick="clearHistory()">🗑️ Effacer</button>
+  </div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+<div id="saved-screen" class="screen">
+  <div class="screen-header"><button class="back-btn" onclick="showScreen('history-screen')">←</button><div><div class="screen-title">Playlist sauvegardée</div><div class="results-meta" id="saved-meta"></div></div></div>
+  <div class="success-msg" id="saved-success"></div>
+  <div id="saved-action-bar"></div>
+  <div id="saved-songs-list"></div>
+  <div class="results-actions"><button class="btn-alt" onclick="showScreen('hero')">🏠</button><button class="btn-alt" onclick="showScreen('history-screen')">← Historique</button><button class="btn-alt" onclick="showScreen('form-screen')">+ Nouveau</button></div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+<div id="weekly-screen" class="screen">
+  <div class="screen-header"><button class="back-btn" onclick="showScreen('hero')">←</button><div><div class="screen-title"><span class="weekly-pulse"></span>🔥 Tendances</div><div class="results-meta" id="weekly-date">Les 10 sons les plus tendances du moment</div></div></div>
+  <div class="success-msg" id="weekly-success"></div>
+  <div id="weekly-loading" class="weekly-loading">Chargement des tendances…</div>
+  <div id="weekly-action-bar" style="display:none"></div>
+  <div id="weekly-songs-list"></div>
+  <div class="results-actions" id="weekly-actions" style="display:none"><button class="btn-alt" onclick="showScreen('hero')">🏠 Accueil</button><button class="btn-alt" onclick="showScreen('form-screen')">🎵 Ma playlist</button></div>
+  <footer>Propulsé par l'IA · Fait pour les amoureux de musique</footer>
+</div>
+
+
+<script>
+
+/* ══ SUPABASE AUTH ══ */
+// Charge le SDK Supabase de manière asynchrone
+let supabase = null;
+const SUPABASE_URL = 'https://nwxmnknsoadcjrocluwe.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_6wU11x2f2dmRmlFK5WM-aA_IWXENyJz';
+
+let _supabasePromise=null;
+async function initSupabase(){
+  if(supabase)return supabase;
+  if(_supabasePromise)return _supabasePromise;
+  _supabasePromise=(async()=>{
+    try{
+      const {createClient}=await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+      return supabase;
+    }catch(e){console.error('Supabase non disponible:',e);return null;}
+  })();
+  return _supabasePromise;
+}
+
+let currentUser=null;
+let authMode='signup'; // 'signup' | 'login'
+
+function switchAuthTab(mode){
+  authMode=mode;
+  // Réécriture explicite sans toggle pour éviter les bugs
+  const tabs=document.querySelectorAll('.auth-tab');
+  if(tabs.length>=2){
+    if(mode==='signup'){
+      tabs[0].classList.add('active');
+      tabs[1].classList.remove('active');
+    } else {
+      tabs[0].classList.remove('active');
+      tabs[1].classList.add('active');
+    }
+  }
+  const title=document.getElementById('auth-title');
+  const btn=document.getElementById('auth-submit-btn');
+  const err=document.getElementById('auth-error');
+  if(title)title.textContent=mode==='signup'?'Créer un compte':'Se connecter';
+  if(btn)btn.textContent=mode==='signup'?'Créer mon compte':'Se connecter';
+  if(err){err.style.display='none';err.style.background='';err.style.color='';}
+}
+
+async function submitAuth(){
+  const sb=await initSupabase();
+  const email=document.getElementById('auth-email').value.trim();
+  const password=document.getElementById('auth-password').value;
+  const errEl=document.getElementById('auth-error');
+  errEl.style.display='none';
+
+  if(!email||!password){errEl.textContent='Email et mot de passe requis.';errEl.style.display='block';return;}
+  if(password.length<6){errEl.textContent='Le mot de passe doit faire au moins 6 caractères.';errEl.style.display='block';return;}
+
+  const btn=document.getElementById('auth-submit-btn');
+  btn.textContent='Chargement…';btn.disabled=true;
+
+  if(!sb){
+    // Mode sans Supabase — simuler un compte local
+    continueAsGuest(email);btn.textContent=authMode==='signup'?'Créer mon compte':'Se connecter';btn.disabled=false;
+    return;
+  }
+
+  try{
+    let result;
+    if(authMode==='signup'){
+      result=await sb.auth.signUp({email,password});
+      if(result.error)throw result.error;
+      if(result.data.user&&!result.data.session){
+        errEl.textContent='✅ Vérifie ta boîte mail pour confirmer ton compte !';errEl.style.display='block';
+        errEl.style.background='rgba(74,222,128,.1)';errEl.style.color='#4ade80';
+        btn.textContent='Créer mon compte';btn.disabled=false;return;
+      }
+    } else {
+      result=await sb.auth.signInWithPassword({email,password});
+      if(result.error)throw result.error;
+    }
+    if(result.data.user)onUserLoggedIn(result.data.user);
+  }catch(e){
+    errEl.textContent=e.message||'Erreur de connexion.';errEl.style.display='block';
+    btn.textContent=authMode==='signup'?'Créer mon compte':'Se connecter';btn.disabled=false;
+  }
+}
+
+function continueAsGuest(email){
+  // Crée un profil local sans compte
+  currentUser={id:'guest',email:email||'Invité',isGuest:true};
+  localStorage.setItem('mw_guest','1');
+  onUserLoggedIn(currentUser);
+}
+
+function onUserLoggedIn(user){
+  setTimeout(loadVotesFromCloud, 500);
+  setTimeout(loadPublicRating, 800);
+  currentUser=user;
+  const initials=(user.email||'?').slice(0,1).toUpperCase();
+  const name=(user.email||'Invité').split('@')[0];
+  document.getElementById('user-avatar').textContent=initials;
+  document.getElementById('user-name-display').textContent=name;
+  document.getElementById('user-badge').style.display='flex';
+  loadLikesFromCloud();
+  localStorage.setItem('mw_user',JSON.stringify({email:user.email,isGuest:user.isGuest||false}));
+  showScreen('hero');
+}
+
+async function signOut(){
+  const sb=await initSupabase();
+  if(sb&&currentUser&&!currentUser.isGuest)await sb.auth.signOut();
+  currentUser=null;
+  localStorage.removeItem('mw_user');
+  localStorage.removeItem('mw_guest');
+  document.getElementById('user-badge').style.display='none';
+  document.getElementById('user-menu').classList.remove('open');
+  showScreen('auth-screen');
+}
+
+function toggleUserMenu(){
+  document.getElementById('user-menu').classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#user-badge')&&!e.target.closest('#user-menu')){
+    const m=document.getElementById('user-menu');if(m)m.classList.remove('open');
+  }
+});
+
+async function checkExistingSession(){
+  const sb=await initSupabase();
+
+  // Gérer le retour après OAuth (hash dans l'URL)
+  if(window.location.hash.includes('access_token')||window.location.search.includes('code=')){
+    if(sb){
+      const {data}=await sb.auth.getSession();
+      if(data?.session?.user){onUserLoggedIn(data.session.user);return;}
+    }
+  }
+
+  // Session Supabase active
+  if(sb){
+    const {data}=await sb.auth.getSession();
+    if(data?.session?.user){onUserLoggedIn(data.session.user);return;}
+  }
+
+  // Compte invité local
+  const saved=localStorage.getItem('mw_user');
+  if(saved){
+    try{
+      const u=JSON.parse(saved);
+      if(u.isGuest){continueAsGuest(u.email);return;}
+    }catch(e){}
+  }
+
+  // Rien — afficher auth
+  showScreen('auth-screen');
+}
+
+
+
+/* ══ OAUTH ══ */
+async function signInWithGoogle(){
+  const sb=await initSupabase();
+  if(!sb){continueAsGuest();return;}
+  const {error}=await sb.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo:window.location.origin}
+  });
+  if(error){
+    const el=document.getElementById('auth-error');
+    el.textContent='Erreur Google : '+error.message;el.style.display='block';
+  }
+}
+
+async function signInWithDiscord(){
+  const sb=await initSupabase();
+  if(!sb){continueAsGuest();return;}
+  const {error}=await sb.auth.signInWithOAuth({
+    provider:'discord',
+    options:{redirectTo:window.location.origin}
+  });
+  if(error){
+    const el=document.getElementById('auth-error');
+    el.textContent='Erreur Discord : '+error.message;el.style.display='block';
+  }
+}
+
+/* Gérer le retour après OAuth (redirect) */
+async function handleOAuthCallback(){
+  const sb=await initSupabase();
+  if(!sb)return;
+  const {data,error}=await sb.auth.getSession();
+  if(data?.session?.user){
+    onUserLoggedIn(data.session.user);
+  }
+}
+
+
+
+/* ══ CLOUD HISTORY (Supabase) ══ */
+
+async function savePlaylistToCloud(songs, meta) {
+  if (!currentUser || currentUser.isGuest) return;
+  const sb = await initSupabase();
+  if (!sb) return;
+  try {
+    await sb.from('playlists').insert({
+      user_id: currentUser.id,
+      meta: meta,
+      songs: songs
+    });
+  } catch(e) {
+    console.error('Erreur sauvegarde cloud:', e);
+  }
+}
+
+async function loadPlaylistsFromCloud() {
+  if (!currentUser || currentUser.isGuest) return null;
+  const sb = await initSupabase();
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb
+      .from('playlists')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    if (error) throw error;
+    return data;
+  } catch(e) {
+    console.error('Erreur chargement cloud:', e);
+    return null;
+  }
+}
+
+async function deletePlaylistFromCloud(id) {
+  if (!currentUser || currentUser.isGuest) return;
+  const sb = await initSupabase();
+  if (!sb) return;
+  try {
+    await sb.from('playlists').delete().eq('id', id);
+  } catch(e) {
+    console.error('Erreur suppression cloud:', e);
+  }
+}
+
+
+
+/* ══ HISTORIQUE TITRES AIMÉS ══ */
+function getAllLikedSongs(){
+  const v=loadVotes();
+  const history=getHistory();
+  const liked=[];
+  const seen=new Set();
+  history.forEach(entry=>{
+    (entry.songs||[]).forEach(s=>{
+      const key=voteKey(s);
+      if(v[key]==='like'&&!seen.has(key)){
+        seen.add(key);
+        liked.push({...s,key});
+      }
+    });
+  });
+  // Aussi depuis window._historyEntries (cloud)
+  (window._historyEntries||[]).forEach(entry=>{
+    (entry.songs||[]).forEach(s=>{
+      const key=voteKey(s);
+      if(v[key]==='like'&&!seen.has(key)){
+        seen.add(key);
+        liked.push({...s,key});
+      }
+    });
+  });
+  return liked;
+}
+
+async function renderLikedSongs(){
+  const list=document.getElementById('liked-list');
+  const countEl=document.getElementById('liked-count');
+  list.innerHTML='<div class="weekly-loading">Chargement…</div>';
+
+  // Charger depuis le cloud si connecté
+  let liked=[];
+  const cloudLikes=await getLikedSongsFromCloud();
+  if(cloudLikes&&cloudLikes.length>0){
+    liked=cloudLikes.map(row=>({artist:row.artist,title:row.title,genre:row.genre,key:row.song_key}));
+  } else {
+    liked=getAllLikedSongs();
+  }
+
+  if(countEl)countEl.textContent=liked.length+' titre'+(liked.length>1?'s':'')+' aimé'+(liked.length>1?'s':'');
+  if(!liked.length){
+    list.innerHTML=`<div class="liked-empty"><div class="icon">💔</div><p>Aucun titre aimé pour l'instant.<br>Utilise 👍 sur tes playlists !</p></div>`;
+    return;
+  }
+  list.innerHTML=liked.map((s,i)=>{
+    return '<div class="liked-song-card">'+
+      '<span class="liked-song-num">'+String(i+1).padStart(2,'0')+'</span>'+
+      '<button class="liked-play-btn" data-artist="'+esc(s.artist)+'" data-title="'+esc(s.title)+'" onclick="playPreview(this.dataset.artist,this.dataset.title,this)">▶</button>'+
+      '<div class="liked-song-info">'+
+        '<div class="liked-song-artist">'+esc(s.artist)+'</div>'+
+        '<div class="liked-song-title">'+esc(s.title)+'</div>'+
+        '<div class="liked-song-genre">'+esc(s.genre||'')+'</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+async function generateFromLiked(){
+  const liked=getAllLikedSongs();
+  if(!liked.length){showScreen('form-screen');return;}
+  showScreen('loading-screen');startLoading();
+  const likedLabels=liked.map(s=>s.artist+' — '+s.title);
+  const meta='Playlist depuis mes ❤️';
+  try{
+    const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'mood',mood:'Varié',energy:'Moyen',context:'Détente',genres:[],likedSongs:likedLabels,dislikedSongs:[]})});
+    if(!res.ok)throw new Error('Erreur');
+    const songs=await res.json();
+    stopLoading();currentSongs=songs;currentMeta=meta;
+    saveToHistory(songs,meta);
+    const moodForStat=sel.mood||'';
+    if(moodForStat)trackMoodStat(moodForStat);
+    renderResults(songs,meta);
+  }catch(e){stopLoading();showScreen('liked-screen');}
+}
+
+/* ══ CLASSEMENT DES MOODS ══ */
+// Stats locales (agrégées depuis l'historique)
+function getMoodStats(){
+  const history=[...getHistory(),...(window._historyEntries||[])];
+  const stats={};
+  history.forEach(e=>{
+    if(!e.meta||e.meta==='Mode Surprise')return;
+    // Extraire le mood du meta "Genres / Mood / Energie / Contexte"
+    const parts=e.meta.split(' / ');
+    // Le mood est généralement la 2e partie (après les genres)
+    for(const part of parts){
+      const moods=['Calme','Stressé','Heureux','Triste','Motivé','Excité','Nostalgique','Focus TDAH','Anxieux'];
+      const found=moods.find(m=>part.includes(m));
+      if(found){stats[found]=(stats[found]||0)+1;break;}
+    }
+  });
+  return stats;
+}
+
+async function getGlobalMoodStats(){
+  // Essayer de charger depuis Supabase
+  const sb=await initSupabase();
+  if(!sb||!currentUser||currentUser.isGuest)return null;
+  try{
+    const {data}=await sb.from('mood_stats').select('mood,count').order('count',{ascending:false}).limit(10);
+    return data;
+  }catch(e){return null;}
+}
+
+async function trackMoodStat(mood){
+  const sb=await initSupabase();
+  if(!sb||!mood||mood==='Mode Surprise')return;
+  try{
+    // Upsert — incrémente le compteur
+    await sb.rpc('increment_mood_stat',{mood_name:mood});
+  }catch(e){
+    // Silencieux si la table n'existe pas encore
+  }
+}
+
+async function renderRanking(){
+  const list=document.getElementById('ranking-list');
+  const personal=document.getElementById('ranking-personal');
+  list.innerHTML='<div class="weekly-loading">Chargement…</div>';
+
+  // Stats globales depuis Supabase
+  // Charger stats globales Supabase
+  const global=await getGlobalMoodStats();
+
+  // Stats locales comme fallback et pour section perso
+  const localStats=getMoodStats();
+  const localArr=Object.entries(localStats).sort((a,b)=>b[1]-a[1]);
+
+  // Si pas de données globales, afficher message d'encouragement
+
+
+  const moodEmojis={
+    'Calme':'🌙','Stressé':'⚠️','Heureux':'😊','Triste':'🌧️',
+    'Motivé':'🚀','Excité':'⚡','Nostalgique':'🕰️','Focus TDAH':'🎯','Anxieux':'💓'
+  };
+
+  if(global&&global.length>0){
+    const max=global[0].count||1;
+    list.innerHTML='<p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem">Données de la communauté Moodwave</p>'+
+      global.map((item,i)=>{
+        const pct=Math.round((item.count/max)*100);
+        const pos=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        return '<div class="mood-rank-item">'+
+          '<div class="mood-rank-pos '+pos+'">'+(i+1)+'</div>'+
+          '<div class="mood-rank-info">'+
+            '<div class="mood-rank-name">'+(moodEmojis[item.mood]||'🎵')+' '+item.mood+'</div>'+
+            '<div class="mood-rank-count">'+item.count+' playlist'+(item.count>1?'s':'')+'</div>'+
+          '</div>'+
+          '<div class="mood-rank-bar-wrap"><div class="mood-rank-bar"><div class="mood-rank-fill" style="width:'+pct+'%"></div></div></div>'+
+        '</div>';
+      }).join('');
+  } else if(localArr.length>0){
+    const max=localArr[0][1]||1;
+    list.innerHTML='<p style="font-size:.75rem;color:var(--muted);margin-bottom:1rem">Tes statistiques personnelles</p>'+
+      localArr.map(([mood,count],i)=>{
+        const pct=Math.round((count/max)*100);
+        const pos=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        return '<div class="mood-rank-item">'+
+          '<div class="mood-rank-pos '+pos+'">'+(i+1)+'</div>'+
+          '<div class="mood-rank-info">'+
+            '<div class="mood-rank-name">'+(moodEmojis[mood]||'🎵')+' '+mood+'</div>'+
+            '<div class="mood-rank-count">'+count+' playlist'+(count>1?'s':'')+'</div>'+
+          '</div>'+
+          '<div class="mood-rank-bar-wrap"><div class="mood-rank-bar"><div class="mood-rank-fill" style="width:'+pct+'%"></div></div></div>'+
+        '</div>';
+      }).join('');
+  } else {
+    list.innerHTML=`<div class="liked-empty"><div class="icon">📊</div>
+      <p>Le classement communauté sera disponible dès que la table Supabase est configurée.<br><br>
+      <span style="font-size:.75rem;color:var(--muted)">Exécute le SQL de configuration dans Supabase pour activer cette fonctionnalité.</span></p></div>`;
+  }
+
+  // Stats perso en bas
+  if(localArr.length>0&&global){
+    personal.innerHTML='<p style="font-size:.75rem;color:var(--muted);margin-top:1.5rem;margin-bottom:.75rem">TES STATS PERSO</p>'+
+      localArr.slice(0,3).map(([mood,count])=>
+        '<div class="mood-rank-item" style="opacity:.7">'+
+          '<div class="mood-rank-name" style="font-size:.85rem">'+(moodEmojis[mood]||'🎵')+' '+mood+'</div>'+
+          '<div class="mood-rank-count" style="font-size:.75rem;color:var(--muted)">'+count+'x</div>'+
+        '</div>'
+      ).join('');
+  }
+}
+
+/* ══ BADGE DE PARTAGE ══ */
+function showShareBadge(meta){
+  const emojis={'Calme':'🌙','Motivé':'🚀','Heureux':'☀️','Triste':'🌧️','Excité':'⚡'};
+  const mood=meta?meta.split(' / ')[0]:'';
+  const emoji=emojis[mood]||'🎵';
+  document.getElementById('badge-emoji').textContent=emoji;
+  document.getElementById('badge-title').textContent='Tu vas adorer cette playlist !';
+  document.getElementById('badge-sub').textContent=
+    "Quelqu'un a partagé une playlist Moodwave avec toi — mood : \""+mood+"\". Crée la tienne gratuitement en 30 secondes.";
+  document.getElementById('share-badge-overlay').classList.add('open');
+}
+function closeShareBadge(){
+  document.getElementById('share-badge-overlay').classList.remove('open');
+}
+
+
+
+/* ══ LIKES CLOUD ══ */
+async function saveVotesToCloud(){
+  if(!currentUser||currentUser.isGuest)return;
+  const sb=await initSupabase();if(!sb)return;
+  try{
+    await sb.from('user_likes').upsert({
+      user_id:currentUser.id,
+      votes:votes,
+      updated_at:new Date().toISOString()
+    },{onConflict:'user_id'});
+  }catch(e){}
+}
+
+async function loadVotesFromCloud(){
+  if(!currentUser||currentUser.isGuest)return;
+  const sb=await initSupabase();if(!sb)return;
+  try{
+    const {data}=await sb.from('user_likes').select('votes').eq('user_id',currentUser.id).single();
+    if(data&&data.votes){
+      votes={...loadVotes(),...data.votes};
+      saveVotes();
+    }
+  }catch(e){}
+}
+
+async function syncLikeToCloud(key, voteType){
+  const sb=await initSupabase();
+  if(!sb||!currentUser||currentUser.isGuest)return;
+  try{
+    if(!voteType){
+      await sb.from('liked_songs').delete().eq('user_id',currentUser.id).eq('song_key',key);
+    } else if(voteType==='like'){
+      // Trouver les infos du titre depuis l'historique
+      const song=findSongByKey(key);
+      await sb.from('liked_songs').upsert({
+        user_id:currentUser.id,
+        song_key:key,
+        artist:song?.artist||'',
+        title:song?.title||'',
+        genre:song?.genre||'',
+        created_at:new Date().toISOString()
+      },{onConflict:'user_id,song_key'});
+    } else {
+      await sb.from('liked_songs').delete().eq('user_id',currentUser.id).eq('song_key',key);
+    }
+  }catch(e){console.log('Sync like silencieux:',e.message);}
+}
+
+function findSongByKey(key){
+  const history=[...getHistory(),...(window._historyEntries||[])];
+  for(const entry of history){
+    for(const s of (entry.songs||[])){
+      if(voteKey(s)===key)return s;
+    }
+  }
+  return null;
+}
+
+async function loadLikesFromCloud(){
+  const sb=await initSupabase();
+  if(!sb||!currentUser||currentUser.isGuest)return;
+  try{
+    const {data}=await sb.from('liked_songs').select('song_key').eq('user_id',currentUser.id);
+    if(data&&data.length>0){
+      data.forEach(row=>{if(!votes[row.song_key])votes[row.song_key]='like';});
+      saveVotes();
+    }
+  }catch(e){}
+}
+
+async function getLikedSongsFromCloud(){
+  const sb=await initSupabase();
+  if(!sb||!currentUser||currentUser.isGuest)return null;
+  try{
+    const {data}=await sb.from('liked_songs')
+      .select('*').eq('user_id',currentUser.id)
+      .order('created_at',{ascending:false});
+    return data;
+  }catch(e){return null;}
+}
+
+
+
+/* ══ FEEDBACK & NOTATION ══ */
+let currentRating = 0;
+let currentCat = '';
+
+const ratingLabels = {
+  1: 'Très décevant 😞',
+  2: 'Peut mieux faire 😐',
+  3: 'Correct 🙂',
+  4: 'Très bien ! 😊',
+  5: `Excellent, j'adore ! 🤩`
+};
+
+function setRating(val){
+  currentRating = val;
+  document.querySelectorAll('.star-btn').forEach(b=>{
+    b.classList.toggle('active', parseInt(b.dataset.val) <= val);
+  });
+  const lbl = document.getElementById('rating-label');
+  if(lbl) lbl.textContent = ratingLabels[val] || '';
+}
+
+function selectCat(el){
+  document.querySelectorAll('.feedback-cat').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+  currentCat = el.dataset.val;
+}
+
+
+async function checkAlreadyVoted(){
+  // Bloquer les invités
+  const guestBlock = document.getElementById('feedback-guest-block');
+  const formWrap = document.getElementById('feedback-form-wrap');
+  if(!currentUser || currentUser.isGuest){
+    if(guestBlock) guestBlock.style.display = 'block';
+    if(formWrap) formWrap.style.display = 'none';
+    return;
+  }
+  // Utilisateur connecté — afficher le formulaire
+  if(guestBlock) guestBlock.style.display = 'none';
+  if(formWrap) formWrap.style.display = 'block';
+  const sb = await initSupabase();
+  if(!sb) return;
+  try{
+    const {data} = await sb
+      .from('feedbacks')
+      .select('id, rating, category, comment')
+      .eq('user_id', currentUser.id)
+      .limit(1);
+    if(data && data.length > 0){
+      const existing = data[0];
+      const btn = document.getElementById('feedback-submit-btn');
+      const sucEl = document.getElementById('feedback-success');
+      // Pré-remplir avec l'avis existant
+      setRating(existing.rating);
+      const catBtn = document.querySelector(`.feedback-cat[data-val="${existing.category}"]`);
+      if(catBtn) selectCat(catBtn);
+      const textarea = document.getElementById('feedback-comment');
+      if(textarea) textarea.value = existing.comment || '';
+      // Désactiver le formulaire
+      if(btn){
+        btn.textContent = '✅ Avis déjà soumis';
+        btn.disabled = true;
+        btn.style.opacity = '.5';
+        btn.style.cursor = 'not-allowed';
+      }
+      if(sucEl){
+        sucEl.textContent = `Tu as déjà soumis un avis — merci pour ta contribution ! 🙏`;
+        sucEl.style.display = 'block';
+      }
+    } else {
+      // Réactiver si besoin (retour sur l'écran)
+      const btn = document.getElementById('feedback-submit-btn');
+      if(btn){ btn.textContent = 'Envoyer mon avis ✨'; btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; }
+    }
+  }catch(e){}
+}
+
+async function submitFeedback(){
+  const comment = document.getElementById('feedback-comment')?.value?.trim() || '';
+  const errEl = document.getElementById('feedback-error');
+  const sucEl = document.getElementById('feedback-success');
+  const btn = document.getElementById('feedback-submit-btn');
+  errEl.style.display = 'none';
+  sucEl.style.display = 'none';
+
+  if(!currentUser || currentUser.isGuest){
+    showScreen('auth-screen'); return;
+  }
+  if(!currentRating){ errEl.textContent = `Merci de donner une note avant d'envoyer.`; errEl.style.display = 'block'; return; }
+  if(!comment){ errEl.textContent = 'Ajoute un commentaire pour nous aider à comprendre ton retour.'; errEl.style.display = 'block'; return; }
+
+  btn.textContent = 'Envoi…'; btn.disabled = true;
+
+  const sb = await initSupabase();
+  if(!sb){
+    sucEl.textContent = '✅ Merci pour ton avis ! (mode hors ligne)';
+    sucEl.style.display = 'block';
+    btn.textContent = 'Envoyer mon avis ✨'; btn.disabled = false;
+    return;
+  }
+
+  try{
+    // Vérifier si l'utilisateur a déjà soumis un avis
+    if(currentUser && !currentUser.isGuest){
+      const {data: existing} = await sb
+        .from('feedbacks')
+        .select('id')
+        .eq('user_id', currentUser.id)
+        .limit(1);
+      if(existing && existing.length > 0){
+        errEl.textContent = `Tu as déjà soumis un avis. Merci pour ta contribution ! 🙏`;
+        errEl.style.display = 'block';
+        btn.textContent = 'Envoyer mon avis ✨'; btn.disabled = false;
+        return;
+      }
+    }
+
+    await sb.from('feedbacks').insert({
+      user_id: currentUser?.isGuest ? null : currentUser?.id || null,
+      rating: currentRating,
+      category: currentCat || 'other',
+      comment,
+      created_at: new Date().toISOString()
+    });
+    sucEl.textContent = '✅ Merci beaucoup ! Ton avis nous aide vraiment à améliorer Moodwave.';
+    sucEl.style.display = 'block';
+    // Reset
+    currentRating = 0; currentCat = '';
+    document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.feedback-cat').forEach(b=>b.classList.remove('selected'));
+    document.getElementById('feedback-comment').value = '';
+    document.getElementById('rating-label').textContent = '';
+    // Recharger la note publique
+    loadPublicRating();
+  }catch(e){
+    errEl.textContent = `Erreur lors de l'envoi. Réessaie.`;
+    errEl.style.display = 'block';
+  }
+  btn.textContent = 'Envoyer mon avis ✨'; btn.disabled = false;
+}
+
+async function loadPublicRating(){
+  const sb = await initSupabase();
+  if(!sb) return;
+  try{
+    const { data } = await sb
+      .from('feedbacks')
+      .select('rating')
+      .not('rating','is',null);
+
+    if(!data || data.length < 3) return; // Afficher seulement si assez d'avis
+
+    const avg = data.reduce((s,r)=>s+r.rating,0) / data.length;
+    const rounded = Math.round(avg * 10) / 10;
+    const stars = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+
+    const widget = document.getElementById('hero-rating');
+    const starsEl = document.getElementById('hero-rating-stars');
+    const scoreEl = document.getElementById('hero-rating-score');
+    const countEl = document.getElementById('hero-rating-count');
+
+    // Widget hero
+    if(widget && starsEl && scoreEl && countEl){
+      starsEl.textContent = stars;
+      scoreEl.textContent = rounded.toFixed(1);
+      countEl.textContent = data.length + ' avis';
+      widget.style.display = 'flex';
+    }
+    // Widget auth
+    const authWidget = document.getElementById('auth-rating');
+    const authStars = document.getElementById('auth-rating-stars');
+    const authScore = document.getElementById('auth-rating-score');
+    const authCount = document.getElementById('auth-rating-count');
+    if(authWidget && authStars && authScore && authCount){
+      authStars.textContent = stars;
+      authScore.textContent = rounded.toFixed(1);
+      authCount.textContent = data.length + ' avis';
+      authWidget.style.display = 'flex';
+    }
+  }catch(e){}
+}
+
+
+
+/* ══ JOURNAL MUSICAL ══ */
+
+function renderJournal(){
+  const allEntries = [...getHistory(),...(window._historyEntries||[])];
+  const seen = new Set();
+  const entries = allEntries.filter(e=>{
+    const k=(e.meta||'')+(e.date||'')+(e.created_at||'');
+    if(seen.has(k))return false;seen.add(k);return true;
+  });
+
+  const emptyEl=document.getElementById('journal-empty');
+  const chartSection=document.getElementById('journal-chart-section');
+  const profileSection=document.getElementById('journal-profile-section');
+
+  if(!entries.length){
+    if(emptyEl)emptyEl.style.display='block';
+    if(chartSection)chartSection.style.display='none';
+    if(profileSection)profileSection.style.display='none';
+    return;
+  }
+  if(emptyEl)emptyEl.style.display='none';
+  if(chartSection)chartSection.style.display='block';
+
+  // Stats
+  const moodSet=new Set();const activeDays=new Set();
+  entries.forEach(e=>{const m=extractMood(e.meta);if(m)moodSet.add(m);
+    const d=e.date?(e.date.split(' à ')[0]):'';if(d)activeDays.add(d);});
+  const sp=document.getElementById('jstat-playlists');const sm=document.getElementById('jstat-moods');const ss=document.getElementById('jstat-streak');
+  if(sp)sp.textContent=entries.length;if(sm)sm.textContent=moodSet.size;if(ss)ss.textContent=activeDays.size;
+
+  // Profil musical
+  if(entries.length>=3){if(profileSection)profileSection.style.display='block';buildMusicProfile(entries,{},Object.entries({}).sort());}
+
+  // Calendrier
+  renderCalendar();
+
+  // Listes séparées moments/perso
+  renderJournalLists(entries);
+
+  // Graphe moods
+  const moodCounts={};const moodEmojis={'Calme':'🌙','Stressé':'⚠️','Heureux':'😊','Triste':'🌧️','Motivé':'🚀','Excité':'⚡','Nostalgique':'🕰️','Focus TDAH':'🎯','Anxieux':'💓'};
+  entries.forEach(e=>{const m=extractMood(e.meta);if(m)moodCounts[m]=(moodCounts[m]||0)+1;});
+  const sortedMoods=Object.entries(moodCounts).sort((a,b)=>b[1]-a[1]);
+  const maxCount=sortedMoods[0]?.[1]||1;
+  const chartEl=document.getElementById('mood-chart');
+  if(chartEl){
+    chartEl.innerHTML=sortedMoods.map(([mood,count])=>{
+      const pct=Math.round((count/maxCount)*100);
+      return `<div class="mood-chart-row"><span class="mood-chart-label">${moodEmojis[mood]||''} ${mood}</span><div class="mood-chart-bar-wrap"><div class="mood-chart-fill" style="width:0%" data-pct="${pct}"></div></div><span class="mood-chart-count">${count}</span></div>`;
+    }).join('');
+    setTimeout(()=>{chartEl.querySelectorAll('.mood-chart-fill').forEach(el=>{el.style.width=el.dataset.pct+'%';});},100);
+  }
+
+  // Souvenirs
+  loadSouvenirs().then(souvenirs=>{renderSouvenirs(souvenirs);checkSouvenirAnniversary(souvenirs);});
+}
+
+
+function extractMood(meta){
+  if(!meta) return null;
+  const moods = ['Calme','Stressé','Heureux','Triste','Motivé','Excité','Nostalgique','Focus TDAH','Anxieux'];
+  for(const m of moods){
+    if(meta.includes(m)) return m;
+  }
+  return null;
+}
+
+function buildMusicProfile(entries, moodCounts, sortedMoods){
+  const profileEl = document.getElementById('journal-profile');
+  if(!profileEl) return;
+
+  // Mood dominant
+  const topMood = sortedMoods[0]?.[0] || '—';
+
+  // Genre dominant
+  const genreCounts = {};
+  entries.forEach(e=>{
+    (e.songs||[]).forEach(s=>{
+      if(s.genre) genreCounts[s.genre] = (genreCounts[s.genre]||0) + 1;
+    });
+  });
+  const topGenre = Object.entries(genreCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+
+  // Moment favori (si dates disponibles)
+  const hourCounts = {};
+  entries.forEach(e=>{
+    if(e.created_at){
+      const h = new Date(e.created_at).getHours();
+      const slot = h < 12 ? 'Matin' : h < 18 ? 'Après-midi' : h < 22 ? 'Soirée' : 'Nuit';
+      hourCounts[slot] = (hourCounts[slot]||0) + 1;
+    }
+  });
+  const topMoment = Object.entries(hourCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+
+  // Artiste le plus généré
+  const artistCounts = {};
+  entries.forEach(e=>{
+    (e.songs||[]).forEach(s=>{
+      if(s.artist) artistCounts[s.artist] = (artistCounts[s.artist]||0) + 1;
+    });
+  });
+  const topArtist = Object.entries(artistCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+
+  // Titre favori (le plus liké)
+  const v = loadVotes();
+  const likedArtists = {};
+  entries.forEach(e=>{
+    (e.songs||[]).forEach(s=>{
+      const k = voteKey(s);
+      if(v[k]==='like' && s.artist){
+        likedArtists[s.artist] = (likedArtists[s.artist]||0) + 1;
+      }
+    });
+  });
+  const topLikedArtist = Object.entries(likedArtists).sort((a,b)=>b[1]-a[1])[0]?.[0] || '—';
+
+  profileEl.innerHTML = [
+    ['Mood signature', topMood],
+    ['Genre favori', topGenre],
+    ['Moment préféré', topMoment],
+    ['Artiste récurrent', topArtist],
+    ['Artiste le plus aimé', topLikedArtist],
+    ['Playlists générées', entries.length+' au total'],
+  ].map(([name, val])=>`
+    <div class="profile-trait">
+      <span class="profile-trait-name">${name}</span>
+      <span class="profile-trait-val">${esc(String(val))}</span>
+    </div>
+  `).join('');
+}
+
+
+
+/* ══ SOUVENIR MUSICAL ══ */
+let souvenirEmoji = '🎵';
+let souvenirTargetSongs = [];
+let souvenirTargetMeta = '';
+
+function openSouvenir(){
+  souvenirTargetSongs = currentSongs;
+  souvenirTargetMeta = currentMeta;
+  souvenirEmoji = '🎵';
+  document.getElementById('souvenir-context').value = '';
+  document.getElementById('souvenir-location').value = '';
+  document.querySelectorAll('.souvenir-emoji-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('souvenir-overlay').classList.add('open');
+}
+
+function closeSouvenir(){
+  document.getElementById('souvenir-overlay').classList.remove('open');
+}
+
+function selectSouvenirEmoji(btn){
+  document.querySelectorAll('.souvenir-emoji-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  souvenirEmoji = btn.dataset.val;
+}
+
+function saveSouvenir(){
+  const context = document.getElementById('souvenir-context').value.trim();
+  const location = document.getElementById('souvenir-location').value.trim();
+  if(!context){
+    document.getElementById('souvenir-context').focus();
+    document.getElementById('souvenir-context').style.borderColor = '#f87171';
+    setTimeout(()=>document.getElementById('souvenir-context').style.borderColor='', 2000);
+    return;
+  }
+  const souvenir = {
+    id: Date.now(),
+    emoji: souvenirEmoji,
+    context,
+    location,
+    date: new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),
+    created_at: new Date().toISOString(),
+    meta: souvenirTargetMeta,
+    songs: souvenirTargetSongs
+  };
+  // Sauvegarder en local
+  const souvenirs = getSouvenirs();
+  souvenirs.unshift(souvenir);
+  localStorage.setItem('moodwave_souvenirs', JSON.stringify(souvenirs));
+  // Sauvegarder dans Supabase si connecté
+  saveSouvenirToCloud(souvenir);
+  closeSouvenir();
+  // Feedback visuel
+  showSuccess('results-success', `${souvenirEmoji} Souvenir créé ! Retrouve-le dans ton journal.`);
+}
+
+function getSouvenirs(){
+  try{ return JSON.parse(localStorage.getItem('moodwave_souvenirs')||'[]'); }
+  catch(e){ return []; }
+}
+
+async function saveSouvenirToCloud(souvenir){
+  if(!currentUser||currentUser.isGuest) return;
+  const sb = await initSupabase(); if(!sb) return;
+  try{
+    await sb.from('souvenirs').insert({
+      user_id: currentUser.id,
+      emoji: souvenir.emoji,
+      context: souvenir.context,
+      location: souvenir.location||null,
+      meta: souvenir.meta,
+      songs: souvenir.songs,
+      created_at: souvenir.created_at
+    });
+  }catch(e){}
+}
+
+async function loadSouvenirs(){
+  // D'abord local
+  let souvenirs = getSouvenirs();
+  // Puis cloud si connecté
+  if(currentUser && !currentUser.isGuest){
+    const sb = await initSupabase(); if(!sb) return souvenirs;
+    try{
+      const {data} = await sb.from('souvenirs').select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at',{ascending:false});
+      if(data && data.length > 0){
+        // Fusionner cloud + local, dédupliquer
+        const cloudIds = new Set(data.map(s=>s.created_at));
+        const localOnly = souvenirs.filter(s=>!cloudIds.has(s.created_at));
+        souvenirs = [...data.map(s=>({...s,id:s.id})), ...localOnly];
+      }
+    }catch(e){}
+  }
+  return souvenirs;
+}
+
+function renderSouvenirs(souvenirs){
+  const section = document.getElementById('journal-souvenirs-section');
+  const list = document.getElementById('souvenirs-list');
+  if(!souvenirs.length || !section || !list) return;
+  section.style.display = 'block';
+  list.innerHTML = souvenirs.map((s,i)=>{
+    const preview = (s.songs||[]).slice(0,2).map(t=>t.artist+' – '+t.title).join(' · ');
+    return `<div class="souvenir-card" onclick="openSouvenirDetail(${i})">
+      <div class="souvenir-card-badge">✨ Souvenir</div>
+      <span class="souvenir-card-emoji">${s.emoji||'🎵'}</span>
+      <div class="souvenir-card-context">${esc(s.context)}</div>
+      <div class="souvenir-card-date">${s.location ? '📍 '+esc(s.location)+' · ' : ''}${s.date||''}</div>
+      ${preview ? `<div class="souvenir-card-tracks">${esc(preview)}…</div>` : ''}
+    </div>`;
+  }).join('');
+  window._currentSouvenirs = souvenirs;
+}
+
+function openSouvenirDetail(idx){
+  const s = (window._currentSouvenirs||[])[idx];
+  if(!s) return;
+  // Ouvrir la playlist du souvenir
+  savedSongs = s.songs || [];
+  savedMeta = s.context + (s.location ? ' · '+s.location : '');
+  document.getElementById('saved-meta').textContent = s.emoji+' '+s.context+' · '+s.date;
+  document.getElementById('saved-success').style.display = 'none';
+  document.getElementById('saved-action-bar').innerHTML = actionBarHTML(savedSongs, savedMeta, 'saved', 'saved-success');
+  document.getElementById('saved-songs-list').innerHTML = songCardsHTML(savedSongs,'saved',savedMeta,'saved-success');
+  attachCardEvents('saved-songs-list', savedSongs, 'saved', savedMeta, 'saved-success');
+  showScreen('saved-screen');
+}
+
+function checkSouvenirAnniversary(souvenirs){
+  const notif = document.getElementById('souvenir-notif');
+  if(!notif || !souvenirs.length) return;
+  const now = new Date();
+  // Chercher un souvenir créé il y a ~30, 90, 180 ou 365 jours
+  const targets = [30, 90, 180, 365];
+  for(const s of souvenirs){
+    if(!s.created_at) continue;
+    const days = Math.round((now - new Date(s.created_at)) / 86400000);
+    const match = targets.find(t => Math.abs(days-t) <= 2);
+    if(match){
+      const label = match === 365 ? `Il y a un an` : match === 180 ? `Il y a 6 mois` : match === 90 ? `Il y a 3 mois` : `Il y a un mois`;
+      document.getElementById('souvenir-notif-title').textContent = `${s.emoji} ${label} — "${s.context}"`;
+      document.getElementById('souvenir-notif-sub').textContent = `Tu avais créé un souvenir musical ${s.location ? 'depuis '+s.location : ''}. Tu veux replonger dans cette ambiance ?`;
+      notif.style.display = 'block';
+      window._notifSouvenirIdx = souvenirs.indexOf(s);
+      break;
+    }
+  }
+}
+
+function openSouvenirFromNotif(){
+  const idx = window._notifSouvenirIdx;
+  if(idx !== undefined) openSouvenirDetail(idx);
+}
+
+
+
+/* ══ CALENDRIER JOURNAL ══ */
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+const MOMENT_KEYWORDS = ['Premier café','Trajet matin','Deep work','Pause déj','Révisions','Sport','Vendredi soir','Dîner amoureux','Détente','Gaming','Soirée amis','Avant sommeil','Road trip','Running','Moment précis'];
+
+function isMomentSignature(meta){
+  return MOMENT_KEYWORDS.some(k => meta && meta.includes(k));
+}
+
+function buildCalendarData(){
+  const allEntries = [...getHistory(), ...(window._historyEntries||[])];
+  const seen = new Set();
+  const entries = allEntries.filter(e=>{
+    const k = (e.meta||'')+(e.date||'')+(e.created_at||'');
+    if(seen.has(k)) return false; seen.add(k); return true;
+  });
+  // Construire un map date -> {moments:[], personal:[]}
+  const map = {};
+  entries.forEach(e=>{
+    let dateKey = null;
+    if(e.created_at){
+      const d = new Date(e.created_at);
+      dateKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    if(!dateKey) return;
+    if(!map[dateKey]) map[dateKey]={moments:[],personal:[]};
+    if(isMomentSignature(e.meta)) map[dateKey].moments.push(e);
+    else map[dateKey].personal.push(e);
+  });
+  return map;
+}
+
+function renderCalendar(){
+  const map = buildCalendarData();
+  const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  document.getElementById('cal-month-label').textContent = monthNames[calMonth]+' '+calYear;
+
+  const grid = document.getElementById('cal-grid');
+  const headers = ['Lu','Ma','Me','Je','Ve','Sa','Di'];
+  let html = headers.map(d=>`<div class="cal-day-header">${d}</div>`).join('');
+
+  const firstDay = new Date(calYear, calMonth, 1);
+  const lastDay = new Date(calYear, calMonth+1, 0);
+  const startDow = (firstDay.getDay()+6)%7; // Lundi=0
+  const today = new Date();
+  const todayKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // Jours du mois précédent
+  for(let i=0; i<startDow; i++){
+    const d = new Date(calYear, calMonth, -startDow+i+1);
+    html += `<div class="cal-day other-month">${d.getDate()}</div>`;
+  }
+
+  // Jours du mois
+  for(let d=1; d<=lastDay.getDate(); d++){
+    const dateKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const data = map[dateKey];
+    const isToday = dateKey === todayKey;
+    const hasMoment = data && data.moments.length > 0;
+    const hasPersonal = data && data.personal.length > 0;
+    const hasBoth = hasMoment && hasPersonal;
+    let cls = 'cal-day';
+    if(isToday) cls += ' today';
+    if(hasBoth) cls += ' has-both';
+    else if(hasMoment) cls += ' has-moment';
+    else if(hasPersonal) cls += ' has-personal';
+    const dots = (hasMoment ? `<div class="cal-dot moment"></div>` : '') + (hasPersonal ? `<div class="cal-dot personal"></div>` : '');
+    const onclick = (hasMoment||hasPersonal) ? `onclick="selectCalDay('${dateKey}')"` : '';
+    html += `<div class="${cls}" ${onclick}>${d}${dots ? `<div class="cal-dots">${dots}</div>` : ''}</div>`;
+  }
+
+  // Jours du mois suivant
+  const endDow = (lastDay.getDay()+6)%7;
+  for(let i=1; i<7-endDow; i++){
+    html += `<div class="cal-day other-month">${i}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function selectCalDay(dateKey){
+  // Désélectionner
+  document.querySelectorAll('.cal-day.selected').forEach(d=>d.classList.remove('selected'));
+  const map = buildCalendarData();
+  const data = map[dateKey];
+  if(!data) return;
+
+  // Mettre en surbrillance
+  const cells = document.querySelectorAll('.cal-day');
+  const [y,m,d] = dateKey.split('-').map(Number);
+  cells.forEach(cell=>{
+    if(parseInt(cell.textContent)===d && !cell.classList.contains('other-month')){
+      cell.classList.add('selected');
+    }
+  });
+
+  // Afficher le planning du jour
+  const planning = document.getElementById('day-planning');
+  const planDate = document.getElementById('day-planning-date');
+  const planContent = document.getElementById('day-planning-content');
+  planning.style.display = 'block';
+
+  const dateObj = new Date(y,m-1,d);
+  planDate.textContent = dateObj.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  let html = '';
+
+  // Section Moments Signature
+  if(data.moments.length > 0){
+    html += `<div class="day-section-label" style="color:#fde68a"><i class="ph-sparkle ph-fill"></i> Moments Signature</div>`;
+    html += data.moments.map((e,i)=>{
+      const preview = (e.songs||[]).slice(0,1).map(s=>s.artist+' – '+s.title).join('');
+      return `<div class="day-entry" data-idx="${i}" data-type="moment" onclick="openEntryFromCal('${dateKey}','moment',${i})">
+        <i class="ph-sparkle ph-fill"></i>
+        <span class="day-entry-name">${esc(e.meta||'Moment Signature')}</span>
+        <span class="day-entry-meta">${(e.songs||[]).length} titres</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Section Playlists perso
+  if(data.personal.length > 0){
+    html += `<div class="day-section-label" style="color:var(--accent2);margin-top:.625rem"><i class="ph-music-note ph-fill"></i> Playlists personnalisées</div>`;
+    html += data.personal.map((e,i)=>{
+      return `<div class="day-entry" onclick="openEntryFromCal('${dateKey}','personal',${i})">
+        <i class="ph-music-note ph-fill"></i>
+        <span class="day-entry-name">${esc(e.meta||'Playlist')}</span>
+        <span class="day-entry-meta">${(e.songs||[]).length} titres</span>
+      </div>`;
+    }).join('');
+  }
+
+  planContent.innerHTML = html;
+  planning.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function openEntryFromCal(dateKey, type, idx){
+  const map = buildCalendarData();
+  const data = map[dateKey];
+  if(!data) return;
+  const entry = type==='moment' ? data.moments[idx] : data.personal[idx];
+  if(!entry) return;
+  savedSongs = entry.songs||[];
+  savedMeta = entry.meta||'';
+  document.getElementById('saved-meta').textContent = entry.meta||'';
+  document.getElementById('saved-success').style.display='none';
+  document.getElementById('saved-action-bar').innerHTML = actionBarHTML(savedSongs,savedMeta,'saved','saved-success');
+  document.getElementById('saved-songs-list').innerHTML = songCardsHTML(savedSongs,'saved',savedMeta,'saved-success');
+  attachCardEvents('saved-songs-list',savedSongs,'saved',savedMeta,'saved-success');
+  showScreen('saved-screen');
+}
+
+function calPrevMonth(){
+  calMonth--; if(calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+  document.getElementById('day-planning').style.display='none';
+}
+function calNextMonth(){
+  calMonth++; if(calMonth>11){calMonth=0;calYear++;}
+  renderCalendar();
+  document.getElementById('day-planning').style.display='none';
+}
+
+function switchJournalTab(tab, btn){
+  document.querySelectorAll('.journal-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('journal-moments-list').style.display = tab==='moments' ? 'block' : 'none';
+  document.getElementById('journal-personal-list').style.display = tab==='personal' ? 'block' : 'none';
+}
+
+function renderJournalLists(entries){
+  const moments = entries.filter(e=>isMomentSignature(e.meta));
+  const personal = entries.filter(e=>!isMomentSignature(e.meta));
+
+  const momentEl = document.getElementById('journal-moments-list');
+  const personalEl = document.getElementById('journal-personal-list');
+
+  const renderList = (list) => {
+    if(!list.length) return `<div class="liked-empty" style="padding:1.5rem"><p style="font-size:.82rem">Aucune entrée pour l'instant.</p></div>`;
+    return list.map((e,i)=>{
+      const preview = (e.songs||[]).slice(0,2).map(s=>s.artist+' – '+s.title).join(' · ');
+      const dateStr = e.created_at ? new Date(e.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short'}) : (e.date||'').split(' à')[0];
+      return `<div class="timeline-entry" data-idx="${i}" onclick="openSavedByIndex(this)">
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <div class="timeline-date">${dateStr}</div>
+          <div class="timeline-mood">${esc(e.meta||'—')}</div>
+          ${preview ? `<div class="timeline-tracks">${esc(preview)}…</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  };
+
+  if(momentEl) momentEl.innerHTML = renderList(moments);
+  if(personalEl) personalEl.innerHTML = renderList(personal);
+  window._historyEntries = entries;
+}
+
+
+
+/* ══ MOMENTS SIGNATURE ══ */
+async function generateMoment(context, mood, energy, ctx, description){
+  showScreen('loading-screen');
+  startLoading();
+  const meta = context;
+  const {liked, disliked} = getLikedDisliked();
+  try{
+    const res = await fetch('/api/playlist',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        type:'mood', mood, energy, context:ctx,
+        surprise:false, genres:[], era:[],
+        freeText:`Moment précis : ${context}. ${description}`,
+        genreFreeText:'', likedSongs:liked, dislikedSongs:disliked
+      })
+    });
+    if(!res.ok) throw new Error('Erreur '+res.status);
+    const songs = await res.json();
+    if(!Array.isArray(songs)||!songs.length) throw new Error('Playlist vide');
+    stopLoading();
+    currentSongs=songs; currentMeta=meta;
+    saveToHistory(songs,meta);
+    renderResults(songs,meta);
+  }catch(e){ stopLoading(); showScreen('moments-screen'); }
+}
+
+/* ══ ÉTAT GLOBAL ══ */
+const sel={mood:null,energy:null,context:null};
+let selectedGenres=[];
+let selectedEras=[];
+let currentSongs=[];
+let currentMeta='';
+let savedSongs=[];
+let savedMeta='';
+let weeklyData=null;
+let weeklySongs=[];
+let votes={};
+let msgInterval=null;
+let activeDropdown=null;
+let currentAudio={url:null,artist:null,title:null,btnEl:null};
+let progressInterval=null;
+let shareContext={songs:[],meta:''};
+let currentStep=1;
+const TOTAL_STEPS=5;
+const stepLabels=['Genres & époque','Ton mood','Ton énergie','Contexte','Récapitulatif'];
+const msgs=['Analyse de ta vibe...','Calibrage des fréquences...','Sélection des 10 titres...','Presque prêt...'];
+
+/* ══ NAVIGATION ══ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  closeAllDropdowns();
+  if(id==='history-screen')renderHistory();
+  if(id==='hero'){updateHistoryBadge();loadPublicRating();}
+  if(id==='auth-screen')loadPublicRating();
+  if(id==='feedback-screen')checkAlreadyVoted();
+  if(id==='form-screen')resetStepper();
+  if(id==='weekly-screen'&&!weeklyData)loadWeekly();
+  // Bouton home visible sur tous les écrans sauf hero et auth
+  const homeBtn=document.getElementById('home-btn');
+  if(homeBtn){
+    const showHome=['results-screen','saved-screen','weekly-screen','history-screen','loading-screen'];
+    homeBtn.classList.toggle('visible', showHome.includes(id));
+  }
+}
+
+/* ══ STEPPER ══ */
+function goStep(n){
+  if(n===3&&!sel.mood)return;
+  if(n===4&&!sel.energy)return;
+  if(n===5&&!sel.context)return;
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep=n;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  updateStepperUI();
+  if(n===5)renderRecap();
+  window.scrollTo(0,0);
+}
+function stepBack(){
+  if(currentStep===1){showScreen('hero');return;}
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep--;
+  document.getElementById('step-'+currentStep).classList.add('active');
+  updateStepperUI();
+}
+function updateStepperUI(){
+  document.getElementById('stepper-fill').style.width=(currentStep/TOTAL_STEPS*100)+'%';
+  document.getElementById('step-label').textContent=stepLabels[currentStep-1];
+  document.getElementById('step-counter').textContent=currentStep+' / '+TOTAL_STEPS;
+}
+function resetStepper(){
+  currentStep=1;
+  document.querySelectorAll('.step-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('step-1').classList.add('active');
+  updateStepperUI();
+  ['mood-next','energy-next','context-next'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.disabled=true;
+  });
+}
+function selectEnergy(el){
+  document.querySelectorAll('.energy-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  sel.energy=el.dataset.val;
+  const b=document.getElementById('energy-next');if(b)b.disabled=false;
+}
+function renderRecap(){
+  const genres=selectedGenres.length>0?selectedGenres.join(', '):'Tous genres';
+  const eras=selectedEras.length>0?selectedEras.join(', '):'—';
+  const ft=document.getElementById('mood-free-text')?.value?.trim()||'';
+  const gft=document.getElementById('genre-free-text')?.value?.trim()||'';
+  document.getElementById('recap-box').innerHTML=
+    '<div class="recap-row"><span class="recap-key">Genres</span><span class="recap-val">'+genres+(gft?' · '+esc(gft):'')+'</span></div>'+
+    '<div class="recap-row"><span class="recap-key">Époque</span><span class="recap-val">'+eras+'</span></div>'+
+    '<div class="recap-row"><span class="recap-key">Mood</span><span class="recap-val">'+(sel.mood||'?')+'</span></div>'+
+    (ft?'<div class="recap-row"><span class="recap-key">Description</span><span class="recap-val" style="font-style:italic;color:var(--muted)">'+esc(ft.slice(0,60))+(ft.length>60?'…':'')+'</span></div>':'')+
+    '<div class="recap-row"><span class="recap-key">Énergie</span><span class="recap-val">'+(sel.energy||'?')+'</span></div>'+
+    '<div class="recap-row"><span class="recap-key">Contexte</span><span class="recap-val">'+(sel.context||'?')+'</span></div>';
+}
+
+/* ══ PILLS ══ */
+function selectPill(el){
+  const g=el.dataset.group;
+  const val=el.dataset.val;
+  if(g==='era'){
+    if(sel[g]===val){el.classList.remove('selected');sel[g]=null;return;}
+  }
+  document.querySelectorAll('.pill[data-group="'+g+'"]').forEach(p=>p.classList.remove('selected'));
+  el.classList.add('selected');
+  sel[g]=val;
+  if(g==='mood'){const b=document.getElementById('mood-next');if(b)b.disabled=false;}
+  if(g==='context'){const b=document.getElementById('context-next');if(b)b.disabled=false;}
+}
+function toggleMultiPill(el){
+  const allBtn=document.querySelector('.all-genres');
+  if(allBtn&&allBtn.classList.contains('selected')){allBtn.classList.remove('selected');selectedGenres=selectedGenres.filter(g=>g!=='De tout');}
+  const val=el.dataset.val;
+  if(el.classList.contains('selected')){el.classList.remove('selected');selectedGenres=selectedGenres.filter(g=>g!==val);}
+  else{el.classList.add('selected');if(!selectedGenres.includes(val))selectedGenres.push(val);}
+}
+function toggleAllGenres(el){
+  document.querySelectorAll('.pill[data-group="genre"]:not(.all-genres)').forEach(p=>p.classList.remove('selected'));
+  selectedGenres=[];
+  if(el.classList.contains('selected')){el.classList.remove('selected');}
+  else{el.classList.add('selected');selectedGenres=['De tout'];}
+}
+function toggleEraPill(el){
+  const val=el.dataset.val;
+  if(el.classList.contains('selected')){el.classList.remove('selected');selectedEras=selectedEras.filter(e=>e!==val);}
+  else{el.classList.add('selected');if(!selectedEras.includes(val))selectedEras.push(val);}
+}
+
+/* ══ UTILS ══ */
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showError(msg){const el=document.getElementById('error-msg');el.textContent=msg;el.style.display='block';}
+function hideError(){document.getElementById('error-msg').style.display='none';}
+function showSuccess(id,msg){const el=document.getElementById(id);if(el){el.textContent=msg;el.style.display='block';setTimeout(()=>el.style.display='none',3000);}}
+
+/* ══ LOADING ══ */
+function startLoading(){
+  let i=0;
+  document.getElementById('loading-text').textContent=msgs[0];
+  msgInterval=setInterval(()=>{i=(i+1)%msgs.length;document.getElementById('loading-text').textContent=msgs[i];},2200);
+}
+function stopLoading(){clearInterval(msgInterval);}
+
+/* ══ DROPDOWN ══ */
+function toggleDropdown(id){
+  const menu=document.getElementById(id);
+  const btn=menu.previousElementSibling;
+  const isOpen=menu.classList.contains('open');
+  closeAllDropdowns();
+  if(!isOpen){menu.classList.add('open');btn.classList.add('open');activeDropdown=id;}
+}
+function closeAllDropdowns(){
+  document.querySelectorAll('.dropdown-menu.open').forEach(m=>{
+    m.classList.remove('open');
+    if(m.previousElementSibling)m.previousElementSibling.classList.remove('open');
+  });
+  activeDropdown=null;
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.dropdown-wrap'))closeAllDropdowns();});
+
+/* ══ AUDIO ══ */
+function stopPlayer(){
+  const audio=document.getElementById('audio-player');
+  audio.pause();audio.src='';
+  document.getElementById('mini-player').classList.remove('visible');
+  document.getElementById('mp-progress').style.width='0';
+  clearInterval(progressInterval);
+  if(currentAudio.btnEl){currentAudio.btnEl.textContent='▶';currentAudio.btnEl.classList.remove('playing');}
+  currentAudio={url:null,artist:null,title:null,btnEl:null};
+}
+function togglePlay(){
+  const audio=document.getElementById('audio-player');
+  const btn=document.getElementById('mp-playpause');
+  if(audio.paused){audio.play();btn.textContent='⏸';}else{audio.pause();btn.textContent='▶';}
+}
+async function playPreview(artist,title,btnEl){
+  const audio=document.getElementById('audio-player');
+  if(currentAudio.artist===artist&&currentAudio.title===title){togglePlay();return;}
+  if(currentAudio.btnEl){currentAudio.btnEl.textContent='▶';currentAudio.btnEl.classList.remove('playing','loading');}
+  stopPlayer();
+  btnEl.classList.add('loading');btnEl.textContent='…';
+  try{
+    const q=encodeURIComponent(artist+' '+title);
+    const r=await fetch('https://itunes.apple.com/search?term='+q+'&media=music&limit=1&entity=song');
+    const d=await r.json();
+    const track=d.results&&d.results[0];
+    if(!track||!track.previewUrl){btnEl.classList.remove('loading');btnEl.textContent='—';return;}
+    currentAudio={url:track.previewUrl,artist,title,btnEl};
+    audio.src=track.previewUrl;audio.play();
+    btnEl.classList.remove('loading');btnEl.classList.add('playing');btnEl.textContent='⏸';
+    document.getElementById('mp-title').textContent=title;
+    document.getElementById('mp-artist').textContent=artist;
+    document.getElementById('mp-playpause').textContent='⏸';
+    document.getElementById('mini-player').classList.add('visible');
+    clearInterval(progressInterval);
+    progressInterval=setInterval(()=>{
+      if(audio.duration)document.getElementById('mp-progress').style.width=(audio.currentTime/audio.duration*100)+'%';
+    },500);
+    audio.onended=()=>{btnEl.textContent='▶';btnEl.classList.remove('playing');document.getElementById('mp-playpause').textContent='▶';clearInterval(progressInterval);};
+  }catch(e){btnEl.classList.remove('loading');btnEl.textContent='▶';}
+}
+
+/* ══ VOTES ══ */
+function loadVotes(){try{return JSON.parse(localStorage.getItem('moodwave_votes')||'{}');}catch(e){return {};}}
+function saveVotes(){localStorage.setItem('moodwave_votes',JSON.stringify(votes));}
+function voteKey(song){return (String(song.artist)+String(song.title)).replace(/[^a-zA-Z0-9]/g,'').toLowerCase().slice(0,40);}
+function vote(key,type){
+  if(votes[key]===type){delete votes[key];}else{votes[key]=type;}
+  saveVotes();
+  const like=document.getElementById('like-'+key);
+  const dislike=document.getElementById('dislike-'+key);
+  if(like)like.className='like-btn'+(votes[key]==='like'?' liked':'');
+  if(dislike)dislike.className='like-btn'+(votes[key]==='dislike'?' disliked':'');
+  updateFeedbackBanner();
+  // Sync cloud
+  syncLikeToCloud(key, votes[key]||null);
+}
+function updateFeedbackBanner(){
+  const banner=document.getElementById('feedback-banner');if(!banner)return;
+  const likes=Object.values(votes).filter(v=>v==='like').length;
+  const dislikes=Object.values(votes).filter(v=>v==='dislike').length;
+  if(likes+dislikes===0){banner.style.display='none';return;}
+  banner.style.display='block';
+  banner.textContent='👍 '+likes+' aimé · 👎 '+dislikes+' rejeté — influencent tes prochaines playlists !';
+}
+function getLikedDisliked(){
+  const v=loadVotes();const liked=[];const disliked=[];
+  Object.entries(v).forEach(([key,val])=>{if(val==='like')liked.push(key);else if(val==='dislike')disliked.push(key);});
+  return {liked,disliked};
+}
+
+/* ══ EXPORT ══ */
+function playlistToText(songs,meta){
+  let t='MOODWAVE — '+meta+'\n'+'─'.repeat(36)+'\n\n';
+  songs.forEach((s,i)=>{t+=String(i+1).padStart(2,'0')+'. '+s.artist+' — '+s.title+' ['+s.genre+']\n   '+s.reason+'\n\n';});
+  return t+'─'.repeat(36)+'\nmoodwave.app\n';
+}
+function copyText(songs,meta,successId){
+  const t=songs.map((s,i)=>(i+1)+'. '+s.artist+' — '+s.title).join('\n');
+  const full='Moodwave · '+meta+'\n\n'+t+'\n\nmoodwave.app';
+  navigator.clipboard.writeText(full).then(()=>showSuccess(successId,'Copié !')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=full;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showSuccess(successId,'Copié !');
+  });
+}
+function downloadTXT(songs,meta){
+  const blob=new Blob([playlistToText(songs,meta)],{type:'text/plain;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave.txt';a.click();
+}
+function downloadCSV(songs,meta){
+  let csv='N,Artiste,Titre,Genre,Raison\n';
+  songs.forEach((s,i)=>{csv+=i+1+',"'+(s.artist||'').replace(/"/g,'""')+'","'+(s.title||'').replace(/"/g,'""')+'","'+(s.genre||'').replace(/"/g,'""')+'","'+(s.reason||'').replace(/"/g,'""')+'"\n';});
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave.csv';a.click();
+}
+function downloadPDF(songs,meta){
+  const w=window.open('','_blank');
+  const rows=songs.map((s,i)=>'<tr><td>'+String(i+1).padStart(2,'0')+'<\/td><td><b>'+esc(s.artist)+'</b><\/td><td>'+esc(s.title)+'<\/td><td>'+esc(s.genre)+'<\/td><td>'+esc(s.reason)+'<\/td><\/tr>').join('');
+  const html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Moodwave</title><\/head><body style="font-family:Arial;padding:40px;max-width:800px;margin:0 auto"><h1 style="color:#7c6aff">Moodwave<\/h1><p style="color:#888">'+esc(meta)+'<\/p><table style="width:100%;border-collapse:collapse;margin-top:20px"><thead><tr style="background:#7c6aff;color:#fff"><th style="padding:8px;text-align:left">N<\/th><th>Artiste<\/th><th>Titre<\/th><th>Genre<\/th><th>Pourquoi<\/th><\/tr><\/thead><tbody style="font-size:14px">'+rows+'<\/tbody><\/table><br><button onclick="window.print()" style="background:#7c6aff;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer">Enregistrer en PDF</button><\/body><\/html>';
+  w.document.write(html);w.document.close();
+}
+function downloadWord(songs,meta){
+  const rows=songs.map((s,i)=>'<tr><td>'+String(i+1).padStart(2,'0')+'<\/td><td><b>'+s.artist+'</b><\/td><td>'+s.title+'<\/td><td>'+s.genre+'<\/td><td>'+s.reason+'<\/td><\/tr>').join('');
+  const html='<html><body><h1>Moodwave — '+meta+'<\/h1><table border="1"><thead><tr><th>N<\/th><th>Artiste<\/th><th>Titre<\/th><th>Genre<\/th><th>Pourquoi<\/th><\/tr><\/thead><tbody>'+rows+'<\/tbody><\/table><\/body><\/html>';
+  const blob=new Blob([html],{type:'application/msword'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moodwave.doc';a.click();
+}
+function openAllOn(platform,songs){
+  const fns={
+    spotify:s=>'https://open.spotify.com/search/'+encodeURIComponent(s.artist+' '+s.title),
+    deezer:s=>'https://www.deezer.com/search/'+encodeURIComponent(s.artist+' '+s.title),
+    youtube:s=>'https://www.youtube.com/results?search_query='+encodeURIComponent(s.artist+' '+s.title),
+    applemusic:s=>'https://music.apple.com/search?term='+encodeURIComponent(s.artist+' '+s.title),
+    soundcloud:s=>'https://soundcloud.com/search?q='+encodeURIComponent(s.artist+' '+s.title)
+  };
+  const fn=fns[platform];if(!fn)return;
+  songs.forEach((s,i)=>setTimeout(()=>window.open(fn(s),'_blank'),i*350));
+}
+
+/* ══ SHARE CARD CANVAS ══ */
+function openShareCard(songs,meta){
+  drawShareCard(songs,meta);
+  document.getElementById('card-overlay').classList.add('open');
+}
+function closeShareCard(){document.getElementById('card-overlay').classList.remove('open');}
+function drawShareCard(songs,meta){
+  const canvas=document.getElementById('share-canvas');
+  const ctx=canvas.getContext('2d');
+  const W=540,H=960;canvas.width=W;canvas.height=H;
+
+  // ── FOND ──
+  ctx.fillStyle='#050310';ctx.fillRect(0,0,W,H);
+  const bgd=ctx.createLinearGradient(0,0,W,H);
+  bgd.addColorStop(0,'rgba(79,46,220,.6)');bgd.addColorStop(.4,'rgba(10,5,40,.8)');
+  bgd.addColorStop(.7,'rgba(5,20,50,.9)');bgd.addColorStop(1,'rgba(180,20,100,.4)');
+  ctx.fillStyle=bgd;ctx.fillRect(0,0,W,H);
+
+  const o1=ctx.createRadialGradient(0,0,0,0,0,380);
+  o1.addColorStop(0,'rgba(124,58,237,.9)');o1.addColorStop(.5,'rgba(79,46,220,.4)');o1.addColorStop(1,'transparent');
+  ctx.fillStyle=o1;ctx.fillRect(0,0,W,H);
+  const o2=ctx.createRadialGradient(W,H,0,W,H,320);
+  o2.addColorStop(0,'rgba(6,182,212,.7)');o2.addColorStop(.5,'rgba(8,145,178,.3)');o2.addColorStop(1,'transparent');
+  ctx.fillStyle=o2;ctx.fillRect(0,0,W,H);
+  const o3=ctx.createRadialGradient(W*.6,H*.7,0,W*.6,H*.7,250);
+  o3.addColorStop(0,'rgba(236,72,153,.35)');o3.addColorStop(1,'transparent');
+  ctx.fillStyle=o3;ctx.fillRect(0,0,W,H);
+
+  // Lignes de scan
+  for(let y=0;y<H;y+=4){ctx.fillStyle='rgba(0,0,0,.07)';ctx.fillRect(0,y,W,1);}
+
+  // Filigrane MOODWAVE
+  ctx.save();ctx.globalAlpha=.04;ctx.font='bold 120px Arial Black,Arial';
+  ctx.fillStyle='#ffffff';ctx.textAlign='center';
+  ctx.fillText('MOOD',W/2,H*.32);ctx.fillText('WAVE',W/2,H*.46);
+  ctx.restore();
+
+  // Bandes diagonales
+  ctx.save();ctx.globalAlpha=.05;
+  for(let i=0;i<8;i++){
+    ctx.fillStyle=i%2===0?'#7c6aff':'#06b6d4';
+    ctx.beginPath();ctx.moveTo(-200+i*120,0);ctx.lineTo(-120+i*120,0);
+    ctx.lineTo(-120+i*120+H*.28,H);ctx.lineTo(-200+i*120+H*.28,H);
+    ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+
+  // ── HEADER ──
+  const pillGrad=ctx.createLinearGradient(30,28,220,28);
+  pillGrad.addColorStop(0,'rgba(124,58,237,.7)');pillGrad.addColorStop(1,'rgba(6,182,212,.4)');
+  ctx.fillStyle=pillGrad;ctx.strokeStyle='rgba(196,181,253,.5)';ctx.lineWidth=1.5;
+  rr(ctx,30,22,200,40,20);ctx.fill();ctx.stroke();
+  const wh=[10,18,26,18,10];
+  wh.forEach((h,i)=>{const bx=46+i*10;const by=42-h/2;ctx.fillStyle='rgba(255,255,255,.9)';rr(ctx,bx,by,6,h,3);ctx.fill();});
+  ctx.fillStyle='#ffffff';ctx.font='bold 15px Arial';ctx.textAlign='left';ctx.fillText('MOODWAVE',108,48);
+
+  ctx.fillStyle='rgba(255,255,255,.08)';ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;
+  rr(ctx,W-130,26,100,28,14);ctx.fill();ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.font='10px Arial';ctx.textAlign='center';
+  ctx.fillText('✦ IA Generated',W-80,44);
+
+  // ── MOOD SECTION ──
+  ctx.textAlign='left';
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.font='bold 10px Arial';
+  ctx.fillText('MON MOOD DU MOMENT',34,84);
+  const sepGrad=ctx.createLinearGradient(34,0,W-34,0);
+  sepGrad.addColorStop(0,'rgba(124,106,255,.8)');sepGrad.addColorStop(.5,'rgba(196,181,253,.5)');sepGrad.addColorStop(1,'rgba(6,182,212,.3)');
+  ctx.strokeStyle=sepGrad;ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(34,90);ctx.lineTo(W-34,90);ctx.stroke();
+
+  const moodParts=meta.split(' / ');
+  const mainMood=moodParts[0]||meta;
+  ctx.shadowColor='rgba(124,106,255,.8)';ctx.shadowBlur=25;
+  ctx.fillStyle='#ffffff';ctx.font='bold 32px Arial';ctx.textAlign='left';
+  ctx.fillText(trunc(mainMood,28),34,128);ctx.shadowBlur=0;
+  if(moodParts.length>1){
+    ctx.fillStyle='rgba(196,181,253,.6)';ctx.font='12px Arial';
+    ctx.fillText(moodParts.slice(1).join(' · ').slice(0,48),34,148);
+  }
+
+  // ── PLAYLIST LABEL ──
+  ctx.fillStyle='rgba(255,255,255,.18)';ctx.font='bold 10px Arial';
+  ctx.fillText('MA PLAYLIST',34,170);
+  ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(34,176);ctx.lineTo(W-34,176);ctx.stroke();
+
+  // ── SONG CARDS ──
+  // Calculer la hauteur dispo : de 180 à H-70 (footer) = 710px pour 10 titres + gaps
+  const availH=H-70-182;
+  const gap=3;
+  const ch=Math.floor((availH-gap*9)/10); // hauteur card dynamique
+  const sy=182;
+
+  const accentColors=[
+    ['#7c3aed','#06b6d4'],['#2563eb','#7c3aed'],['#db2777','#7c3aed'],
+    ['#0891b2','#06b6d4'],['#7c3aed','#db2777'],['#2563eb','#0891b2'],
+    ['#7c3aed','#06b6d4'],['#db2777','#2563eb'],['#0891b2','#7c3aed'],['#06b6d4','#2563eb']
+  ];
+
+  songs.slice(0,10).forEach((s,i)=>{
+    const y=sy+i*(ch+gap);
+    ctx.fillStyle=i%2===0?'rgba(255,255,255,.06)':'rgba(255,255,255,.03)';
+    ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
+    rr(ctx,22,y,W-44,ch,10);ctx.fill();ctx.stroke();
+
+    const ac=accentColors[i];
+    const acg=ctx.createLinearGradient(0,y,0,y+ch);
+    acg.addColorStop(0,ac[0]);acg.addColorStop(1,ac[1]);
+    ctx.fillStyle=acg;rr(ctx,22,y,4,ch,2);ctx.fill();
+
+    const midY=y+ch/2;
+    // Numéro
+    ctx.fillStyle='rgba(196,181,253,.35)';ctx.font='bold 9px Arial';ctx.textAlign='left';
+    ctx.fillText(String(i+1).padStart(2,'0'),32,midY-8);
+    // Artiste
+    ctx.fillStyle='rgba(196,181,253,.85)';ctx.font='10px Arial';
+    ctx.fillText(trunc(s.artist,28),32,midY+5);
+    // Titre
+    ctx.shadowColor=ac[0];ctx.shadowBlur=6;
+    ctx.fillStyle='#ffffff';ctx.font='bold 13px Arial';
+    ctx.fillText(trunc(s.title,26),32,midY+19);
+    ctx.shadowBlur=0;
+
+    // Genre
+    if(s.genre){
+      const gt=s.genre.slice(0,13);
+      ctx.font='8.5px Arial';
+      const gW=ctx.measureText(gt).width+14;
+      const gx=W-22-gW-6;const gy=midY-8;
+      ctx.fillStyle='rgba(255,255,255,.06)';ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;
+      rr(ctx,gx,gy,gW,16,8);ctx.fill();ctx.stroke();
+      ctx.fillStyle='rgba(200,200,255,.55)';ctx.textAlign='center';
+      ctx.fillText(gt,gx+gW/2,gy+11);ctx.textAlign='left';
+    }
+  });
+
+  // ── FOOTER CTA ──
+  const footerY=H-62;
+  const ctaGrad=ctx.createLinearGradient(22,footerY,W-22,footerY);
+  ctaGrad.addColorStop(0,'rgba(124,58,237,.8)');ctaGrad.addColorStop(1,'rgba(6,182,212,.6)');
+  ctx.fillStyle=ctaGrad;ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;
+  rr(ctx,22,footerY,W-44,48,24);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#ffffff';ctx.font='bold 14px Arial';ctx.textAlign='center';
+  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=8;
+  ctx.fillText('🎵  Génère ta playlist sur moodwave.app',W/2,footerY+18);ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,.6)';ctx.font='10px Arial';
+  ctx.fillText('Gratuit · IA · Basé sur ton mood',W/2,footerY+36);
+  ctx.textAlign='left';
+}
+
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function trunc(s,max){return s&&s.length>max?s.slice(0,max-1)+'…':s||'';}
+function downloadShareCard(){const a=document.createElement('a');a.download='moodwave-playlist.png';a.href=document.getElementById('share-canvas').toDataURL('image/png');a.click();}
+
+/* ══ SHARE SOCIAL ══ */
+function buildShareText(songs,meta){
+  return 'Ma playlist Moodwave · '+meta+'\n\n'+songs.slice(0,10).map((s,i)=>(i+1)+'. '+s.artist+' — '+s.title).join('\n')+'\n\nmoodwave.app';
+}
+function openShareModal(songs,meta){shareContext={songs,meta};document.getElementById('share-modal').classList.add('open');}
+function closeModal(){document.getElementById('share-modal').classList.remove('open');}
+function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta)),'_blank');}
+function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://project-0mjoz.vercel.app'),'_blank');}
+function shareTwitter(){window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta).slice(0,240)),'_blank');}
+function shareLinkedIn(){window.open('https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent('https://project-0mjoz.vercel.app'),'_blank');}
+function shareSMS(){window.open('sms:?body='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta)));}
+function shareEmail(){window.open('mailto:?subject=Ma playlist Moodwave&body='+encodeURIComponent(buildShareText(shareContext.songs,shareContext.meta)));}
+function shareTikTok(){navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(()=>alert('Texte copié ! Colle-le dans ta vidéo TikTok'));}
+function shareInstagram(){navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(()=>alert('Texte copié ! Colle-le dans ta story Instagram'));}
+function shareNative(){if(navigator.share)navigator.share({title:'Moodwave',text:buildShareText(shareContext.songs,shareContext.meta),url:'https://project-0mjoz.vercel.app'});else navigator.clipboard.writeText('https://project-0mjoz.vercel.app').then(()=>alert('Lien copié !'));}
+function shareTextCopy(){navigator.clipboard.writeText(buildShareText(shareContext.songs,shareContext.meta)).then(closeModal);}
+function copyShareUrl(songs,meta,successId){
+  const id=Date.now().toString(36);
+  localStorage.setItem('mw_p_'+id,JSON.stringify({songs,meta}));
+  const url=window.location.origin+'/?p='+id;
+  navigator.clipboard.writeText(url).then(()=>showSuccess(successId,'Lien copié !')).catch(()=>showSuccess(successId,url));
+}
+
+/* ══ ACTION BAR ══ */
+function actionBarHTML(songs,meta,prefix,successId){
+  // Exposer les songs dans le scope global pour que le dropdown puisse y accéder
+  if(prefix==='current')currentSongs=songs;
+  else if(prefix==='saved')savedSongs=songs;
+  else if(prefix==='weekly')weeklySongs=songs;
+  window.currentSongs=currentSongs;window.savedSongs=savedSongs;window.weeklySongs=weeklySongs;
+  const p=prefix;
+  const songsJson=JSON.stringify(songs).replace(/'/g,"\\'");
+  return '<div class="action-bar">'+
+    '<div class="dropdown-wrap">'+
+    '<button class="dropdown-btn" onclick="toggleDropdown(\'dd-listen-'+p+'\')">🎧 Écouter sur <span class="arr">▼</span></button>'+
+    '<div class="dropdown-menu" id="dd-listen-'+p+'">'+
+    '<button class="dropdown-item" onclick="openAllOn(\'spotify\','+p+'Songs);closeAllDropdowns()"><span class="di">🎵</span> Spotify</button>'+
+    '<button class="dropdown-item" onclick="openAllOn(\'deezer\','+p+'Songs);closeAllDropdowns()"><span class="di">🎶</span> Deezer</button>'+
+    '<button class="dropdown-item" onclick="openAllOn(\'youtube\','+p+'Songs);closeAllDropdowns()"><span class="di">▶️</span> YouTube</button>'+
+    '<button class="dropdown-item" onclick="openAllOn(\'applemusic\','+p+'Songs);closeAllDropdowns()"><span class="di">🍎</span> Apple Music</button>'+
+    '<button class="dropdown-item" onclick="openAllOn(\'soundcloud\','+p+'Songs);closeAllDropdowns()"><span class="di">☁️</span> SoundCloud</button>'+
+    '</div></div>'+
+    '<div class="dropdown-wrap">'+
+    '<button class="dropdown-btn" onclick="toggleDropdown(\'dd-export-'+p+'\')">📤 Exporter <span class="arr">▼</span></button>'+
+    '<div class="dropdown-menu" id="dd-export-'+p+'">'+
+    '<button class="dropdown-item" onclick="openShareCard('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">🖼️</span> Carte Instagram/TikTok</button>'+
+    '<button class="dropdown-item" onclick="copyShareUrl('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\',\''+successId+'\');closeAllDropdowns()"><span class="di">🔗</span> Copier le lien</button>'+
+    '<button class="dropdown-item sep" onclick="copyText('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\',\''+successId+'\');closeAllDropdowns()"><span class="di">📋</span> Copier la liste</button>'+
+    '<button class="dropdown-item" onclick="downloadTXT('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">📄</span> Fichier .txt</button>'+
+    '<button class="dropdown-item" onclick="downloadCSV('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">📊</span> Fichier .csv</button>'+
+    '<button class="dropdown-item" onclick="downloadPDF('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">📕</span> PDF</button>'+
+    '<button class="dropdown-item" onclick="downloadWord('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\');closeAllDropdowns()"><span class="di">📘</span> Word</button>'+
+    '</div></div>'+
+    '<button class="share-btn" onclick="openShareModal('+p+'Songs,\''+meta.replace(/'/g,"\\'")+'\')">🚀 Partager</button>'+
+    '</div>';
+}
+
+/* ══ SONG CARDS ══ */
+function songCardsHTML(songs,listId,meta,successId){
+  votes=loadVotes();
+  listId=listId||'current';meta=meta||currentMeta;successId=successId||'results-success';
+  return songs.map((s,i)=>{
+    const key=voteKey(s);const v=votes[key];
+    const metaE=esc(meta);
+    return '<div class="song-card" id="song-card-'+i+'" data-idx="'+i+'" data-list="'+esc(listId)+'" data-meta="'+metaE+'" data-success="'+esc(successId)+'">'+
+      '<div class="song-card-top">'+
+      '<button class="preview-btn" data-artist="'+esc(s.artist)+'" data-title="'+esc(s.title)+'">▶</button>'+
+      '<div class="song-info">'+
+        '<div class="song-num">'+String(i+1).padStart(2,'0')+'</div>'+
+        '<div class="song-artist">'+esc(s.artist)+'</div>'+
+        '<div class="song-title">'+esc(s.title)+'</div>'+
+        '<span class="genre-tag">'+esc(s.genre)+'</span>'+
+        (s.trend?'<span class="trend-tag">🔥 '+esc(s.trend)+'</span>':'')+
+        '<div class="reason">'+esc(s.reason)+'</div>'+
+        '<div class="stream-links">'+
+          '<a class="stream-link spotify" href="https://open.spotify.com/search/'+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener" title="Spotify"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"#1ed760\"><path d=\"M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z\"/></svg></a>'+
+          '<a class="stream-link deezer" href="https://www.deezer.com/search/'+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener" title="Deezer"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\"><rect x=\"0\" y=\"16\" width=\"4\" height=\"4\" fill=\"#00C7F2\"/><rect x=\"5\" y=\"13\" width=\"4\" height=\"7\" fill=\"#00C7F2\"/><rect x=\"10\" y=\"9\" width=\"4\" height=\"11\" fill=\"#BF40BE\"/><rect x=\"15\" y=\"5\" width=\"4\" height=\"15\" fill=\"#FF8C00\"/><rect x=\"20\" y=\"0\" width=\"4\" height=\"20\" fill=\"#EF5466\"/></svg></a>'+
+          '<a class="stream-link youtube" href="https://www.youtube.com/results?search_query='+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener" title="YouTube"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"12\" fill=\"#FF0000\"/><circle cx=\"12\" cy=\"12\" r=\"5\" fill=\"none\" stroke=\"white\" stroke-width=\"1.5\"/><polygon points=\"10.5,9.5 10.5,14.5 15,12\" fill=\"white\"/></svg></a>'+
+          '<a class="stream-link apple" href="https://music.apple.com/search?term='+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener" title="Apple Music"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\"><defs><linearGradient id=\"apl\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" style=\"stop-color:#FC5C7D\"/><stop offset=\"100%\" style=\"stop-color:#6A3093\"/></linearGradient></defs><rect width=\"24\" height=\"24\" rx=\"5.5\" fill=\"url(#apl)\"/><path d=\"M17 8.5V15c0 1.1-.9 2-2 2a2 2 0 0 1-2-2 2 2 0 0 1 2-2c.37 0 .71.1 1 .28V9.8l-5 1V16c0 1.1-.9 2-2 2a2 2 0 0 1-2-2 2 2 0 0 1 2-2c.37 0 .71.1 1 .28V8.5L17 8.5z\" fill=\"white\"/></svg></a>'+
+          '<a class="stream-link soundcloud" href="https://soundcloud.com/search?q='+encodeURIComponent(s.artist+' '+s.title)+'" target="_blank" rel="noopener" title="SoundCloud"><svg width=\"18\" height=\"18\" viewBox=\"0 0 32 32\" fill=\"#FF5500\"><path d=\"M0 20.8c0 1.6 1.2 2.8 2.8 3h.4V17.8c-.4.2-.8.4-1.2.8-.8.8-1.2 1.8-1.2 2.8h-.8zM4.8 24h.8V17.4c-.4 0-.8.2-1.2.4v6.4c.2.2.2.2.4 0v-.2zM7.2 16.6c-.4.2-.4.2-.8.4V24h1.6v-7.6c-.4.2-.6.2-.8.2zM9.6 16.2V24h1.6v-8.2c-.4.2-.8.2-1.2.4h-.4zM12 15.4V24h1.6V14.8c-.4.2-.8.4-1.2.6h-.4zM14.4 14.2V24H16V13.2c-.6.2-1.2.6-1.6 1zM16.8 12.6c-.2 0-.2.2-.4.2V24H18V12.2c-.4.2-.8.2-1.2.4zM19.2 11.8V24h1.6V11.4c-.4.2-.8.2-1.2.4h-.4zM21.6 11.4V24h1.2c.2 0 .4 0 .6-.2v-12c-.6-.2-1.2-.2-1.8-.4zM24.4 11.6c.2 0 .4 0 .4.2V24h2.4c.2 0 .6-.2.8-.2V11.6c-.6-1.6-2.2-2.6-4-2.4-1.6-3.2-5-5.2-8.8-4.8-4.2.4-7.4 4-7.4 8.2 0 .2 0 .4.2.6 1 .4 2 1 2.6 2h14.8c-.4-.4-1-.6-1-.6z\"/></svg></a>'+
+        '</div>'+
+      '</div>'+
+      '<div class="like-btns">'+
+        '<button class="regen-btn" data-action="regen">↻</button>'+
+        '<button class="like-btn'+(v==='like'?' liked':'')+'" id="like-'+key+'" data-action="like" data-key="'+key+'">👍</button>'+
+        '<button class="like-btn'+(v==='dislike'?' disliked':'')+'" id="dislike-'+key+'" data-action="dislike" data-key="'+key+'">👎</button>'+
+      '</div>'+
+      '</div></div>';
+  }).join('');
+}
+
+function attachCardEvents(containerId,songsRef,listId,meta,successId){
+  const container=document.getElementById(containerId);
+  if(!container)return;
+  container.addEventListener('click',function(e){
+    const btn=e.target.closest('button');if(!btn)return;
+    const card=btn.closest('.song-card');if(!card)return;
+    const idx=parseInt(card.dataset.idx);
+    const action=btn.dataset.action;
+    if(action==='regen')regenSong(idx,songsRef,card.dataset.meta,card.dataset.list,card.dataset.success);
+    else if(action==='like')vote(btn.dataset.key,'like');
+    else if(action==='dislike')vote(btn.dataset.key,'dislike');
+    else if(btn.classList.contains('preview-btn'))playPreview(btn.dataset.artist,btn.dataset.title,btn);
+  });
+}
+
+/* ══ REGEN ══ */
+async function regenSong(idx,songs,meta,listId,successId){
+  const card=document.getElementById('song-card-'+idx);if(!card)return;
+  const btn=card.querySelector('.regen-btn');
+  if(btn){btn.classList.add('spinning');btn.style.pointerEvents='none';}
+  const otherSongs=songs.filter((_,i)=>i!==idx).map(s=>s.artist+' — '+s.title);
+  const song=songs[idx];
+  try{
+    const res=await fetch('/api/regen',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({song:{artist:song.artist,title:song.title},otherSongs,meta,genres:selectedGenres,era:selectedEras})});
+    if(!res.ok)throw new Error('Erreur '+res.status);
+    const newSong=await res.json();
+    songs[idx]=newSong;
+    saveToHistory(songs,meta,true);
+    const v2=votes[voteKey(newSong)]||null;
+    card.dataset.meta=meta;
+    card.innerHTML='<div class="song-card-top">'+
+      '<button class="preview-btn" data-artist="'+esc(newSong.artist)+'" data-title="'+esc(newSong.title)+'">▶</button>'+
+      '<div class="song-info"><div class="song-num">'+String(idx+1).padStart(2,'0')+'</div>'+
+      '<div class="song-artist">'+esc(newSong.artist)+'</div>'+
+      '<div class="song-title">'+esc(newSong.title)+'</div>'+
+      '<span class="genre-tag">'+esc(newSong.genre)+'</span>'+
+      '<div class="reason">'+esc(newSong.reason)+'</div></div>'+
+      '<div class="like-btns">'+
+        '<button class="regen-btn" data-action="regen">↻</button>'+
+        '<button class="like-btn'+(v2==='like'?' liked':'')+'" data-action="like" data-key="'+voteKey(newSong)+'">👍</button>'+
+        '<button class="like-btn'+(v2==='dislike'?' disliked':'')+'" data-action="dislike" data-key="'+voteKey(newSong)+'">👎</button>'+
+      '</div></div>';
+    card.style.opacity='0';card.style.transform='translateY(-8px)';
+    requestAnimationFrame(()=>{card.style.transition='opacity .3s,transform .3s';card.style.opacity='1';card.style.transform='translateY(0)';});
+    showSuccess(successId||'results-success','✨ Titre remplacé !');
+  }catch(e){if(btn){btn.classList.remove('spinning');btn.style.pointerEvents='';}}
+}
+
+/* ══ GÉNÉRATION ══ */
+async function generate(isSurprise){
+  hideError();
+  if(!isSurprise&&(!sel.mood||!sel.energy||!sel.context)){showError('Sélectionne toutes les options avant de générer.');return;}
+  const withSurprise=isSurprise||document.getElementById('surprise-toggle').classList.contains('on');
+  showScreen('loading-screen');startLoading();
+  const genreLabel=selectedGenres.length>0&&!selectedGenres.includes('De tout')?selectedGenres.join('-')+' / ':'';
+  const eraLabel=selectedEras.length>0?' ('+selectedEras.join(', ')+')':'';
+  const meta=isSurprise?'Mode Surprise':genreLabel+(sel.mood||'')+eraLabel+' / '+(sel.energy||'')+' / '+(sel.context||'')+(withSurprise?' · Surprise':'');
+  const {liked,disliked}=getLikedDisliked();
+  const freeText=document.getElementById('mood-free-text')?.value?.trim()||'';
+  const genreFreeText=document.getElementById('genre-free-text')?.value?.trim()||'';
+  const body=isSurprise
+    ?{type:'surprise',likedSongs:liked,dislikedSongs:disliked}
+    :{type:'mood',mood:sel.mood,energy:sel.energy,context:sel.context,surprise:withSurprise,genres:selectedGenres,era:selectedEras,freeText,likedSongs:liked,dislikedSongs:disliked};
+  try{
+    const res=await fetch('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error||'Erreur ('+res.status+')');}
+    const songs=await res.json();
+    if(!Array.isArray(songs)||!songs.length)throw new Error('Playlist vide');
+    stopLoading();currentSongs=songs;currentMeta=meta;votes={};
+    saveToHistory(songs,meta);
+    const moodForStat=sel.mood||'';
+    if(moodForStat)trackMoodStat(moodForStat);
+    renderResults(songs,meta);
+  }catch(e){stopLoading();showScreen('form-screen');showError('Erreur : '+e.message);}
+}
+
+function renderResults(songs,meta){
+  document.getElementById('results-meta').textContent=meta;
+  document.getElementById('results-success').style.display='none';
+  const fb=document.getElementById('feedback-banner');if(fb)fb.style.display='none';
+  document.getElementById('results-action-bar').innerHTML=actionBarHTML(songs,meta,'current','results-success');
+  document.getElementById('songs-list').innerHTML=songCardsHTML(songs,'current',meta,'results-success');
+  attachCardEvents('songs-list',currentSongs,'current',meta,'results-success');
+  showScreen('results-screen');
+}
+
+/* ══ HISTORIQUE ══ */
+function getHistory(){try{return JSON.parse(localStorage.getItem('moodwave_history')||'[]');}catch(e){return[];}}
+function saveToHistory(songs,meta,update){
+  const h=getHistory();
+  if(update){const idx=h.findIndex(e=>e.meta===meta);if(idx>=0){h[idx].songs=songs;localStorage.setItem('moodwave_history',JSON.stringify(h));return;}}
+  const entry={id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs};
+  h.unshift(entry);
+  if(h.length>20)h.pop();
+  localStorage.setItem('moodwave_history',JSON.stringify(h));
+  updateHistoryBadge();
+  // Sauvegarder dans le cloud si connecté
+  savePlaylistToCloud(songs, meta);
+}
+function updateHistoryBadge(){
+  const n=getHistory().length;
+  document.getElementById('history-count-badge').textContent=n;
+  const btn=document.getElementById('btn-history-hero');
+  if(btn)btn.style.display=n>0?'block':'none';
+}
+async function renderHistory(){
+  const list=document.getElementById('history-list');
+  const actions=document.getElementById('history-actions');
+  list.innerHTML='<div class="weekly-loading">Chargement…</div>';
+
+  let entries = [];
+
+  // Charger depuis le cloud si connecté avec un vrai compte
+  if(currentUser && !currentUser.isGuest){
+    const cloudData = await loadPlaylistsFromCloud();
+    if(cloudData && cloudData.length > 0){
+      entries = cloudData.map(e=>({
+        id: e.id,
+        cloudId: e.id,
+        date: new Date(e.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),
+        meta: e.meta,
+        songs: e.songs
+      }));
+    }
+  }
+
+  // Fallback localStorage
+  if(entries.length === 0) entries = getHistory();
+
+  if(!entries.length){
+    list.innerHTML='<div class="history-empty"><div class="icon">🎵</div><p>Aucune playlist.<br>Génère ta première playlist !</p></div>';
+    actions.style.display='none';return;
+  }
+  actions.style.display='flex';
+  // Stocker les entries globalement AVANT de générer le HTML
+  window._historyEntries = entries;
+  list.innerHTML=entries.map((e,i)=>{
+    const preview=e.songs.slice(0,3).map(s=>s.artist+' – '+s.title).join(' · ');
+    const tags=e.meta.split(' / ').map(t=>'<span class="h-tag">'+esc(t.trim())+'</span>').join('');
+    // Utiliser l'index numérique pour éviter les problèmes de guillemets avec les UUID
+    return '<div class="history-item" data-idx="'+i+'" onclick="openSavedByIndex(this)">'+
+      '<div class="history-header"><div class="history-tags">'+tags+'</div><span class="h-date">'+esc(e.date)+'</span></div>'+
+      '<div class="h-preview">'+esc(preview)+'…</div>'+
+      '<div class="h-count">'+e.songs.length+' titres</div></div>';
+  }).join('');
+}
+function openSavedByIndex(el){
+  const idx=parseInt(el.dataset.idx);
+  const entries=window._historyEntries||[];
+  const entry=entries[idx];
+  if(!entry)return;
+  openSavedEntry(entry);
+}
+
+function openSaved(id){
+  const allEntries=[...(window._historyEntries||[]),...getHistory()];
+  const entry=allEntries.find(e=>String(e.id)===String(id));if(!entry)return;
+  openSavedEntry(entry);
+}
+
+function openSavedEntry(entry){  savedSongs=entry.songs;savedMeta=entry.meta;
+  document.getElementById('saved-meta').textContent=entry.meta+' · '+entry.date;
+  document.getElementById('saved-success').style.display='none';
+  document.getElementById('saved-action-bar').innerHTML=actionBarHTML(entry.songs,entry.meta,'saved','saved-success');
+  document.getElementById('saved-songs-list').innerHTML=songCardsHTML(entry.songs,'saved',entry.meta,'saved-success');
+  attachCardEvents('saved-songs-list',savedSongs,'saved',entry.meta,'saved-success');
+  showScreen('saved-screen');
+}
+function clearHistory(){
+  if(!confirm('Effacer toutes tes playlists ?'))return;
+  localStorage.removeItem('moodwave_history');updateHistoryBadge();renderHistory();
+}
+
+/* ══ WEEKLY ══ */
+async function loadWeekly(){
+  try{
+    const res=await fetch('/api/weekly');
+    if(!res.ok)throw new Error('Erreur '+res.status);
+    const data=await res.json();
+    weeklyData=data;
+    weeklySongs=data.songs||[];
+    const dateEl=document.getElementById('weekly-date');
+    if(dateEl&&data.weekLabel)dateEl.textContent=data.weekLabel;
+    document.getElementById('weekly-loading').style.display='none';
+    if(data.songs){
+      const list=document.getElementById('weekly-songs-list');
+      list.innerHTML=songCardsHTML(data.songs,'weekly','Top 10 tendances','weekly-success');
+      attachCardEvents('weekly-songs-list',data.songs,'weekly','Top 10 tendances','weekly-success');
+      const bar=document.getElementById('weekly-action-bar');
+      bar.style.display='block';
+      bar.innerHTML=actionBarHTML(data.songs,'Top 10 tendances','weekly','weekly-success');
+    }
+    document.getElementById('weekly-actions').style.display='flex';
+  }catch(e){
+    document.getElementById('weekly-loading').innerHTML='<p style="color:var(--muted)">Impossible de charger les tendances. Réessaie plus tard.</p>';
+  }
+}
+
+/* ══ FOND ANIMÉ CANVAS ══ */
+function initBackground(){
+  // Particules
+  const container=document.getElementById('particles');
+  for(let i=0;i<25;i++){
+    const p=document.createElement('div');p.className='particle';
+    const size=1+Math.random()*2.5;
+    p.style.cssText='left:'+Math.random()*100+'%;width:'+size+'px;height:'+size+'px;background:'+(Math.random()>.5?'rgba(196,181,253,':'rgba(103,232,249,')+(.3+Math.random()*.5)+');animation-duration:'+(8+Math.random()*14)+'s;animation-delay:'+(-(Math.random()*18))+'s;box-shadow:0 0 '+(size*3)+'px currentColor;';
+    container.appendChild(p);
+  }
+  // Canvas
+  const canvas=document.getElementById('bg-canvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,t=0;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  function drawWave(yBase,amp,freq,speed,color,lw){
+    ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.shadowColor=color;ctx.shadowBlur=24;
+    for(let x=0;x<=W;x+=2){const y=yBase+Math.sin((x*freq)+t*speed)*amp+Math.sin((x*freq*.7)+t*speed*1.3)*amp*.4;x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();ctx.shadowBlur=0;
+  }
+  function drawRings(){
+    const cx=W*.5,cy=H*.42;
+    for(let i=0;i<5;i++){
+      const r=80+i*65+Math.sin(t*.4+i)*14;
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.strokeStyle='rgba(124,106,255,'+(0.08-i*.01)+')';ctx.lineWidth=1.5;ctx.stroke();
+    }
+  }
+  function drawBeams(){
+    const cx=W*.5,cy=H*.15;
+    for(let i=0;i<6;i++){
+      const angle=(i/6)*Math.PI+t*.05;const len=H*.7;
+      const grad=ctx.createLinearGradient(cx,cy,cx+Math.cos(angle)*len,cy+Math.sin(angle)*len);
+      grad.addColorStop(0,'rgba(124,106,255,.12)');grad.addColorStop(1,'transparent');
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(angle)*len,cy+Math.sin(angle)*len);
+      ctx.strokeStyle=grad;ctx.lineWidth=80;ctx.stroke();
+    }
+  }
+  function animate(){
+    ctx.clearRect(0,0,W,H);
+    drawBeams();drawRings();
+    drawWave(H*.25,45,.007,.7,'rgba(124,106,255,.5)',2.5);
+    drawWave(H*.3,30,.009,1.0,'rgba(167,139,250,.35)',1.8);
+    drawWave(H*.6,55,.006,.55,'rgba(8,145,178,.45)',2.5);
+    drawWave(H*.66,25,.011,.85,'rgba(103,232,249,.3)',1.5);
+    drawWave(H*.48,18,.014,1.3,'rgba(196,181,253,.25)',1.2);
+    t+=.015;requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+/* ══ PWA ══ */
+function registerSW(){if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>{});}
+
+/* ══ INIT ══ */
+votes=loadVotes();
+updateHistoryBadge();
+initBackground();
+registerSW();
+loadPublicRating();
+checkExistingSession();
+const urlp=new URLSearchParams(window.location.search).get('p');
+if(urlp){const raw=localStorage.getItem('mw_p_'+urlp);if(raw)try{const d=JSON.parse(raw);currentSongs=d.songs;currentMeta=d.meta;saveToHistory(d.songs,d.meta);renderResults(d.songs,d.meta);setTimeout(()=>showShareBadge(d.meta),1500);}catch(e){}}
+</script>
+</body>
+</html>

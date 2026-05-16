@@ -1,0 +1,30 @@
+name: Push Notifications
+
+on:
+  schedule:
+    # Surprise quotidienne — 8h00 UTC chaque matin
+    - cron: '0 8 * * *'
+    # Tendances hebdomadaires — 8h00 UTC chaque lundi
+    - cron: '0 8 * * 1'
+  workflow_dispatch: # Permet de lancer manuellement depuis GitHub
+
+jobs:
+  send-surprise:
+    if: github.event.schedule == '0 8 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Envoyer notification surprise
+        run: |
+          curl -X GET \
+            -H "x-admin-secret: ${{ secrets.ADMIN_SECRET }}" \
+            https://project-0mjoz.vercel.app/api/push-surprise
+
+  send-weekly:
+    if: github.event.schedule == '0 8 * * 1' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Envoyer notification tendances
+        run: |
+          curl -X GET \
+            -H "x-admin-secret: ${{ secrets.ADMIN_SECRET }}" \
+            https://project-0mjoz.vercel.app/api/push-weekly

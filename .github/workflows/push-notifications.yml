@@ -5,7 +5,7 @@ on:
     # Surprise quotidienne — 8h00 UTC chaque matin
     - cron: '0 8 * * *'
     # Tendances hebdomadaires — 8h00 UTC chaque lundi
-    - cron: '27 16 * * *'
+    - cron: '29 18 * * *'
   workflow_dispatch: # Permet de lancer manuellement depuis GitHub
 
 jobs:
@@ -20,7 +20,7 @@ jobs:
             https://project-0mjoz.vercel.app/api/push-surprise
 
   send-weekly:
-    if: github.event.schedule == '27 16 * * *' || github.event_name == 'workflow_dispatch'
+    if: github.event.schedule == '29 18 * * *' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Envoyer notification tendances

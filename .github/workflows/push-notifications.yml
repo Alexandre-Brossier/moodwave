@@ -3,7 +3,7 @@ name: Push Notifications
 on:
   schedule:
     # Surprise quotidienne — 8h00 UTC chaque matin
-    - cron: '0 8 * * *'
+    - cron: '8 16 * * *'
     # Tendances hebdomadaires — 8h00 UTC chaque lundi
     - cron: '0 8 * * 1'
   workflow_dispatch: # Permet de lancer manuellement depuis GitHub

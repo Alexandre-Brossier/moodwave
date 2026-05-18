@@ -3293,7 +3293,12 @@ function shareCollabCode(){
 }
 
 async function leaveCollabSession(){
-  window._collabGenerating=false;
+  // Réinitialiser TOUS les états collab
+  window._collabGenerating = false;
+  window._collabResultShown = false;
+  collabMyMood = null;
+  collabMyEnergy = null;
+  collabMyContext = null;
   if(collabChannel){
     const sb = await initSupabase();
     if(sb) sb.removeChannel(collabChannel);
@@ -4398,7 +4403,7 @@ const msgs=['Analyse de ta vibe...','Calibrage des fréquences...','Sélection d
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+  if(id !== 'collab-result-screen') window.scrollTo(0,0);
   closeAllDropdowns();
   if(id==='history-screen')renderHistory();
   if(id==='hero'){updateHistoryBadge();loadPublicRating();}

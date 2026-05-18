@@ -27,7 +27,7 @@
     .particles{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
     .particle{position:absolute;border-radius:50%;animation:particleUp linear infinite;pointer-events:none}
     @keyframes particleUp{0%{transform:translateY(100vh);opacity:0}10%{opacity:.8}90%{opacity:.3}100%{transform:translateY(-40px);opacity:0}}
-    .screen{display:none;position:relative;z-index:5;min-height:100vh;padding:1.5rem 1.25rem 6rem;max-width:560px;margin:0 auto}
+    .screen{display:none;position:relative;z-index:5;min-height:100vh;padding:1.5rem 1.25rem 6rem;max-width:560px;margin:0 auto;box-sizing:border-box}
     .screen.active{display:flex;flex-direction:column}
     .back-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;line-height:1;padding:0;justify-content:center;flex-shrink:0;transition:background .2s}
     .back-btn:hover{background:rgba(255,255,255,.18)}
@@ -673,6 +673,10 @@
     .pseudo-onboard-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:1.5rem;width:100%;max-width:380px}
     .pseudo-onboard-rules{font-size:.72rem;color:var(--muted);margin-top:.5rem;text-align:left}
     .pseudo-onboard-rules li{margin-bottom:.2rem}
+
+
+    #collab-result-screen{overflow-y:visible;height:auto}
+    #collab-songs-list{overflow-y:visible}
 
     .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}

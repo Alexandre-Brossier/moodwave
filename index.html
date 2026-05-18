@@ -3159,8 +3159,8 @@ async function submitCollabMood(){
     // Masquer le form, afficher l'attente
     document.getElementById('collab-form-box').style.display = 'none';
     document.getElementById('collab-waiting-msg').style.display = 'block';
-    // Si les deux sont prêts → générer
-    if(data.creator_mood && data.joiner_mood){
+    // Si les deux sont prêts → générer (seulement si créateur)
+    if(data.creator_mood && data.joiner_mood && collabRole === 'creator'){
       generateCollabPlaylist(data);
     }
   }catch(e){
@@ -3197,12 +3197,26 @@ function handleSessionUpdate(session){
     document.getElementById('collab-p2-avatar').textContent = otherName[0].toUpperCase();
     document.getElementById('collab-p2-status').textContent = `${otherMood.mood} · ${otherMood.energy}`;
   }
-  // Si les deux ont soumis → générer
-  if(session.creator_mood && session.joiner_mood && document.getElementById('collab-result-screen')){
+  // Si les deux ont soumis → générer (seulement si joiner)
+  // Le créateur gère sa propre génération dans submitCollabMood
+  if(session.creator_mood && session.joiner_mood && collabRole === 'joiner'){
     const currentScreen = document.querySelector('.screen.active');
     if(currentScreen && currentScreen.id === 'collab-mood-screen'){
       generateCollabPlaylist(session);
     }
+  }
+  // Mettre à jour le statut du joiner vu par le créateur
+  if(session.joiner_id && collabRole === 'creator'){
+    const p2 = document.getElementById('collab-p2');
+    const p2Status = document.getElementById('collab-p2-status');
+    const p2Name = document.getElementById('collab-p2-name');
+    const p2Avatar = document.getElementById('collab-p2-avatar');
+    if(p2) p2.classList.remove('waiting');
+    if(p2Name) p2Name.textContent = session.joiner_name || 'Ami';
+    if(p2Avatar) p2Avatar.textContent = (session.joiner_name||'A')[0].toUpperCase();
+    if(p2Status) p2Status.textContent = session.joiner_mood
+      ? `${session.joiner_mood.mood} · ${session.joiner_mood.energy}`
+      : 'Connecté';
   }
   // Si le joiner vient de rejoindre → mettre à jour l'UI
   if(session.status === 'joined' && collabRole === 'creator'){
@@ -3304,8 +3318,8 @@ function showCollabResult(session, songs){
   const meta = `Collab · ${c.name||'A'} (${c.mood}) + ${j.name||'B'} (${j.mood})`;
   currentSongs = songs;
   currentMeta = meta;
-  // Sauvegarder l'historique une seule fois — uniquement le créateur
-  if(collabRole === 'creator') saveToHistory(songs, meta);
+  // Les deux utilisateurs sauvegardent la playlist dans leur propre historique
+  saveToHistory(songs, meta);
   // Remplir l'écran résultat collab
   document.getElementById('collab-result-p1').textContent = `${c.name||'A'} · ${c.mood}`;
   document.getElementById('collab-result-p2').textContent = `${j.name||'B'} · ${j.mood}`;

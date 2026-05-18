@@ -664,6 +664,16 @@
     .cpill.active{background:rgba(124,106,255,.3);border-color:#a78bfa;color:#fff}
     .cpill:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25)}
 
+
+    /* PSEUDO ONBOARDING */
+    #pseudo-onboard-screen{align-items:center;justify-content:center;text-align:center;gap:1rem}
+    .pseudo-onboard-icon{font-size:3rem;color:var(--accent2);margin-bottom:.5rem}
+    .pseudo-onboard-title{font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;color:#fff}
+    .pseudo-onboard-sub{font-size:.85rem;color:var(--muted);line-height:1.65;max-width:300px}
+    .pseudo-onboard-box{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:1.5rem;width:100%;max-width:380px}
+    .pseudo-onboard-rules{font-size:.72rem;color:var(--muted);margin-top:.5rem;text-align:left}
+    .pseudo-onboard-rules li{margin-bottom:.2rem}
+
     .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}
     .weekly-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
@@ -1294,6 +1304,32 @@
   </div>
 </div>
 
+
+<div id="pseudo-onboard-screen" class="screen">
+  <div class="pseudo-onboard-icon"><i class="ph-user-circle ph-fill"></i></div>
+  <div class="pseudo-onboard-title">Choisis ton pseudo</div>
+  <div class="pseudo-onboard-sub">C'est le nom que les autres utilisateurs verront dans la collab, le défi et les souvenirs.</div>
+
+  <div class="pseudo-onboard-box">
+    <input class="challenge-input" id="onboard-pseudo-input" type="text"
+      maxlength="24" placeholder="Ton pseudo…"
+      oninput="validateOnboardPseudo(this)">
+    <ul class="pseudo-onboard-rules">
+      <li>Entre 2 et 24 caractères</li>
+      <li>Lettres, chiffres, tirets, points, underscores</li>
+      <li>Pas de mots inappropriés</li>
+    </ul>
+    <div class="error-msg" id="onboard-pseudo-error" style="margin:.625rem 0"></div>
+    <button class="btn-primary" id="onboard-pseudo-btn" style="margin-top:.875rem;width:100%;padding:.9rem" onclick="saveOnboardPseudo()" disabled>
+      <i class="ph-arrow-right ph-fill"></i> Continuer
+    </button>
+    <button class="btn-alt" style="margin-top:.5rem;width:100%;font-size:.8rem" onclick="skipOnboardPseudo()">
+      Passer pour l'instant
+    </button>
+  </div>
+  <footer>Tu pourras changer ton pseudo à tout moment dans les paramètres.</footer>
+</div>
+
 <div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-title">Partager <button class="modal-close-btn" onclick="closeModal()">✕</button></div>
@@ -1747,6 +1783,10 @@ function onUserLoggedIn(user){
   loadPseudo().then(()=>{
     const nameEl=document.getElementById('user-name-display');
     if(nameEl&&currentPseudo)nameEl.textContent=currentPseudo;
+    // Vérifier si l'utilisateur a besoin de choisir un pseudo
+    checkNeedsPseudo().then(needs=>{
+      if(needs) setTimeout(()=>showScreen('pseudo-onboard-screen'), 300);
+    });
   });
   currentUser=user;
   const initials=(user.email||'?').slice(0,1).toUpperCase();
@@ -3210,12 +3250,25 @@ async function generateCollabPlaylist(session){
   startLoading();
   const c = session.creator_mood;
   const j = session.joiner_mood;
+  // Extraire les genres favoris depuis l'historique
+  const history = getHistory();
+  const genreCounts = {};
+  history.slice(0,15).forEach(e=>{
+    (e.songs||[]).forEach(s=>{
+      if(s.genre) genreCounts[s.genre]=(genreCounts[s.genre]||0)+1;
+    });
+  });
+  const topGenres = Object.entries(genreCounts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(g=>g[0]);
+  const genreHint = topGenres.length > 0 ? `\n- Genres appréciés : ${topGenres.join(', ')} (base-toi dessus mais reste ouvert)` : '';
+
   const prompt = `Génère une playlist pour DEUX personnes avec des moods différents :
 - Personne 1 (${c.name||'A'}) : mood ${c.mood}, énergie ${c.energy}, contexte ${c.context||'Détente'}
-- Personne 2 (${j.name||'B'}) : mood ${j.mood}, énergie ${j.energy}, contexte ${j.context||'Détente'}
+- Personne 2 (${j.name||'B'}) : mood ${j.mood}, énergie ${j.energy}, contexte ${j.context||'Détente'}${genreHint}
 La playlist doit trouver un équilibre qui convient aux deux.
+Varie les genres musicaux — ne reste pas sur un seul style.
 Alterne entre les styles qui correspondent à chaque personne.
-Certains titres peuvent satisfaire les deux en même temps.`;
+Certains titres peuvent satisfaire les deux en même temps.
+Inclus des genres différents : pop, rock, R&B, indie, hip-hop, jazz selon les moods.`;
 
   try{
     const res = await fetchWithAuth('/api/playlist',{
@@ -3251,7 +3304,8 @@ function showCollabResult(session, songs){
   const meta = `Collab · ${c.name||'A'} (${c.mood}) + ${j.name||'B'} (${j.mood})`;
   currentSongs = songs;
   currentMeta = meta;
-  saveToHistory(songs, meta);
+  // Sauvegarder l'historique une seule fois — uniquement le créateur
+  if(collabRole === 'creator') saveToHistory(songs, meta);
   // Remplir l'écran résultat collab
   document.getElementById('collab-result-p1').textContent = `${c.name||'A'} · ${c.mood}`;
   document.getElementById('collab-result-p2').textContent = `${j.name||'B'} · ${j.mood}`;
@@ -4290,6 +4344,73 @@ function setCM(group, val){
   // Activer le bouton valider
   const submit = document.getElementById('collab-submit-btn');
   if(submit) submit.disabled = !(collabMyMood && collabMyEnergy && collabMyContext);
+}
+
+
+
+/* ══ PSEUDO ONBOARDING ══ */
+function validateOnboardPseudo(input){
+  const val = input.value.trim();
+  const btn = document.getElementById('onboard-pseudo-btn');
+  const errEl = document.getElementById('onboard-pseudo-error');
+  errEl.style.display = 'none';
+  if(btn) btn.disabled = !(isPseudoValid(val) && isPseudoClean(val));
+}
+
+async function saveOnboardPseudo(){
+  const pseudo = document.getElementById('onboard-pseudo-input').value.trim();
+  const errEl = document.getElementById('onboard-pseudo-error');
+  const btn = document.getElementById('onboard-pseudo-btn');
+  errEl.style.display = 'none';
+
+  if(!isPseudoValid(pseudo) || !isPseudoClean(pseudo)){
+    errEl.textContent = 'Pseudo invalide.';
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ph-clock ph-fill"></i> Vérification…';
+
+  const sb = await initSupabase(); if(!sb) return;
+  try{
+    // Vérifier unicité
+    const {data: existing} = await sb.from('profiles')
+      .select('user_id').eq('pseudo', pseudo).limit(1);
+    if(existing && existing.length > 0){
+      errEl.textContent = 'Ce pseudo est déjà pris.';
+      errEl.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = '<i class="ph-arrow-right ph-fill"></i> Continuer';
+      return;
+    }
+    await sb.from('profiles').upsert({
+      user_id: currentUser.id, pseudo,
+      updated_at: new Date().toISOString()
+    }, {onConflict:'user_id'});
+    currentPseudo = pseudo;
+    const nameEl = document.getElementById('user-name-display');
+    if(nameEl) nameEl.textContent = pseudo;
+    showScreen('hero');
+  }catch(e){
+    errEl.textContent = `Erreur : ${e.message}`;
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ph-arrow-right ph-fill"></i> Continuer';
+  }
+}
+
+function skipOnboardPseudo(){
+  showScreen('hero');
+}
+
+async function checkNeedsPseudo(){
+  if(!currentUser || currentUser.isGuest) return false;
+  const sb = await initSupabase(); if(!sb) return false;
+  try{
+    const {data} = await sb.from('profiles')
+      .select('pseudo').eq('user_id', currentUser.id).single();
+    return !data?.pseudo;
+  }catch(e){ return true; }
 }
 
 

@@ -1779,6 +1779,7 @@ function continueAsGuest(email){
 function onUserLoggedIn(user){
   setTimeout(loadVotesFromCloud, 500);
   setTimeout(loadPublicRating, 800);
+  setTimeout(async()=>{ await loadPlaylistsFromCloudIntoMemory(); updateHistoryBadge(); }, 700);
   window._journalLoaded = false;
   loadPseudo().then(()=>{
     const nameEl=document.getElementById('user-name-display');
@@ -3206,17 +3207,28 @@ function handleSessionUpdate(session){
     }
   }
   // Mettre à jour le statut du joiner vu par le créateur
-  if(session.joiner_id && collabRole === 'creator'){
+  // Mettre à jour P2 côté créateur quand le joiner rejoint ou soumet son mood
+  if(collabRole === 'creator'){
+    const joinerName = session.joiner_name || 'Ami';
     const p2 = document.getElementById('collab-p2');
     const p2Status = document.getElementById('collab-p2-status');
     const p2Name = document.getElementById('collab-p2-name');
     const p2Avatar = document.getElementById('collab-p2-avatar');
-    if(p2) p2.classList.remove('waiting');
-    if(p2Name) p2Name.textContent = session.joiner_name || 'Ami';
-    if(p2Avatar) p2Avatar.textContent = (session.joiner_name||'A')[0].toUpperCase();
-    if(p2Status) p2Status.textContent = session.joiner_mood
-      ? `${session.joiner_mood.mood} · ${session.joiner_mood.energy}`
-      : 'Connecté';
+    if(session.joiner_id || session.status === 'joined'){
+      if(p2) p2.classList.remove('waiting');
+      if(p2Name) p2Name.textContent = joinerName;
+      if(p2Avatar) p2Avatar.textContent = joinerName[0].toUpperCase();
+      if(p2Status) p2Status.textContent = session.joiner_mood
+        ? `${session.joiner_mood.mood} · ${session.joiner_mood.energy}`
+        : 'Connecté ✓';
+    }
+  }
+  // Mettre à jour P1 côté joiner quand le créateur soumet son mood
+  if(collabRole === 'joiner' && session.creator_mood){
+    const p1status = document.getElementById('collab-p1-status');
+    if(p1status) p1status.textContent = `${session.creator_mood.mood} · ${session.creator_mood.energy}`;
+    const p1 = document.getElementById('collab-p1');
+    if(p1) p1.classList.add('ready');
   }
   // Si le joiner vient de rejoindre → mettre à jour l'UI
   if(session.status === 'joined' && collabRole === 'creator'){
@@ -5045,18 +5057,16 @@ setTimeout(showPushPrompt, 2500);
 }
 
 /* ══ HISTORIQUE ══ */
-function getHistory(){try{return JSON.parse(localStorage.getItem('moodwave_history')||'[]');}catch(e){return[];}}
-function saveToHistory(songs,meta,update){
-  const h=getHistory();
-  if(update){const idx=h.findIndex(e=>e.meta===meta);if(idx>=0){h[idx].songs=songs;localStorage.setItem('moodwave_history',JSON.stringify(h));return;}}
-  const entry={id:Date.now(),date:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}),meta,songs};
-  h.unshift(entry);
-  if(h.length>20)h.pop();
-  localStorage.setItem('moodwave_history',JSON.stringify(h));
-  updateHistoryBadge();
-  // Sauvegarder dans le cloud si connecté
-  savePlaylistToCloud(songs, meta);
+function getHistory(){return window._historyEntries||[];}
+function saveToHistory(songs,meta){
+  // Uniquement Supabase — pas de localStorage
+  if(currentUser && !currentUser.isGuest){
+    savePlaylistToCloud(songs, meta).then(()=>{
+      loadPlaylistsFromCloudIntoMemory().then(updateHistoryBadge);
+    });
+  }
 }
+
 function updateHistoryBadge(){
   const n=getHistory().length;
   document.getElementById('history-count-badge').textContent=n;

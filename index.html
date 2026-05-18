@@ -654,6 +654,11 @@
     .push-prompt-perk i{color:#4ade80;font-size:.95rem;flex-shrink:0}
     .push-prompt-skip{background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;padding:.5rem;text-align:center;font-family:'DM Sans',sans-serif;width:100%}
 
+
+    /* Pills collab — éviter que les enfants interceptent le clic */
+    #collab-mood-screen .pill > i,
+    #collab-mood-screen .pill > span{pointer-events:none}
+
     .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}
     .weekly-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
@@ -3056,13 +3061,17 @@ function showCollabMoodScreen(code){
 }
 
 function selectCollabPill(el){
-  const group = el.dataset.cg;
-  // Désélectionner uniquement les pills du même groupe collab
-  document.querySelectorAll(`[data-cg="${group}"]`).forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  if(group === 'mood') collabMyMood = el.dataset.val;
-  if(group === 'energy') collabMyEnergy = el.dataset.val;
-  if(group === 'context') collabMyContext = el.dataset.val;
+  // Remonter au parent avec data-cg si le clic a touché un enfant (icône/span)
+  const pill = el.closest('[data-cg]') || el;
+  const group = pill.dataset.cg;
+  if(!group) return;
+  // Désélectionner uniquement les pills du même groupe dans l'écran collab
+  const screen = document.getElementById('collab-mood-screen');
+  if(screen) screen.querySelectorAll(`[data-cg="${group}"]`).forEach(p=>p.classList.remove('active'));
+  pill.classList.add('active');
+  if(group === 'mood') collabMyMood = pill.dataset.val;
+  if(group === 'energy') collabMyEnergy = pill.dataset.val;
+  if(group === 'context') collabMyContext = pill.dataset.val;
   const btn = document.getElementById('collab-submit-btn');
   if(btn) btn.disabled = !(collabMyMood && collabMyEnergy && collabMyContext);
 }

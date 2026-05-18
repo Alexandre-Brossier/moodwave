@@ -3137,42 +3137,44 @@ function initCollabPillListeners(){
 }
 
 async function submitCollabMood(){
-  if(!collabMyMood || !collabMyEnergy) return;
+  if(!collabMyMood || !collabMyEnergy || !collabMyContext) return;
   const sb = await initSupabase(); if(!sb) return;
   const btn = document.getElementById('collab-submit-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="ph-clock ph-fill"></i> En attente…';
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="ph-clock ph-fill"></i> En attente…'; }
   try{
-    const moodData = {mood: collabMyMood, energy: collabMyEnergy, context: collabMyContext||'Détente', name: getUserDisplayName()};
-    const update = collabRole === 'creator'
-      ? {creator_mood: moodData, status: collabSession.joiner_mood ? 'ready' : 'creator_ready'}
-      : {joiner_mood: moodData, status: collabSession.creator_mood ? 'ready' : 'joiner_ready'};
-    const {data, error} = await sb.from('sessions').update(update).eq('id', collabSession.id).select().single();
+    const moodData = {mood:collabMyMood, energy:collabMyEnergy, context:collabMyContext, name:getUserDisplayName()};
+    const field = collabRole==='creator' ? 'creator_mood' : 'joiner_mood';
+    await sb.from('sessions').update({[field]:moodData}).eq('id', collabSession.id);
 
-    // Si data est null (problème RLS), recharger la session manuellement
-    if(data){
-      collabSession = data;
-    } else {
-      const {data: reloaded} = await sb.from('sessions').select('*').eq('id', collabSession.id).single();
-      if(reloaded) collabSession = reloaded;
-    }
+    // Recharger la session
+    const {data:session} = await sb.from('sessions').select('*').eq('id', collabSession.id).single();
+    if(session) collabSession = session;
 
-    // Mettre à jour l'UI participant
+    // UI : mettre à jour le statut
     const myEl = document.getElementById('collab-p1');
-    myEl.classList.add('ready');
-    document.getElementById('collab-p1-status').textContent = `${collabMyMood} · ${collabMyEnergy}`;
-    // Masquer le form, afficher l'attente
-    document.getElementById('collab-form-box').style.display = 'none';
-    document.getElementById('collab-waiting-msg').style.display = 'block';
-    // Si les deux sont prêts → générer (seulement si créateur)
-    if(data.creator_mood && data.joiner_mood && collabRole === 'creator'){
-      generateCollabPlaylist(data);
+    if(myEl) myEl.classList.add('ready');
+    const p1s = document.getElementById('collab-p1-status');
+    if(p1s) p1s.textContent = `${collabMyMood} · ${collabMyEnergy}`;
+    const formBox = document.getElementById('collab-form-box');
+    if(formBox) formBox.style.display='none';
+
+    if(collabRole === 'joiner'){
+      // Joiner : loading immédiat en attendant que le créateur génère
+      showScreen('loading-screen');
+      startLoading();
+    } else {
+      // Créateur : afficher message d'attente
+      const waitMsg = document.getElementById('collab-waiting-msg');
+      if(waitMsg) waitMsg.style.display='block';
+      // Si le joiner a déjà soumis → générer directement
+      if(collabSession.creator_mood && collabSession.joiner_mood && !window._collabGenerating){
+        generateCollabPlaylist(collabSession);
+      }
     }
   }catch(e){
-    document.getElementById('collab-mood-error').textContent = `Erreur : ${e.message}`;
-    document.getElementById('collab-mood-error').style.display = 'block';
-    btn.disabled = false;
-    btn.innerHTML = '<i class="ph-paper-plane-tilt ph-fill"></i> Valider mon mood';
+    const errEl = document.getElementById('collab-mood-error');
+    if(errEl){ errEl.textContent=`Erreur : ${e.message}`; errEl.style.display='block'; }
+    if(btn){ btn.disabled=false; btn.innerHTML='<i class="ph-paper-plane-tilt ph-fill"></i> Valider mon mood'; }
   }
 }
 

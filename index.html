@@ -3187,140 +3187,71 @@ function subscribeToSession(code){
 function handleSessionUpdate(session){
   if(!session) return;
   collabSession = session;
-  // Mettre à jour l'UI de l'autre participant
-  const otherMood = collabRole === 'creator' ? session.joiner_mood : session.creator_mood;
-  const otherName = collabRole === 'creator' ? (session.joiner_name||'Ami') : (session.creator_name||'Créateur');
-  if(otherMood){
-    const p2 = document.getElementById('collab-p2');
-    p2.classList.remove('waiting');
-    p2.classList.add('ready');
-    document.getElementById('collab-p2-name').textContent = otherName;
-    document.getElementById('collab-p2-avatar').textContent = otherName[0].toUpperCase();
-    document.getElementById('collab-p2-status').textContent = `${otherMood.mood} · ${otherMood.energy}`;
-  }
-  // Si les deux ont soumis → générer (seulement si joiner)
-  // Le créateur gère sa propre génération dans submitCollabMood
-  if(session.creator_mood && session.joiner_mood && collabRole === 'joiner'){
-    const currentScreen = document.querySelector('.screen.active');
-    if(currentScreen && currentScreen.id === 'collab-mood-screen'){
+
+  // Créateur : mise à jour du joiner
+  if(collabRole === 'creator' && (session.joiner_id || session.joiner_name)){
+    const joinerName = session.joiner_name || 'Ami';
+    const p2=document.getElementById('collab-p2');
+    const p2n=document.getElementById('collab-p2-name');
+    const p2a=document.getElementById('collab-p2-avatar');
+    const p2s=document.getElementById('collab-p2-status');
+    if(p2) p2.classList.remove('waiting');
+    if(p2n) p2n.textContent=joinerName;
+    if(p2a) p2a.textContent=joinerName[0].toUpperCase();
+    if(p2s) p2s.textContent=session.joiner_mood
+      ?`${session.joiner_mood.mood} · ${session.joiner_mood.energy}`
+      :'Connecté ✓';
+    // Générer si les deux moods sont là
+    if(session.creator_mood && session.joiner_mood && !window._collabGenerating)
       generateCollabPlaylist(session);
+  }
+
+  // Joiner : mise à jour du créateur + réception résultat
+  if(collabRole === 'joiner'){
+    if(session.creator_mood){
+      const p1=document.getElementById('collab-p1');
+      const p1s=document.getElementById('collab-p1-status');
+      if(p1) p1.classList.add('ready');
+      if(p1s) p1s.textContent=`${session.creator_mood.mood} · ${session.creator_mood.energy}`;
     }
-  }
-  // Mettre à jour le statut du joiner vu par le créateur
-  // Mettre à jour P2 côté créateur quand le joiner rejoint ou soumet son mood
-  if(collabRole === 'creator'){
-    const joinerName = session.joiner_name || 'Ami';
-    const p2 = document.getElementById('collab-p2');
-    const p2Status = document.getElementById('collab-p2-status');
-    const p2Name = document.getElementById('collab-p2-name');
-    const p2Avatar = document.getElementById('collab-p2-avatar');
-    if(session.joiner_id || session.status === 'joined'){
-      if(p2) p2.classList.remove('waiting');
-      if(p2Name) p2Name.textContent = joinerName;
-      if(p2Avatar) p2Avatar.textContent = joinerName[0].toUpperCase();
-      if(p2Status) p2Status.textContent = session.joiner_mood
-        ? `${session.joiner_mood.mood} · ${session.joiner_mood.energy}`
-        : 'Connecté ✓';
+    if(session.result){
+      stopLoading();
+      showCollabResult(session, session.result);
     }
-  }
-  // Mettre à jour P1 côté joiner quand le créateur soumet son mood
-  if(collabRole === 'joiner' && session.creator_mood){
-    const p1status = document.getElementById('collab-p1-status');
-    if(p1status) p1status.textContent = `${session.creator_mood.mood} · ${session.creator_mood.energy}`;
-    const p1 = document.getElementById('collab-p1');
-    if(p1) p1.classList.add('ready');
-  }
-  // Si le joiner vient de rejoindre → mettre à jour l'UI
-  if(session.status === 'joined' && collabRole === 'creator'){
-    const joinerName = session.joiner_name || 'Ami';
-    const p2 = document.getElementById('collab-p2');
-    p2.classList.remove('waiting');
-    document.getElementById('collab-p2-name').textContent = joinerName;
-    document.getElementById('collab-p2-avatar').textContent = joinerName[0].toUpperCase();
-    document.getElementById('collab-p2-status').textContent = 'Connecté';
   }
 }
 
 async function generateCollabPlaylist(session){
-  if(!session || !session.creator_mood || !session.joiner_mood) return;
-
-  // Si la playlist est déjà dans Supabase, la charger directement
-  if(session.result){
-    showCollabResult(session, session.result);
-    return;
-  }
-
-  // Seul le CRÉATEUR génère la playlist
-  if(collabRole !== 'creator') {
-    // Le joiner attend que le créateur génère et stocke le résultat
-    showScreen('loading-screen');
-    startLoading();
-    // Polling toutes les 2s pour voir si le résultat est disponible
-    let attempts = 0;
-    const poll = setInterval(async()=>{
-      attempts++;
-      const sb = await initSupabase();
-      if(!sb){ clearInterval(poll); stopLoading(); return; }
-      const {data} = await sb.from('sessions').select('result').eq('id', session.id).single();
-      if(data?.result){
-        clearInterval(poll);
-        stopLoading();
-        showCollabResult({...session, result: data.result}, data.result);
-      }
-      if(attempts > 30){ clearInterval(poll); stopLoading(); } // timeout 60s
-    }, 2000);
-    return;
-  }
-
-  showScreen('loading-screen');
-  startLoading();
-  const c = session.creator_mood;
-  const j = session.joiner_mood;
-  // Extraire les genres favoris depuis l'historique
-  const history = getHistory();
-  const genreCounts = {};
-  history.slice(0,15).forEach(e=>{
-    (e.songs||[]).forEach(s=>{
-      if(s.genre) genreCounts[s.genre]=(genreCounts[s.genre]||0)+1;
-    });
-  });
-  const topGenres = Object.entries(genreCounts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(g=>g[0]);
-  const genreHint = topGenres.length > 0 ? `\n- Genres appréciés : ${topGenres.join(', ')} (base-toi dessus mais reste ouvert)` : '';
-
-  const prompt = `Génère une playlist pour DEUX personnes avec des moods différents :
-- Personne 1 (${c.name||'A'}) : mood ${c.mood}, énergie ${c.energy}, contexte ${c.context||'Détente'}
-- Personne 2 (${j.name||'B'}) : mood ${j.mood}, énergie ${j.energy}, contexte ${j.context||'Détente'}${genreHint}
-La playlist doit trouver un équilibre qui convient aux deux.
-Varie les genres musicaux — ne reste pas sur un seul style.
-Alterne entre les styles qui correspondent à chaque personne.
-Certains titres peuvent satisfaire les deux en même temps.
-Inclus des genres différents : pop, rock, R&B, indie, hip-hop, jazz selon les moods.`;
-
+  if(!session||!session.creator_mood||!session.joiner_mood) return;
+  if(collabRole!=='creator') return;
+  if(window._collabGenerating) return;
+  window._collabGenerating=true;
+  showScreen('loading-screen'); startLoading();
+  const c=session.creator_mood; const j=session.joiner_mood;
+  const hist=window._historyEntries||[];
+  const gc={};
+  hist.slice(0,15).forEach(e=>(e.songs||[]).forEach(s=>{ if(s.genre) gc[s.genre]=(gc[s.genre]||0)+1; }));
+  const tg=Object.entries(gc).sort((a,b)=>b[1]-a[1]).slice(0,3).map(g=>g[0]);
+  const gh=tg.length?`\n- Genres appréciés : ${tg.join(', ')}`:'';
+  const prompt=`Génère une playlist pour DEUX personnes :
+- ${c.name||'P1'} : mood ${c.mood}, énergie ${c.energy}, contexte ${c.context||'Détente'}
+- ${j.name||'P2'} : mood ${j.mood}, énergie ${j.energy}, contexte ${j.context||'Détente'}${gh}
+Trouve un équilibre. Varie les genres : pop, rock, R&B, indie, hip-hop, électro, jazz.`;
   try{
-    const res = await fetchWithAuth('/api/playlist',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        type:'collab', mood: c.mood, energy: c.energy,
-        context: c.context||'Détente', freeText: prompt,
-        genres:[], era:[], genreFreeText:'', likedSongs:[], dislikedSongs:[]
-      })
-    });
-    if(!res.ok) throw new Error('Erreur API');
-    const songs = await res.json();
-
-    // Sauvegarder le résultat dans Supabase pour que le joiner puisse le charger
-    const sb = await initSupabase();
-    if(sb) await sb.from('sessions').update({result: songs, status:'done'}).eq('id', session.id);
-
-    stopLoading();
-    showCollabResult(session, songs);
+    const res=await fetchWithAuth('/api/playlist',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'collab',mood:c.mood,energy:c.energy,context:c.context||'Détente',
+        freeText:prompt,genres:[],era:[],genreFreeText:'',likedSongs:[],dislikedSongs:[]})});
+    if(!res.ok) throw new Error('Erreur API '+res.status);
+    const songs=await res.json();
+    const sb=await initSupabase();
+    if(sb) await sb.from('sessions').update({result:songs,status:'done'}).eq('id',session.id);
+    stopLoading(); window._collabGenerating=false;
+    showCollabResult(session,songs);
   }catch(e){
-    stopLoading();
-    showScreen('collab-mood-screen');
-  setTimeout(initCollabPillListeners, 100);
-    document.getElementById('collab-mood-error').textContent = `Erreur de génération : ${e.message}`;
-    document.getElementById('collab-mood-error').style.display = 'block';
+    stopLoading(); window._collabGenerating=false;
+    showScreen('collab-mood-screen'); setTimeout(initCollabPillListeners,100);
+    const errEl=document.getElementById('collab-mood-error');
+    if(errEl){errEl.textContent=`Erreur : ${e.message}`;errEl.style.display='block';}
   }
 }
 

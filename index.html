@@ -3201,8 +3201,8 @@ function handleSessionUpdate(session){
     if(p2s) p2s.textContent=session.joiner_mood
       ?`${session.joiner_mood.mood} · ${session.joiner_mood.energy}`
       :'Connecté ✓';
-    // Générer si les deux moods sont là
-    if(session.creator_mood && session.joiner_mood && !window._collabGenerating)
+    // Générer seulement si pas encore fait (pas de result, pas done)
+    if(session.creator_mood && session.joiner_mood && !session.result && session.status!=='done' && !window._collabGenerating)
       generateCollabPlaylist(session);
   }
 
@@ -3247,6 +3247,7 @@ Trouve un équilibre. Varie les genres : pop, rock, R&B, indie, hip-hop, électr
     if(sb) await sb.from('sessions').update({result:songs,status:'done'}).eq('id',session.id);
     stopLoading(); window._collabGenerating=false;
     showCollabResult(session,songs);
+    if(collabChannel){ initSupabase().then(sb2=>{ if(sb2) sb2.removeChannel(collabChannel); collabChannel=null; }); }
   }catch(e){
     stopLoading(); window._collabGenerating=false;
     showScreen('collab-mood-screen'); setTimeout(initCollabPillListeners,100);
@@ -3292,6 +3293,7 @@ function shareCollabCode(){
 }
 
 async function leaveCollabSession(){
+  window._collabGenerating=false;
   if(collabChannel){
     const sb = await initSupabase();
     if(sb) sb.removeChannel(collabChannel);

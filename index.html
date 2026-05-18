@@ -656,6 +656,14 @@
 
 
 
+
+    /* COLLAB PILLS */
+    .cpill{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);color:#d0d0f0;font-family:'DM Sans',sans-serif;font-size:.8rem;padding:.55rem .3rem;border-radius:14px;cursor:pointer;transition:all .2s;text-align:center;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;width:100%}
+    .cpill i{font-size:1.1rem;pointer-events:none}
+    .cpill span{font-size:.78rem;pointer-events:none}
+    .cpill.active{background:rgba(124,106,255,.3);border-color:#a78bfa;color:#fff}
+    .cpill:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25)}
+
     .weekly-pulse{width:9px;height:9px;border-radius:50%;background:#4ade80;display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:.4rem}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.35)}}
     .weekly-loading{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
@@ -1043,33 +1051,33 @@
     <div class="collab-step-title"><i class="ph-smiley ph-fill" style="color:var(--accent2)"></i> Ton mood pour cette session</div>
 
     <div style="font-size:.75rem;color:var(--muted);margin-bottom:.625rem">Comment tu te sens ?</div>
-    <div class="pills" style="grid-template-columns:repeat(3,1fr)">
-      <div class="pill" data-cg="mood" data-val="Calme"><i class="ph-moon ph-fill"></i><span>Calme</span></div>
-      <div class="pill" data-cg="mood" data-val="Stressé"><i class="ph-warning ph-fill"></i><span>Stressé</span></div>
-      <div class="pill" data-cg="mood" data-val="Heureux"><i class="ph-smiley ph-fill"></i><span>Heureux</span></div>
-      <div class="pill" data-cg="mood" data-val="Triste"><i class="ph-cloud-rain ph-fill"></i><span>Triste</span></div>
-      <div class="pill" data-cg="mood" data-val="Motivé"><i class="ph-rocket ph-fill"></i><span>Motivé</span></div>
-      <div class="pill" data-cg="mood" data-val="Excité"><i class="ph-lightning ph-fill"></i><span>Excité</span></div>
-      <div class="pill" data-cg="mood" data-val="Nostalgique"><i class="ph-clock-counter-clockwise ph-fill"></i><span>Nostalgique</span></div>
-      <div class="pill" data-cg="mood" data-val="Focus"><i class="ph-target ph-fill"></i><span>Focus</span></div>
-      <div class="pill" data-cg="mood" data-val="Anxieux"><i class="ph-heartbeat ph-fill"></i><span>Anxieux</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:.875rem">
+      <button class="cpill" id="cm-Calme" onclick="setCM('mood','Calme')"><i class="ph-moon ph-fill"></i><span>Calme</span></button>
+      <button class="cpill" id="cm-Stressé" onclick="setCM('mood','Stressé')"><i class="ph-warning ph-fill"></i><span>Stressé</span></button>
+      <button class="cpill" id="cm-Heureux" onclick="setCM('mood','Heureux')"><i class="ph-smiley ph-fill"></i><span>Heureux</span></button>
+      <button class="cpill" id="cm-Triste" onclick="setCM('mood','Triste')"><i class="ph-cloud-rain ph-fill"></i><span>Triste</span></button>
+      <button class="cpill" id="cm-Motivé" onclick="setCM('mood','Motivé')"><i class="ph-rocket ph-fill"></i><span>Motivé</span></button>
+      <button class="cpill" id="cm-Excité" onclick="setCM('mood','Excité')"><i class="ph-lightning ph-fill"></i><span>Excité</span></button>
+      <button class="cpill" id="cm-Nostalgique" onclick="setCM('mood','Nostalgique')"><i class="ph-clock-counter-clockwise ph-fill"></i><span>Nostalgique</span></button>
+      <button class="cpill" id="cm-Focus" onclick="setCM('mood','Focus')"><i class="ph-target ph-fill"></i><span>Focus</span></button>
+      <button class="cpill" id="cm-Anxieux" onclick="setCM('mood','Anxieux')"><i class="ph-heartbeat ph-fill"></i><span>Anxieux</span></button>
     </div>
 
-    <div style="font-size:.75rem;color:var(--muted);margin:.875rem 0 .625rem">Niveau d'énergie ?</div>
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:.625rem">Niveau d'énergie ?</div>
     <div style="display:flex;gap:.5rem;margin-bottom:.875rem">
-      <button class="pill" data-cg="energy" data-val="Faible" style="flex:1"><i class="ph-battery-low ph-fill"></i><span>Faible</span></button>
-      <button class="pill" data-cg="energy" data-val="Moyen" style="flex:1"><i class="ph-battery-medium ph-fill"></i><span>Moyen</span></button>
-      <button class="pill" data-cg="energy" data-val="Élevé" style="flex:1"><i class="ph-battery-full ph-fill"></i><span>Élevé</span></button>
+      <button class="cpill" id="ce-Faible" onclick="setCM('energy','Faible')" style="flex:1"><i class="ph-battery-low ph-fill"></i><span>Faible</span></button>
+      <button class="cpill" id="ce-Moyen" onclick="setCM('energy','Moyen')" style="flex:1"><i class="ph-battery-medium ph-fill"></i><span>Moyen</span></button>
+      <button class="cpill" id="ce-Élevé" onclick="setCM('energy','Élevé')" style="flex:1"><i class="ph-battery-full ph-fill"></i><span>Élevé</span></button>
     </div>
 
-    <div style="font-size:.75rem;color:var(--muted);margin:.875rem 0 .625rem">Contexte d'écoute ?</div>
-    <div class="pills" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.25rem">
-      <div class="pill" data-cg="context" data-val="Détente"><i class="ph-couch ph-fill"></i><span>Détente</span></div>
-      <div class="pill" data-cg="context" data-val="Sport"><i class="ph-barbell ph-fill"></i><span>Sport</span></div>
-      <div class="pill" data-cg="context" data-val="Travail"><i class="ph-laptop ph-fill"></i><span>Travail</span></div>
-      <div class="pill" data-cg="context" data-val="Fête"><i class="ph-confetti ph-fill"></i><span>Fête</span></div>
-      <div class="pill" data-cg="context" data-val="Trajet"><i class="ph-train ph-fill"></i><span>Trajet</span></div>
-      <div class="pill" data-cg="context" data-val="Autre"><i class="ph-music-note ph-fill"></i><span>Autre</span></div>
+    <div style="font-size:.75rem;color:var(--muted);margin-bottom:.625rem">Contexte d'écoute ?</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.25rem">
+      <button class="cpill" id="cc-Détente" onclick="setCM('context','Détente')"><i class="ph-couch ph-fill"></i><span>Détente</span></button>
+      <button class="cpill" id="cc-Sport" onclick="setCM('context','Sport')"><i class="ph-barbell ph-fill"></i><span>Sport</span></button>
+      <button class="cpill" id="cc-Travail" onclick="setCM('context','Travail')"><i class="ph-laptop ph-fill"></i><span>Travail</span></button>
+      <button class="cpill" id="cc-Fête" onclick="setCM('context','Fête')"><i class="ph-confetti ph-fill"></i><span>Fête</span></button>
+      <button class="cpill" id="cc-Trajet" onclick="setCM('context','Trajet')"><i class="ph-train ph-fill"></i><span>Trajet</span></button>
+      <button class="cpill" id="cc-Autre" onclick="setCM('context','Autre')"><i class="ph-music-note ph-fill"></i><span>Autre</span></button>
     </div>
 
     <button class="btn-primary" id="collab-submit-btn" onclick="submitCollabMood()" disabled><i class="ph-paper-plane-tilt ph-fill"></i> Valider mon mood</button>
@@ -4261,6 +4269,27 @@ async function loadPseudo(){
       .select('pseudo').eq('user_id', currentUser.id).single();
     if(data?.pseudo) currentPseudo = data.pseudo;
   }catch(e){}
+}
+
+
+
+/* ══ COLLAB MOOD SELECTION ══ */
+function setCM(group, val){
+  // Désélectionner les boutons du même groupe
+  const prefixes = {mood:'cm-', energy:'ce-', context:'cc-'};
+  const prefix = prefixes[group];
+  if(!prefix) return;
+  document.querySelectorAll(`[id^="${prefix}"]`).forEach(b => b.classList.remove('active'));
+  // Sélectionner le bouton cliqué
+  const btn = document.getElementById(prefix + val);
+  if(btn) btn.classList.add('active');
+  // Mettre à jour les variables
+  if(group === 'mood') collabMyMood = val;
+  if(group === 'energy') collabMyEnergy = val;
+  if(group === 'context') collabMyContext = val;
+  // Activer le bouton valider
+  const submit = document.getElementById('collab-submit-btn');
+  if(submit) submit.disabled = !(collabMyMood && collabMyEnergy && collabMyContext);
 }
 
 
